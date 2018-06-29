@@ -34,6 +34,9 @@ DECLARE_GLOBAL_DATA_PTR;
 #define DP83867_SW_RESET	BIT(15)
 #define DP83867_SW_RESTART	BIT(14)
 
+/* PHYCTRL bits */
+#define MII_DP83867_PHYCTRL_FORCE_LINK_GOOD BIT(10)
+
 /* MICR Interrupt bits */
 #define MII_DP83867_MICR_AN_ERR_INT_EN		BIT(15)
 #define MII_DP83867_MICR_SPEED_CHNG_INT_EN	BIT(14)
@@ -406,6 +409,13 @@ static int dp83867_config(struct phy_device *phydev)
 
 	if (dp83867->port_mirroring != DP83867_PORT_MIRRORING_KEEP)
 		dp83867_config_port_mirroring(phydev);
+
+	/* Disable FORCE_LINK_GOOD */
+	val = phy_read(phydev, phydev->addr, MII_DP83867_PHYCTRL);
+	if (val & MII_DP83867_PHYCTRL_FORCE_LINK_GOOD) {
+		val &= ~(MII_DP83867_PHYCTRL_FORCE_LINK_GOOD);
+		phy_write(phydev, MDIO_DEVAD_NONE, MII_DP83867_PHYCTRL, val);
+	}
 
 	genphy_config_aneg(phydev);
 	return 0;
