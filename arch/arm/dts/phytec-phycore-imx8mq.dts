@@ -19,6 +19,7 @@
 /memreserve/ 0x40000000 0x00020000;
 
 #include "fsl-imx8mq.dtsi"
+#include <dt-bindings/net/ti-dp83867.h>
 
 / {
 	model = "Phytec phyCORE-i.MX8MQ";
@@ -45,6 +46,26 @@
 
 &iomuxc {
 	imx8mq-pcl066 {
+		pinctrl_fec1: fec1grp {
+			fsl,pins = <
+				MX8MQ_IOMUXC_ENET_MDC_ENET1_MDC				0x3
+				MX8MQ_IOMUXC_ENET_MDIO_ENET1_MDIO			0x23
+				MX8MQ_IOMUXC_ENET_TD3_ENET1_RGMII_TD3		0x1f
+				MX8MQ_IOMUXC_ENET_TD2_ENET1_RGMII_TD2		0x1f
+				MX8MQ_IOMUXC_ENET_TD1_ENET1_RGMII_TD1		0x1f
+				MX8MQ_IOMUXC_ENET_TD0_ENET1_RGMII_TD0		0x1f
+				MX8MQ_IOMUXC_ENET_RD3_ENET1_RGMII_RD3		0x91
+				MX8MQ_IOMUXC_ENET_RD2_ENET1_RGMII_RD2		0x91
+				MX8MQ_IOMUXC_ENET_RD1_ENET1_RGMII_RD1		0x91
+				MX8MQ_IOMUXC_ENET_RD0_ENET1_RGMII_RD0		0x91
+				MX8MQ_IOMUXC_ENET_TXC_ENET1_RGMII_TXC		0x1f
+				MX8MQ_IOMUXC_ENET_RXC_ENET1_RGMII_RXC		0x91
+				MX8MQ_IOMUXC_ENET_RX_CTL_ENET1_RGMII_RX_CTL	0x91
+				MX8MQ_IOMUXC_ENET_TX_CTL_ENET1_RGMII_TX_CTL	0x1f
+				MX8MQ_IOMUXC_GPIO1_IO09_GPIO1_IO9			0x19
+			>;
+		};
+
 		pinctrl_i2c1: i2c1grp {
 			fsl,pins = <
 				MX8MQ_IOMUXC_I2C1_SCL_I2C1_SCL			0x4000007f
@@ -126,6 +147,35 @@
 				MX8MQ_IOMUXC_SD2_DATA3_USDHC2_DATA3		0xc3
 				MX8MQ_IOMUXC_GPIO1_IO04_USDHC2_VSELECT		0xc1
 			>;
+		};
+	};
+};
+
+&fec1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_fec1>;
+	phy-mode = "rgmii";
+	phy-handle = <&ethphy0>;
+	fsl,magic-packet;
+	fsl,rgmii_txc_dly;
+	fsl,rgmii_rxc_dly;
+	status = "okay";
+	fsl,mii-exclusive;
+
+	mdio {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		ethphy0: ethernet-phy@0 {
+			compatible = "ethernet-phy-ieee802.3-c22";
+			reg = <1>;
+			interrupt-parent = <&gpio2>;
+			interrupts = <20 IRQ_TYPE_EDGE_FALLING>;
+			ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
+			ti,tx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
+			ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
+			ti,clk-output-sel = <DP83867_CLK_O_SEL_CHN_A_TCLK>;
+			enet-phy-lane-no-swap;
 		};
 	};
 };
