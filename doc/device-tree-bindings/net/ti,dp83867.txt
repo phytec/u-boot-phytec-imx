@@ -9,6 +9,10 @@ Required properties:
 	- ti,fifo-depth - Transmitt FIFO depth- see dt-bindings/net/ti-dp83867.h
 		for applicable values
 
+Optional property:
+        - ti,clk-output-sel - Muxing option for CLK_OUT pin - see dt-bindings/net/ti-dp83867.h
+                for applicable values.
+
 Default child nodes are standard Ethernet PHY device
 nodes as described in doc/devicetree/bindings/net/ethernet.txt
 
