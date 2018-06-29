@@ -65,8 +65,47 @@ int ft_board_setup(void *blob, bd_t *bd)
 }
 #endif
 
+#ifdef CONFIG_FEC_MXC
+#define FEC_RST_PAD IMX_GPIO_NR(1, 9)
+static iomux_v3_cfg_t const fec1_rst_pads[] = {
+	IMX8MQ_PAD_GPIO1_IO09__GPIO1_IO9 | MUX_PAD_CTRL(NO_PAD_CTRL),
+};
+
+static void setup_iomux_fec(void)
+{
+	imx_iomux_v3_setup_multiple_pads(fec1_rst_pads,
+					 ARRAY_SIZE(fec1_rst_pads));
+
+	gpio_request(IMX_GPIO_NR(1, 9), "fec1_rst");
+	gpio_direction_output(IMX_GPIO_NR(1, 9), 0);
+	udelay(500);
+	gpio_direction_output(IMX_GPIO_NR(1, 9), 1);
+}
+
+static int setup_fec(void)
+{
+	setup_iomux_fec();
+
+	/* Use 125M anatop REF_CLK1 for ENET1, not from external */
+	clrsetbits_le32(IOMUXC_GPR1,
+			BIT(13) | BIT(17), 0);
+	return set_clk_enet(ENET_125MHz);
+}
+
+
+int board_phy_config(struct phy_device *phydev)
+{
+	if (phydev->drv->config)
+		phydev->drv->config(phydev);
+	return 0;
+}
+#endif
+
 int board_init(void)
 {
+#ifdef CONFIG_FEC_MXC
+	setup_fec();
+#endif
 	return 0;
 }
 

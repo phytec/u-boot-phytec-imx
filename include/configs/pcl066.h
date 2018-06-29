@@ -78,6 +78,37 @@
 #undef CONFIG_CMD_CRC32
 #undef CONFIG_BOOTM_NETBSD
 
+/* ENET Config */
+/* ENET1 */
+#if defined(CONFIG_CMD_NET)
+#define CONFIG_CMD_PING
+#define CONFIG_CMD_DHCP
+#define CONFIG_CMD_MII
+#define CONFIG_MII
+#define CONFIG_ETHPRIME                 "FEC"	/* "eth0"	*/
+
+#define CONFIG_FEC_MXC
+#define CONFIG_FEC_XCV_TYPE             RGMII
+#define CONFIG_FEC_MXC_PHYADDR          1
+#define FEC_QUIRK_ENET_MAC
+
+#define CONFIG_PHY_GIGE			/* Support for 1000BASE-X */
+#define IMX_FEC_BASE			0x30BE0000
+
+#ifndef CONFIG_DM_ETH
+#define CONFIG_DM_ETH
+#endif
+
+#ifndef CONFIG_PHYLIB
+#define CONFIG_PHYLIB
+#endif
+
+#ifndef CONFIG_PHY_TI
+#define CONFIG_PHY_TI
+#endif
+
+#endif
+
 #define CONFIG_MFG_ENV_SETTINGS \
 	"mfgtool_args=setenv bootargs console=${console},${baudrate} " \
 		"rdinit=/linuxrc " \
