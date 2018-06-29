@@ -1241,6 +1241,7 @@ static int fec_phy_init(struct fec_priv *priv, struct udevice *dev)
 {
 	struct phy_device *phydev;
 	int mask = 0xffffffff;
+	struct fec_eth_pdata *fec_pdata = dev_get_platdata(dev);
 
 #ifdef CONFIG_PHYLIB
 	mask = 1 << CONFIG_FEC_MXC_PHYADDR;
@@ -1251,6 +1252,11 @@ static int fec_phy_init(struct fec_priv *priv, struct udevice *dev)
 		return -ENODEV;
 
 	phy_connect_dev(phydev, dev);
+
+#ifdef CONFIG_DM_ETH
+	if (fec_pdata->phy_of_handle)
+		dev_set_of_offset(phydev->dev, fec_pdata->phy_of_handle);
+#endif
 
 	priv->phydev = phydev;
 	phy_config(phydev);
@@ -1335,9 +1341,11 @@ static int fecmxc_remove(struct udevice *dev)
 
 static int fecmxc_ofdata_to_platdata(struct udevice *dev)
 {
-	struct eth_pdata *pdata = dev_get_platdata(dev);
+	struct fec_eth_pdata *fec_pdata = dev_get_platdata(dev);
+	struct eth_pdata *pdata = &fec_pdata->eth_pdata;
 	struct fec_priv *priv = dev_get_priv(dev);
 	const char *phy_mode;
+	int node = dev_of_offset(dev);
 
 	pdata->iobase = (phys_addr_t)devfdt_get_addr(dev);
 	priv->eth = (struct ethernet_regs *)pdata->iobase;
@@ -1351,6 +1359,9 @@ static int fecmxc_ofdata_to_platdata(struct udevice *dev)
 		debug("%s: Invalid PHY interface '%s'\n", __func__, phy_mode);
 		return -EINVAL;
 	}
+
+	fec_pdata->phy_of_handle = fdtdec_lookup_phandle(gd->fdt_blob, node,
+							 "phy-handle");
 
 	/* TODO
 	 * Need to get the reset-gpio and related properties from DT
