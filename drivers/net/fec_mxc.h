@@ -224,6 +224,11 @@ struct fec_bd {
 	uint32_t data_pointer;		/* payload's buffer address */
 };
 
+struct fec_eth_pdata {
+	struct eth_pdata eth_pdata;
+	int phy_of_handle;
+};
+
 /* Supported phy types on this platform */
 enum xceiver_type {
 	SEVENWIRE,	/* 7-wire       */
