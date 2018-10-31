@@ -38,6 +38,12 @@ DECLARE_GLOBAL_DATA_PTR;
 #define ESDHC_CLK_PAD_CTRL	((SC_PAD_CONFIG_OUT_IN << PADRING_CONFIG_SHIFT) | (SC_PAD_ISO_OFF << PADRING_LPCONFIG_SHIFT) \
 						| (SC_PAD_28FDSOI_DSE_DV_HIGH << PADRING_DSE_SHIFT) | (SC_PAD_28FDSOI_PS_PU << PADRING_PULL_SHIFT))
 
+#define ENET_INPUT_PAD_CTRL	((SC_PAD_CONFIG_OD_IN << PADRING_CONFIG_SHIFT) | (SC_PAD_ISO_OFF << PADRING_LPCONFIG_SHIFT) \
+						| (SC_PAD_28FDSOI_DSE_18V_10MA << PADRING_DSE_SHIFT) | (SC_PAD_28FDSOI_PS_PU << PADRING_PULL_SHIFT))
+
+#define ENET_NORMAL_PAD_CTRL	((SC_PAD_CONFIG_NORMAL << PADRING_CONFIG_SHIFT) | (SC_PAD_ISO_OFF << PADRING_LPCONFIG_SHIFT) \
+						| (SC_PAD_28FDSOI_DSE_18V_10MA << PADRING_DSE_SHIFT) | (SC_PAD_28FDSOI_PS_PU << PADRING_PULL_SHIFT))
+
 #define UART_PAD_CTRL	((SC_PAD_CONFIG_OUT_IN << PADRING_CONFIG_SHIFT) | (SC_PAD_ISO_OFF << PADRING_LPCONFIG_SHIFT) \
 						| (SC_PAD_28FDSOI_DSE_DV_LOW << PADRING_DSE_SHIFT) | (SC_PAD_28FDSOI_PS_PD << PADRING_PULL_SHIFT))
 
@@ -174,6 +180,112 @@ int board_mmc_getcd(struct mmc *mmc)
 
 	return ret;
 }
+
+#ifdef CONFIG_FEC_MXC
+#include <miiphy.h>
+
+static iomux_cfg_t pad_enet0[] = {
+	SC_P_ENET0_RGMII_RX_CTL | MUX_PAD_CTRL(ENET_INPUT_PAD_CTRL),
+	SC_P_ENET0_RGMII_RXD0 | MUX_PAD_CTRL(ENET_INPUT_PAD_CTRL),
+	SC_P_ENET0_RGMII_RXD1 | MUX_PAD_CTRL(ENET_INPUT_PAD_CTRL),
+	SC_P_ENET0_RGMII_RXD2 | MUX_PAD_CTRL(ENET_INPUT_PAD_CTRL),
+	SC_P_ENET0_RGMII_RXD3 | MUX_PAD_CTRL(ENET_INPUT_PAD_CTRL),
+	SC_P_ENET0_RGMII_RXC | MUX_PAD_CTRL(ENET_INPUT_PAD_CTRL),
+	SC_P_ENET0_RGMII_TX_CTL | MUX_PAD_CTRL(ENET_NORMAL_PAD_CTRL),
+	SC_P_ENET0_RGMII_TXD0 | MUX_PAD_CTRL(ENET_NORMAL_PAD_CTRL),
+	SC_P_ENET0_RGMII_TXD1 | MUX_PAD_CTRL(ENET_NORMAL_PAD_CTRL),
+	SC_P_ENET0_RGMII_TXD2 | MUX_PAD_CTRL(ENET_NORMAL_PAD_CTRL),
+	SC_P_ENET0_RGMII_TXD3 | MUX_PAD_CTRL(ENET_NORMAL_PAD_CTRL),
+	SC_P_ENET0_RGMII_TXC | MUX_PAD_CTRL(ENET_NORMAL_PAD_CTRL),
+
+	/* Shared MDIO */
+	SC_P_ENET0_MDC | MUX_PAD_CTRL(ENET_NORMAL_PAD_CTRL),
+	SC_P_ENET0_MDIO | MUX_PAD_CTRL(ENET_NORMAL_PAD_CTRL),
+};
+
+static void setup_iomux_fec(void)
+{
+	if (0 == CONFIG_FEC_ENET_DEV)
+		imx8_iomux_setup_multiple_pads(pad_enet0, ARRAY_SIZE(pad_enet0));
+}
+
+static void enet_device_phy_reset(void)
+{
+	struct gpio_desc desc_enet0;
+	struct gpio_desc desc_enet1;
+	int ret;
+
+	ret = dm_gpio_lookup_name("gpio@18_1", &desc_enet0);
+	if (ret)
+		return;
+
+	ret = dm_gpio_request(&desc_enet0, "enet0_reset");
+	if (ret)
+		return;
+
+	ret = dm_gpio_lookup_name("gpio@18_4", &desc_enet1);
+	if (ret)
+		return;
+
+	ret = dm_gpio_request(&desc_enet1, "enet1_reset");
+	if (ret)
+		return;
+
+	dm_gpio_set_dir_flags(&desc_enet0, GPIOD_IS_OUT);
+	dm_gpio_set_value(&desc_enet0, 0);
+	udelay(50);
+	dm_gpio_set_value(&desc_enet0, 1);
+
+	dm_gpio_set_dir_flags(&desc_enet1, GPIOD_IS_OUT);
+	dm_gpio_set_value(&desc_enet1, 0);
+	udelay(50);
+	dm_gpio_set_value(&desc_enet1, 1);
+	/* The board has a long delay for this reset to become stable */
+	mdelay(200);
+}
+
+int board_eth_init(bd_t *bis)
+{
+	int ret;
+	struct power_domain pd;
+
+	printf("[%s] %d\n", __func__, __LINE__);
+
+	if (CONFIG_FEC_ENET_DEV) {
+		if (!power_domain_lookup_name("conn_enet1", &pd))
+			power_domain_on(&pd);
+	} else {
+		if (!power_domain_lookup_name("conn_enet0", &pd))
+			power_domain_on(&pd);
+	}
+
+	setup_iomux_fec();
+
+	ret = fecmxc_initialize_multi(bis, CONFIG_FEC_ENET_DEV,
+		   CONFIG_FEC_MXC_PHYADDR, IMX_FEC_BASE);
+	if (ret)
+		printf("FEC1 MXC: %s:failed\n", __func__);
+
+	return ret;
+}
+
+int board_phy_config(struct phy_device *phydev)
+{
+	if (phydev->drv->config)
+		phydev->drv->config(phydev);
+
+	return 0;
+}
+
+static int setup_fec(int ind)
+{
+	/* Reset ENET PHY */
+	enet_device_phy_reset();
+
+	return 0;
+}
+
+#endif
 
 /*
  * Board specific reset that is system reset.

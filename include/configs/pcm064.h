@@ -43,6 +43,28 @@
 #define CONFIG_MXC_GPIO
 
 /* ENET Config */
+#define CONFIG_DM_ETH
+#define CONFIG_MII
+
+#define CONFIG_FEC_MXC
+#define CONFIG_FEC_XCV_TYPE             RGMII
+#define FEC_QUIRK_ENET_MAC
+
+#define CONFIG_PHY_GIGE /* Support for 1000BASE-X */
+#define CONFIG_PHYLIB
+#define CONFIG_PHY_TI
+
+/* ENET0 connects TI DP83867 on CPU board */
+#define CONFIG_FEC_ENET_DEV 0
+
+#if (CONFIG_FEC_ENET_DEV == 0)
+#define IMX_FEC_BASE                    0x5B040000
+#define CONFIG_FEC_MXC_PHYADDR          0x1
+#define CONFIG_ETHPRIME                 "eth0"
+#endif
+
+/* ENET0 MDIO are shared */
+#define CONFIG_FEC_MXC_MDIO_BASE        0x5B040000
 
 /* Boot M4 */
 #define M4_BOOT_ENV \
