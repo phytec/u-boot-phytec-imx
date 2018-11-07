@@ -26,8 +26,8 @@
 	compatible = "phytec,imx8mq-pcl066", "fsl,imx8mq";
 
 	chosen {
-		bootargs = "console=ttymxc1,115200 earlycon=ec_imx6q,0x30860000,115200";
-		stdout-path = &uart2;
+		bootargs = "console=ttymxc0,115200 earlycon=ec_imx6q,0x30860000,115200";
+		stdout-path = &uart1;
 	};
 
 	regulators {
@@ -73,10 +73,10 @@
 			>;
 		};
 
-		pinctrl_uart2: uart2grp {
+		pinctrl_uart1: uart1grp {
 			fsl,pins = <
-				MX8MQ_IOMUXC_UART2_RXD_UART2_DCE_RX		0x79
-				MX8MQ_IOMUXC_UART2_TXD_UART2_DCE_TX		0x79
+				MX8MQ_IOMUXC_UART1_RXD_UART1_DCE_RX		0x79
+				MX8MQ_IOMUXC_UART1_TXD_UART1_DCE_TX		0x79
 			>;
 		};
 
@@ -273,14 +273,14 @@
 	};
 };
 
-&uart2 { /* console */
+
+&uart1 { /*console */
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_uart2>;
-	assigned-clocks = <&clk IMX8MQ_CLK_UART2_SRC>;
+	pinctrl-0 = <&pinctrl_uart1>;
+	assigned-clocks = <&clk IMX8MQ_CLK_UART1_SRC>;
 	assigned-clock-parents = <&clk IMX8MQ_CLK_25M>;
 	status = "okay";
 };
-
 
 &usdhc1 {
 	pinctrl-names = "default", "state_100mhz", "state_200mhz";
