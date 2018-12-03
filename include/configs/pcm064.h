@@ -185,8 +185,8 @@
 #define CONFIG_SYS_MMC_ENV_PART		0	/* user area */
 #endif
 
-#define CONFIG_SYS_MMC_ENV_DEV		1   /* USDHC2 */
-#define CONFIG_MMCROOT			"/dev/mmcblk2p2"  /* USDHC2 */
+#define CONFIG_SYS_MMC_ENV_DEV		0   /* USDHC0 */
+#define CONFIG_MMCROOT			"/dev/mmcblk0p2"  /* USDHC0 */
 #define CONFIG_SYS_FSL_USDHC_NUM	2
 
 /* Size of malloc() pool */
