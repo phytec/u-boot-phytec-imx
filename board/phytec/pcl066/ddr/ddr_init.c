@@ -35,7 +35,7 @@ void ddr_init(void)
 	int ddr_size = 0;
 	ddr_size = get_imx8mq_ddr_size();
 
-	if (ddr_size == PHYBOARD_POLARIS_1GB) {
+	if (ddr_size != PHYBOARD_POLARIS_2GB) {
 		/** Initialize DDR clock and DDRC registers **/
 		reg32_write(0x3038a088,0x7070000);
 		reg32_write(0x3038a084,0x4030000);
