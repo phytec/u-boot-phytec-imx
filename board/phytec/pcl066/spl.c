@@ -24,7 +24,7 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-#define EEPROM_I2C_ADDR		0x5a
+#define EEPROM_I2C_ADDR		0x58
 
 int get_imx8mq_ddr_size(void);
 
