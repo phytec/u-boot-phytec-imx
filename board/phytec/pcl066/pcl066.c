@@ -22,6 +22,7 @@
 #include <spl.h>
 #include <power/pmic.h>
 #include <power/pfuze100_pmic.h>
+#include <asm/mach-imx/boot_mode.h>
 #include "som.h"
 
 DECLARE_GLOBAL_DATA_PTR;
@@ -103,6 +104,21 @@ int board_phy_config(struct phy_device *phydev)
 }
 #endif
 
+void pcl066_set_bootsource(void)
+{
+	if (get_boot_device() == MMC1_BOOT) {
+		env_set("mmcdev", "0");
+		env_set("mmcroot", "/dev/mmcblk0p2 rootwait rw");
+		env_set("boot_source", "emmc");
+	} else if (get_boot_device() == SD2_BOOT) {
+		env_set("mmcdev", "1");
+		env_set("mmcroot", "/dev/mmcblk1p2 rootwait rw");
+		env_set("boot_source", "sd");
+	} else {
+		pr_err("No available bootsource selected!\n");
+	}
+}
+
 int board_init(void)
 {
 #ifdef CONFIG_FEC_MXC
@@ -114,6 +130,7 @@ int board_init(void)
 int board_late_init(void)
 {
 #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
+	pcl066_set_bootsource();
 	env_set("board_name", "phyCORE-i.MX8MQ");
 	env_set("board_rev", "iMX8MQ");
 #endif
