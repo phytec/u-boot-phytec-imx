@@ -53,9 +53,9 @@ int dram_init(void)
 {
 	/* rom_pointer[1] contains the size of TEE occupies */
 	if (rom_pointer[1])
-		gd->ram_size = PHYS_SDRAM_SIZE - rom_pointer[1];
+		gd->ram_size = imx8mq_ddrc_sdram_size() - rom_pointer[1];
 	else
-		gd->ram_size = PHYS_SDRAM_SIZE;
+		gd->ram_size = imx8mq_ddrc_sdram_size();
 
 	return 0;
 }
