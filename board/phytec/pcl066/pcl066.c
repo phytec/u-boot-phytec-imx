@@ -106,14 +106,20 @@ int board_phy_config(struct phy_device *phydev)
 
 void pcl066_set_bootsource(void)
 {
+	char cmd[32];
+
 	if (get_boot_device() == MMC1_BOOT) {
 		env_set("mmcdev", "0");
 		env_set("mmcroot", "/dev/mmcblk0p2 rootwait rw");
 		env_set("boot_source", "emmc");
+		sprintf(cmd, "mmc dev %d", 0);
+		run_command(cmd, 0);
 	} else if (get_boot_device() == SD2_BOOT) {
 		env_set("mmcdev", "1");
 		env_set("mmcroot", "/dev/mmcblk1p2 rootwait rw");
 		env_set("boot_source", "sd");
+		sprintf(cmd, "mmc dev %d", 1);
+		run_command(cmd, 0);
 	} else {
 		pr_err("No available bootsource selected!\n");
 	}
@@ -125,6 +131,11 @@ int board_init(void)
 	setup_fec();
 #endif
 	return 0;
+}
+
+int board_mmc_get_env_dev(int devno)
+{
+	return devno;
 }
 
 int board_late_init(void)
