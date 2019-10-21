@@ -111,7 +111,7 @@
 	"ipaddr=192.168.3.11\0" \
 	"netmask=255.255.255.0\0" \
 	"serverip=192.168.3.10\0" \
-	"fdt_file=Image-phytec-imx8qm-phycore-rdk.dtb\0" \
+	"fdt_file=oftree\0" \
 	"mmcdev="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0" \
 	"mmcpart=" __stringify(CONFIG_SYS_MMC_IMG_LOAD_PART) "\0" \
 	"mmcroot=" CONFIG_MMCROOT " rootwait rw\0" \
