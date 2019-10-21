@@ -133,7 +133,7 @@
 	"fdt_addr=0x43000000\0"			\
 	"fdt_high=0xffffffffffffffff\0"		\
 	"boot_fdt=try\0" \
-	"fdt_file=Image-phytec-imx8mq-phyboard-polaris-rdk-emmc.dtb\0" \
+	"fdt_file=oftree\0" \
 	"initrd_addr=0x43800000\0"		\
 	"initrd_high=0xffffffffffffffff\0" \
 	"ipaddr=192.168.3.11\0" \
