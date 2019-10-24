@@ -321,15 +321,13 @@ static int dp83867_config(struct phy_device *phydev)
 
 	if (phy_interface_is_rgmii(phydev)) {
 		val = phy_read(phydev, MDIO_DEVAD_NONE, MII_DP83867_PHYCTRL);
-		if (val < 0)
-			return val;
+		if (val < 0) {
+			ret = val;
+			goto err_out;
+		}
 		val &= ~DP83867_PHYCR_FIFO_DEPTH_MASK;
 		val |= (dp83867->fifo_depth << DP83867_PHYCR_FIFO_DEPTH_SHIFT);
-		ret = phy_write(phydev, MDIO_DEVAD_NONE, MII_DP83867_PHYCTRL,
-				val);
-
-		if (ret)
-			goto err_out;
+		val |= (DP83867_MDI_CROSSOVER_AUTO << DP83867_MDI_CROSSOVER);
 
 		/* The code below checks if "port mirroring" N/A MODE4 has been
 		 * enabled during power on bootstrap.
@@ -340,15 +338,15 @@ static int dp83867_config(struct phy_device *phydev)
 		 * In this particular case one needs to check STRAP_STS1
 		 * register's bit 11 (marked as RESERVED).
 		 */
-
 		bs = phy_read_mmd_indirect(phydev, DP83867_STRAP_STS1,
 					   DP83867_DEVADDR, phydev->addr);
-		val = phy_read(phydev, MDIO_DEVAD_NONE, MII_DP83867_PHYCTRL);
-		if (bs & DP83867_STRAP_STS1_RESERVED) {
+		if (bs & DP83867_STRAP_STS1_RESERVED)
 			val &= ~DP83867_PHYCR_RESERVED_MASK;
-			phy_write(phydev, MDIO_DEVAD_NONE, MII_DP83867_PHYCTRL,
+
+		ret = phy_write(phydev, MDIO_DEVAD_NONE, MII_DP83867_PHYCTRL,
 				  val);
-		}
+		if (ret)
+			goto err_out;
 
 	} else if (phy_interface_is_sgmii(phydev)) {
 		phy_write(phydev, MDIO_DEVAD_NONE, MII_BMCR,
