@@ -10,7 +10,6 @@
 #include <errno.h>
 #include <asm/io.h>
 #include <asm/mach-imx/iomux-v3.h>
-#include <asm/arch/ddr.h>
 #include <asm/arch/imx8mq_pins.h>
 #include <asm/arch/sys_proto.h>
 #include <power/pmic.h>
@@ -20,18 +19,24 @@
 #include <asm/mach-imx/mxc_i2c.h>
 #include <fsl_esdhc.h>
 #include <mmc.h>
-#include "ddr/ddr.h"
+#include <asm/arch/ddr.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
 #define EEPROM_I2C_ADDR		0x5a
 
 int get_imx8mq_ddr_size(void);
+extern struct dram_timing_info dram_timing_2gb;
 
 void spl_dram_init(void)
 {
-	/* ddr init */
-	ddr_init();
+	int ddr_size = 0;
+
+	ddr_size = get_imx8mq_ddr_size();
+	if (ddr_size == PHYBOARD_POLARIS_2GB)
+		ddr_init(&dram_timing_2gb);
+	else
+		ddr_init(&dram_timing);
 }
 
 #define I2C_PAD_CTRL	(PAD_CTL_DSE6 | PAD_CTL_HYS | PAD_CTL_PUE)

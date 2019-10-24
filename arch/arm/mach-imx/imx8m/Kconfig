@@ -60,7 +60,7 @@ config TARGET_IMX8MM_DDR4_EVK
 config TARGET_IMX8MQ_PCL066
 	bool "imx8mq_pcl066"
 	select IMX8MQ
-	select SUPPORT_SPL
+	select IMX8M_LPDDR4
 endchoice
 
 source "board/freescale/imx8mq_evk/Kconfig"
