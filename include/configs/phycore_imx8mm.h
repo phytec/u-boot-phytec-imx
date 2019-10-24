@@ -206,8 +206,8 @@
 #define CONFIG_ENV_SPI_MAX_HZ		CONFIG_SF_DEFAULT_SPEED
 #endif
 #define CONFIG_ENV_SIZE			0x1000
-#define CONFIG_SYS_MMC_ENV_DEV		1   /* USDHC2 */
-#define CONFIG_MMCROOT			"/dev/mmcblk1p2"  /* USDHC2 */
+#define CONFIG_SYS_MMC_ENV_DEV		2   /* USDHC3 */
+#define CONFIG_MMCROOT			"/dev/mmcblk2p2"  /* USDHC3 */
 
 /* Size of malloc() pool */
 #define CONFIG_SYS_MALLOC_LEN		((CONFIG_ENV_SIZE + (2*1024) + (16*1024)) * 1024)
