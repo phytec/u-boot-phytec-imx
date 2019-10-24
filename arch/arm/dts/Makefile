@@ -629,7 +629,8 @@ dtb-$(CONFIG_ARCH_IMX8M) += fsl-imx8mq-evk.dtb \
 		fsl-imx8mm-evk.dtb \
 		fsl-imx8mm-ddr3l-val.dtb \
 		fsl-imx8mm-ddr4-evk.dtb \
-		fsl-imx8mm-ddr4-val.dtb
+		fsl-imx8mm-ddr4-val.dtb \
+		phytec-phycore-imx8mq.dtb
 
 dtb-$(CONFIG_RCAR_GEN2) += \
 	r8a7790-lager-u-boot.dtb \
