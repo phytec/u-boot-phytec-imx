@@ -249,9 +249,10 @@ struct fec_priv {
 #ifdef CONFIG_PHYLIB
 	struct phy_device *phydev;
 #else
-	int phy_id;
 	int (*mii_postcall)(int);
 #endif
+	int phy_id;
+	ofnode phy_of_node;
 #ifdef CONFIG_DM_REGULATOR
 	struct udevice *phy_supply;
 #endif
