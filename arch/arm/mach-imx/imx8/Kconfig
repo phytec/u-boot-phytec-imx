@@ -79,6 +79,11 @@ config TARGET_IMX8QM_DDR4_ARM2
 	select BOARD_LATE_INIT
 	select IMX8QM
 
+config TARGET_IMX8QM_PCM064
+        bool "PHYTEC PCM-064 i.MX8QM"
+        select BOARD_LATE_INIT
+        select IMX8QM
+
 config TARGET_IMX8QXP_LPDDR4_ARM2
 	bool "Support i.MX8QXP lpddr4 validation board"
 	select BOARD_LATE_INIT
@@ -100,5 +105,6 @@ source "board/freescale/imx8qxp_mek/Kconfig"
 source "board/freescale/imx8qm_mek/Kconfig"
 source "board/freescale/imx8qxp_arm2/Kconfig"
 source "board/freescale/imx8qm_arm2/Kconfig"
+source "board/phytec/pcm064/Kconfig"
 
 endif
