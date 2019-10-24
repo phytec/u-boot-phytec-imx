@@ -24,6 +24,9 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+#define EEPROM_I2C_ADDR		0x5a
+
+int get_imx8mq_ddr_size(void);
 
 void spl_dram_init(void)
 {
@@ -45,6 +48,19 @@ struct i2c_pads_info i2c_pad_info1 = {
 		.gp = IMX_GPIO_NR(5, 15),
 	},
 };
+
+int get_imx8mq_ddr_size(void)
+{
+	unsigned char var;
+
+	i2c_set_bus_num(0);
+	if (i2c_read(EEPROM_I2C_ADDR, 0x05, 2, &var, sizeof(var)) != 0)
+		var = 1;
+	else
+		var = var - '0';
+
+	return var;
+}
 
 #define USDHC2_CD_GPIO	IMX_GPIO_NR(2, 12)
 #define USDHC1_PWR_GPIO IMX_GPIO_NR(2, 10)
