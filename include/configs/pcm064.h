@@ -132,6 +132,8 @@
 	"loadcntr=fatload mmc ${mmcdev}:${mmcpart} ${cntr_addr} ${cntr_file}\0" \
 	"auth_os=auth_cntr ${cntr_addr}\0" \
 	"mmcboot=echo Booting from mmc ...; " \
+		"if run loadhdp; then; hdp load ${hdp_addr}; fi;" \
+		"if run loadhdprx; then; hdprx load ${hdprx_addr}; fi;" \
 		"run mmcargs; " \
 		"if test ${sec_boot} = yes; then " \
 			"if run auth_os; then " \
