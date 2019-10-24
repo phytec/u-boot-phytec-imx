@@ -197,6 +197,20 @@
 	scl-gpios = <&gpio5 14 GPIO_ACTIVE_HIGH>;
 	sda-gpios = <&gpio5 15 GPIO_ACTIVE_HIGH>;
 	status = "okay";
+
+	/* M24C32-D */
+	i2c_eeprom: eeprom@51 {
+		compatible = "atmel,24c32";
+		reg = <0x51>;
+		u-boot,i2c-offset-len = <2>;
+	};
+
+	/* M24C32-D Identification page */
+	i2c_eeprom_id: eeprom@59 {
+		compatible = "atmel,24c32";
+		reg = <0x59>;
+		u-boot,i2c-offset-len = <2>;
+	};
 };
 
 &flexspi {
