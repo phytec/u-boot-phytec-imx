@@ -66,6 +66,7 @@ int get_imx8mq_ddr_size(void)
 
 #define USDHC2_CD_GPIO	IMX_GPIO_NR(2, 12)
 #define USDHC1_PWR_GPIO IMX_GPIO_NR(2, 10)
+#define USDHC2_WSELECT_GPIO IMX_GPIO_NR(1, 3)
 
 int board_mmc_getcd(struct mmc *mmc)
 {
@@ -111,6 +112,7 @@ static iomux_v3_cfg_t const usdhc2_pads[] = {
 	IMX8MQ_PAD_SD2_DATA3__USDHC2_DATA3 | MUX_PAD_CTRL(USDHC_PAD_CTRL), /* 0xd6 */
 	IMX8MQ_PAD_SD2_CD_B__GPIO2_IO12 | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
 	IMX8MQ_PAD_SD2_RESET_B__GPIO2_IO19 | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
+	IMX8MQ_PAD_GPIO1_IO03__GPIO1_IO3 | MUX_PAD_CTRL(USDHC_GPIO_PAD_CTRL),
 };
 
 static struct fsl_esdhc_cfg usdhc_cfg[2] = {
@@ -180,6 +182,8 @@ int board_mmc_init(bd_t *bis)
 			usdhc_cfg[1].sdhc_clk = mxc_get_clock(USDHC2_CLK_ROOT);
 			imx_iomux_v3_setup_multiple_pads(
 				usdhc2_pads, ARRAY_SIZE(usdhc2_pads));
+			gpio_request(USDHC2_WSELECT_GPIO, "w_select");
+			gpio_direction_output(USDHC2_WSELECT_GPIO, 0);
 			break;
 		default:
 			printf("Warning: you configured more USDHC controllers"
