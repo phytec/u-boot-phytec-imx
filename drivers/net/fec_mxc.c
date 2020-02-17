@@ -1276,37 +1276,19 @@ static const struct eth_ops fecmxc_ops = {
 	.read_rom_hwaddr	= fecmxc_read_rom_hwaddr,
 };
 
-static int device_get_phy_addr(struct udevice *dev)
-{
-	struct ofnode_phandle_args phandle_args;
-	int reg;
-
-	if (dev_read_phandle_with_args(dev, "phy-handle", NULL, 0, 0,
-				       &phandle_args)) {
-		debug("Failed to find phy-handle");
-		return -ENODEV;
-	}
-
-	reg = ofnode_read_u32_default(phandle_args.node, "reg", 0);
-
-	return reg;
-}
-
 static int fec_phy_init(struct fec_priv *priv, struct udevice *dev)
 {
 	struct phy_device *phydev;
 	int addr;
 
-	addr = device_get_phy_addr(dev);
-#ifdef CONFIG_FEC_MXC_PHYADDR
-	addr = CONFIG_FEC_MXC_PHYADDR;
-#endif
+	addr = priv->phy_id;
 
 	phydev = phy_connect(priv->bus, addr, dev, priv->interface);
 	if (!phydev)
 		return -ENODEV;
 
 	priv->phydev = phydev;
+	priv->phydev->node = priv->phy_of_node;
 	phy_config(phydev);
 
 	return 0;
@@ -1487,14 +1469,28 @@ static int fecmxc_ofdata_to_platdata(struct udevice *dev)
 	int ret = 0;
 	struct eth_pdata *pdata = dev_get_platdata(dev);
 	struct fec_priv *priv = dev_get_priv(dev);
+	struct ofnode_phandle_args phandle_args;
 	const char *phy_mode;
 
-	pdata->iobase = (phys_addr_t)devfdt_get_addr(dev);
+	pdata->iobase = (phys_addr_t)dev_read_addr(dev);
 	priv->eth = (struct ethernet_regs *)pdata->iobase;
 
 	pdata->phy_interface = -1;
-	phy_mode = fdt_getprop(gd->fdt_blob, dev_of_offset(dev), "phy-mode",
-			       NULL);
+
+	if (dev_read_phandle_with_args(dev, "phy-handle", NULL, 0, 0,
+				       &phandle_args)) {
+		debug("Failed to find phy-handle");
+		return -ENODEV;
+	}
+
+	priv->phy_id = ofnode_read_u32_default(phandle_args.node, "reg", -1);
+#ifdef CONFIG_FEC_MXC_PHYADDR
+	priv->phy_id = CONFIG_FEC_MXC_PHYADDR;
+#endif
+	priv->phy_of_node = phandle_args.node;
+
+	phy_mode = dev_read_prop(dev, "phy-mode", NULL);
+
 	if (phy_mode)
 		pdata->phy_interface = phy_get_interface_by_name(phy_mode);
 	if (pdata->phy_interface == -1) {
