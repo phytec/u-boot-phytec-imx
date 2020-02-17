@@ -97,26 +97,15 @@
  * Another approach is add the clocks for inmates into clks_init_on
  * in clk-imx8mm.c, then clk_ingore_unused could be removed.
  */
-#define JAILHOUSE_ENV \
-	"jh_clk= \0 " \
-	"jh_mmcboot=mw 0x303d0518 0xff; setenv fdt_file fsl-imx8mm-evk-root.dtb;" \
-		"setenv jh_clk clk_ignore_unused; " \
-			   "if run loadimage; then " \
-				   "run mmcboot; " \
-			   "else run jh_netboot; fi; \0" \
-	"jh_netboot=mw 0x303d0518 0xff; setenv fdt_file fsl-imx8mm-evk-root.dtb; setenv jh_clk clk_ignore_unused; run netboot; \0 "
-
-
 #define CONFIG_MFG_ENV_SETTINGS \
 	CONFIG_MFG_ENV_SETTINGS_DEFAULT \
 	"initrd_addr=0x43800000\0" \
 	"initrd_high=0xffffffffffffffff\0" \
-	"emmc_dev=2\0"\
+	"emmc_dev=2\0" \
 	"sd_dev=1\0" \
 
-#define CONFIG_EXTRA_ENV_SETTINGS		\
+#define CONFIG_EXTRA_ENV_SETTINGS \
 	CONFIG_MFG_ENV_SETTINGS \
-	JAILHOUSE_ENV \
 	"script=boot.scr\0" \
 	"image=Image\0" \
 	"console=ttymxc2,115200 earlycon=ec_imx6q,0x30880000,115200\0" \
@@ -151,7 +140,7 @@
 		"else " \
 			"echo wait for boot; " \
 		"fi;\0" \
-	"netargs=setenv bootargs ${jh_clk} console=${console} " \
+	"netargs=setenv bootargs console=${console} " \
 		"root=/dev/nfs " \
 		"ip=dhcp nfsroot=${serverip}:${nfsroot},v3,tcp\0" \
 	"netboot=echo Booting from net ...; " \
