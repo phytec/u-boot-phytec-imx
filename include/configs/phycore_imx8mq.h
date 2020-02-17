@@ -90,9 +90,6 @@
 #define CONFIG_MII
 #define CONFIG_ETHPRIME                 "FEC"	/* "eth0"	*/
 
-#define CONFIG_FEC_MXC
-#define CONFIG_FEC_XCV_TYPE             RGMII
-#define CONFIG_FEC_MXC_PHYADDR          1
 #define FEC_QUIRK_ENET_MAC
 
 #define CONFIG_PHY_GIGE			/* Support for 1000BASE-X */
