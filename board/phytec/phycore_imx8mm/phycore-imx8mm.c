@@ -115,21 +115,12 @@ static int check_mmc_autodetect(void)
 
 void board_late_mmc_env_init(void)
 {
-	char cmd[32];
-	char mmcblk[32];
 	u32 dev_no = mmc_get_env_dev();
 
 	if (!check_mmc_autodetect())
 		return;
 
 	env_set_ulong("mmcdev", dev_no);
-
-	/* Set mmcblk env */
-	sprintf(mmcblk, "/dev/mmcblk%dp2 rootwait rw", dev_no);
-	env_set("mmcroot", mmcblk);
-
-	sprintf(cmd, "mmc dev %d", dev_no);
-	run_command(cmd, 0);
 }
 
 int board_late_init(void)
