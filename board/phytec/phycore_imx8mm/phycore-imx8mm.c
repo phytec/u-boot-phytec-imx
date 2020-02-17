@@ -23,6 +23,7 @@
 #include <asm/mach-imx/dma.h>
 #include <power/pmic.h>
 #include <usb.h>
+#include <fsl_sec.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -98,6 +99,10 @@ int board_init(void)
 
 #ifdef CONFIG_FSL_FSPI
 	board_qspi_init();
+#endif
+
+#ifdef CONFIG_FSL_CAAM
+        sec_init();
 #endif
 
 	return 0;
