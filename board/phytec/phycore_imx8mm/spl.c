@@ -19,12 +19,42 @@
 #include <fsl_esdhc.h>
 #include <mmc.h>
 #include <asm/arch/ddr.h>
+#include <i2c.h>
 
 DECLARE_GLOBAL_DATA_PTR;
+
+#define EEPROM_I2C_ADDR		0x59
 
 void spl_dram_init(void)
 {
 	ddr_init(&dram_timing);
+}
+
+int get_imx8mm_ddr_size(void)
+{
+	unsigned char var;
+
+	i2c_set_bus_num(0);
+	if (i2c_read(EEPROM_I2C_ADDR, 6, 2, &var, sizeof(var)) == 0) {
+		switch (var) {
+		case '1':
+			return 1;
+		case '2':
+			return 2;
+		case '3':
+			return 3;
+		case '4':
+			return 4;
+		case '5':
+			return 5;
+		default:
+			printf("Warning: No ddr size can be read from the"
+				" eeprom.\n");
+			return 0;
+		}
+	}
+
+	return 0;
 }
 
 #define I2C_PAD_CTRL	(PAD_CTL_DSE6 | PAD_CTL_HYS | PAD_CTL_PUE | PAD_CTL_PE)
@@ -178,6 +208,8 @@ void board_init_f(ulong dummy)
 	}
 
 	enable_tzc380();
+
+	setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info1);
 
 	/* DDR initialization */
 	spl_dram_init();
