@@ -97,6 +97,7 @@
 
 #define DP83867_IO_MUX_CFG_IO_IMPEDANCE_MAX	0x0
 #define DP83867_IO_MUX_CFG_IO_IMPEDANCE_MIN	0x1f
+#define DP83867_IO_MUX_CFG_CLK_O_DISABLE	BIT(6)
 #define DP83867_IO_MUX_CFG_CLK_O_SEL_SHIFT	8
 #define DP83867_IO_MUX_CFG_CLK_O_SEL_MASK	\
 		GENMASK(0x1f, DP83867_IO_MUX_CFG_CLK_O_SEL_SHIFT)
@@ -224,7 +225,6 @@ static int dp83867_of_init(struct phy_device *phydev)
 	 * Keep the default value if ti,clk-output-sel is not set
 	 * or to high
 	 */
-
 	dp83867->clk_output_sel =
 		ofnode_read_u32_default(node, "ti,clk-output-sel",
 					DP83867_CLK_O_SEL_REF_CLK);
@@ -263,9 +263,15 @@ static int dp83867_of_init(struct phy_device *phydev)
 	if (dp83867->clk_output_sel != DP83867_CLK_O_SEL_REF_CLK) {
 		val = phy_read_mmd_indirect(phydev, DP83867_IO_MUX_CFG,
 					    DP83867_DEVADDR, phydev->addr);
-		val &= ~DP83867_IO_MUX_CFG_CLK_O_SEL_MASK;
-		val |= (dp83867->clk_output_sel <<
-			DP83867_IO_MUX_CFG_CLK_O_SEL_SHIFT);
+
+		if (dp83867->clk_output_sel == DP83867_CLK_O_SEL_OFF) {
+			val |= DP83867_IO_MUX_CFG_CLK_O_DISABLE;
+		} else {
+			val &= ~DP83867_IO_MUX_CFG_CLK_O_SEL_MASK;
+			val |= (dp83867->clk_output_sel <<
+				DP83867_IO_MUX_CFG_CLK_O_SEL_SHIFT);
+		}
+
 		phy_write_mmd_indirect(phydev, DP83867_IO_MUX_CFG,
 				       DP83867_DEVADDR, phydev->addr, val);
 	}
