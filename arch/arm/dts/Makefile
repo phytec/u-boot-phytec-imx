@@ -620,6 +620,7 @@ dtb-$(CONFIG_ARCH_IMX8) += fsl-imx8qxp-mek.dtb \
 	fsl-imx8qxp-mek-auto.dtb \
 	fsl-imx8qm-ddr4-arm2.dtb \
 	fsl-imx8qm-lpddr4-arm2.dtb \
+	phycore-imx8qm.dtb \
 	fsl-imx8qxp-lpddr4-arm2.dtb \
 	fsl-imx8qxp-lpddr4-arm2-gpmi-nand.dtb \
 	fsl-imx8qxp-17x17-val.dtb \
