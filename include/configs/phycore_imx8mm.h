@@ -16,14 +16,15 @@
 #define CONFIG_CSF_SIZE			0x2000 /* 8K region */
 #endif
 
-#define CONFIG_SYS_BOOTM_LEN           SZ_64M
+#define CONFIG_SYS_BOOTM_LEN		SZ_64M
 
-#define CONFIG_SPL_MAX_SIZE		(148 * 1024)
-#define CONFIG_SYS_MONITOR_LEN		(512 * 1024)
+#define CONFIG_SPL_MAX_SIZE				(148 * 1024)
+#define CONFIG_SYS_MONITOR_LEN				(512 * 1024)
 #define CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_USE_SECTOR
-#define CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR	0x300
-#define CONFIG_SYS_MMCSD_FS_BOOT_PARTITION	1
-#define CONFIG_SYS_UBOOT_BASE		(QSPI0_AMBA_BASE + CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR * 512)
+#define CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR		0x300
+#define CONFIG_SYS_MMCSD_FS_BOOT_PARTITION		1
+#define CONFIG_SYS_UBOOT_BASE \
+		(QSPI0_AMBA_BASE + CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR * 512)
 
 #ifdef CONFIG_SPL_BUILD
 /*#define CONFIG_ENABLE_DDR_TRAINING_DEBUG*/
@@ -36,10 +37,10 @@
 #define CONFIG_SPL_LIBCOMMON_SUPPORT
 #define CONFIG_SPL_LIBGENERIC_SUPPORT
 #define CONFIG_SPL_GPIO_SUPPORT
-#define CONFIG_SPL_BSS_START_ADDR      0x00910000
-#define CONFIG_SPL_BSS_MAX_SIZE        0x2000	/* 8 KB */
-#define CONFIG_SYS_SPL_MALLOC_START    0x42200000
-#define CONFIG_SYS_SPL_MALLOC_SIZE     0x80000	/* 512 KB */
+#define CONFIG_SPL_BSS_START_ADDR	0x00910000
+#define CONFIG_SPL_BSS_MAX_SIZE		0x2000	/* 8 KB */
+#define CONFIG_SYS_SPL_MALLOC_START	0x42200000
+#define CONFIG_SYS_SPL_MALLOC_SIZE	0x80000	/* 512 KB */
 #define CONFIG_SYS_ICACHE_OFF
 #define CONFIG_SYS_DCACHE_OFF
 
@@ -63,7 +64,7 @@
 
 #define CONFIG_CMD_READ
 #define CONFIG_SERIAL_TAG
-#define CONFIG_FASTBOOT_USB_DEV 0
+#define CONFIG_FASTBOOT_USB_DEV		0
 
 #define CONFIG_REMAKE_ELF
 
@@ -84,13 +85,12 @@
 #define CONFIG_CMD_DHCP
 #define CONFIG_CMD_MII
 #define CONFIG_MII
-#define CONFIG_ETHPRIME                 "FEC"
+#define CONFIG_ETHPRIME			"FEC"
 
 #define FEC_QUIRK_ENET_MAC
 
 #define CONFIG_PHY_GIGE
 #define IMX_FEC_BASE			0x30BE0000
-
 #endif
 
 /*
@@ -109,22 +109,23 @@
 	"script=boot.scr\0" \
 	"image=Image\0" \
 	"console=ttymxc2,115200\0" \
-	"fdt_addr=0x43000000\0"			\
-	"fdt_high=0xffffffffffffffff\0"		\
+	"fdt_addr=0x43000000\0" \
+	"fdt_high=0xffffffffffffffff\0" \
 	"boot_fdt=try\0" \
 	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0" \
-	"initrd_addr=0x43800000\0"		\
+	"initrd_addr=0x43800000\0" \
 	"initrd_high=0xffffffffffffffff\0" \
 	"ipaddr=192.168.3.11\0" \
 	"serverip=192.168.3.10\0" \
 	"netmask=255.225.255.0\0" \
 	"ip_dyn=no\0" \
-	"mmcdev="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0" \
+	"mmcdev=" __stringify(CONFIG_SYS_MMC_ENV_DEV) "\0" \
 	"mmcpart=" __stringify(CONFIG_SYS_MMC_IMG_LOAD_PART) "\0" \
 	"mmcautodetect=yes\0" \
-	"mmcargs=setenv bootargs console=${console} root=/dev/mmcblk${mmcdev}p2 " \
-		 "rootwait rw\0" \
-	"loadbootscript=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${script};\0" \
+	"mmcargs=setenv bootargs console=${console} " \
+		"root=/dev/mmcblk${mmcdev}p${mmcroot} rootwait rw\0" \
+	"loadbootscript=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} " \
+		"${script};\0" \
 	"bootscript=echo Running bootscript from mmc ...; " \
 		"source\0" \
 	"loadimage=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${image}\0" \
@@ -141,11 +142,10 @@
 			"echo wait for boot; " \
 		"fi;\0" \
 	"nfsroot=/nfs\0" \
-	"netargs=setenv bootargs console=${console} " \
-		"root=/dev/nfs " \
-		"ip=dhcp nfsroot=${serverip}:${nfsroot},v3,tcp\0" \
+	"netargs=setenv bootargs console=${console} root=/dev/nfs ip=dhcp " \
+		"nfsroot=${serverip}:${nfsroot},v3,tcp\0" \
 	"netboot=echo Booting from net ...; " \
-		"run netargs;  " \
+		"run netargs; " \
 		"if test ${ip_dyn} = yes; then " \
 			"setenv get_cmd dhcp; " \
 		"else " \
@@ -163,28 +163,28 @@
 		"fi;\0"
 
 #define CONFIG_BOOTCOMMAND \
-	   "mmc dev ${mmcdev}; if mmc rescan; then " \
-		   "if run loadbootscript; then " \
-			   "run bootscript; " \
-		   "else " \
-			   "if run loadimage; then " \
-				   "run mmcboot; " \
-			   "else run netboot; " \
-			   "fi; " \
-		   "fi; " \
-	   "else booti ${loadaddr} - ${fdt_addr}; fi"
+	"mmc dev ${mmcdev}; if mmc rescan; then " \
+		"if run loadbootscript; then " \
+			"run bootscript; " \
+		"else " \
+			"if run loadimage; then " \
+				"run mmcboot; " \
+			"else run netboot; " \
+			"fi; " \
+		"fi; " \
+	"else booti ${loadaddr} - ${fdt_addr}; fi"
 
 /* Link Definitions */
 #define CONFIG_LOADADDR			0x40480000
 
-#define CONFIG_SYS_LOAD_ADDR           CONFIG_LOADADDR
+#define CONFIG_SYS_LOAD_ADDR		CONFIG_LOADADDR
 
-#define CONFIG_SYS_INIT_RAM_ADDR        0x40000000
-#define CONFIG_SYS_INIT_RAM_SIZE        0x80000
+#define CONFIG_SYS_INIT_RAM_ADDR	0x40000000
+#define CONFIG_SYS_INIT_RAM_SIZE	0x80000
 #define CONFIG_SYS_INIT_SP_OFFSET \
-        (CONFIG_SYS_INIT_RAM_SIZE - GENERATED_GBL_DATA_SIZE)
+		(CONFIG_SYS_INIT_RAM_SIZE - GENERATED_GBL_DATA_SIZE)
 #define CONFIG_SYS_INIT_SP_ADDR \
-        (CONFIG_SYS_INIT_RAM_ADDR + CONFIG_SYS_INIT_SP_OFFSET)
+		(CONFIG_SYS_INIT_RAM_ADDR + CONFIG_SYS_INIT_SP_OFFSET)
 
 #define CONFIG_ENV_OVERWRITE
 #if defined(CONFIG_ENV_IS_IN_MMC)
@@ -204,10 +204,11 @@
 #define CONFIG_MMCROOT			"/dev/mmcblk2p2"  /* USDHC3 */
 
 /* Size of malloc() pool */
-#define CONFIG_SYS_MALLOC_LEN		((CONFIG_ENV_SIZE + (2*1024) + (16*1024)) * 1024)
+#define CONFIG_SYS_MALLOC_LEN		((CONFIG_ENV_SIZE + (2 * 1024) \
+					 + (16 * 1024)) * 1024)
 
-#define CONFIG_SYS_SDRAM_BASE           0x40000000
-#define PHYS_SDRAM                      0x40000000
+#define CONFIG_SYS_SDRAM_BASE		0x40000000
+#define PHYS_SDRAM			0x40000000
 
 #define CONFIG_BAUDRATE			115200
 
@@ -217,12 +218,12 @@
 /* Monitor Command Prompt */
 #undef CONFIG_SYS_PROMPT
 #define CONFIG_SYS_PROMPT		"u-boot=> "
-#define CONFIG_SYS_PROMPT_HUSH_PS2     "> "
-#define CONFIG_SYS_CBSIZE              2048
-#define CONFIG_SYS_MAXARGS             64
-#define CONFIG_SYS_BARGSIZE CONFIG_SYS_CBSIZE
+#define CONFIG_SYS_PROMPT_HUSH_PS2	"> "
+#define CONFIG_SYS_CBSIZE		2048
+#define CONFIG_SYS_MAXARGS		64
+#define CONFIG_SYS_BARGSIZE		CONFIG_SYS_CBSIZE
 #define CONFIG_SYS_PBSIZE		(CONFIG_SYS_CBSIZE + \
-					sizeof(CONFIG_SYS_PROMPT) + 16)
+					 sizeof(CONFIG_SYS_PROMPT) + 16)
 
 #define CONFIG_IMX_BOOTAUX
 
@@ -272,10 +273,10 @@
 
 #endif
 
-#define CONFIG_USB_GADGET_VBUS_DRAW 2
+#define CONFIG_USB_GADGET_VBUS_DRAW	2
 
 #define CONFIG_MXC_USB_PORTSC  (PORT_PTS_UTMI | PORT_PTS_PTW)
-#define CONFIG_USB_MAX_CONTROLLER_COUNT         2
+#define CONFIG_USB_MAX_CONTROLLER_COUNT	2
 
 #define CONFIG_OF_SYSTEM_SETUP
 
