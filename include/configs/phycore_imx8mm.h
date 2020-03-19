@@ -121,9 +121,16 @@
 	"ip_dyn=no\0" \
 	"mmcdev=" __stringify(CONFIG_SYS_MMC_ENV_DEV) "\0" \
 	"mmcpart=" __stringify(CONFIG_SYS_MMC_IMG_LOAD_PART) "\0" \
+	"mmcroot=2\0" \
 	"mmcautodetect=yes\0" \
 	"mmcargs=setenv bootargs console=${console} " \
 		"root=/dev/mmcblk${mmcdev}p${mmcroot} rootwait rw\0" \
+	"mmcargsreset=" \
+		"setenv mmcdev " __stringify(CONFIG_SYS_MMC_ENV_DEV) "; " \
+		"setenv mmcpart " __stringify(CONFIG_SYS_MMC_IMG_LOAD_PART) "; " \
+		"setexpr mmcroot " __stringify(CONFIG_SYS_MMC_IMG_LOAD_PART) " + 1; " \
+		"setenv mmcargs setenv bootargs console=${console} " \
+			"root=/dev/mmcblk${mmcdev}p${mmcroot} rootwait rw;\0" \
 	"loadbootscript=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} " \
 		"${script};\0" \
 	"bootscript=echo Running bootscript from mmc ...; " \
@@ -160,14 +167,73 @@
 			"fi; " \
 		"else " \
 			"booti; " \
-		"fi;\0"
+		"fi;\0" \
+	"doraucboot=0\0" \
+	"raucslot=system0\0" \
+	"raucargs=setenv mmcargs \"setenv bootargs console=${console} " \
+		"root=/dev/mmcblk${mmcdev}p${mmcroot} rauc.slot=${raucslot} " \
+		"rootwait rw\";\0" \
+	"raucboot=echo Booting A/B system ...; " \
+		"test -n \"${BOOT_ORDER}\" || setenv BOOT_ORDER \"system0 system1\"; " \
+		"test -n \"${BOOT_system0_LEFT}\" || setenv BOOT_system0_LEFT 3; " \
+		"test -n \"${BOOT_system1_LEFT}\" || setenv BOOT_system1_LEFT 3; " \
+		"setenv raucstatus; " \
+		"for BOOT_SLOT in \"${BOOT_ORDER}\"; do " \
+			"if test \"x${raucstatus}\" != \"x\"; then " \
+				"echo Skipping remaing slots!; " \
+			"elif test \"x${BOOT_SLOT}\" = \"xsystem0\"; then " \
+				"if test ${BOOT_system0_LEFT} -gt 0; then " \
+					"echo \"Found valid slot A, " \
+						"${BOOT_system0_LEFT} attempts remaining\"; " \
+					"setexpr BOOT_system0_LEFT ${BOOT_system0_LEFT} - 1; " \
+					"setenv mmcpart 1; " \
+					"setenv mmcroot 2; " \
+					"setenv raucslot system0; " \
+					"run raucargs; " \
+					"setenv raucstatus success; " \
+				"fi; " \
+			"elif test \"x${BOOT_SLOT}\" = \"xsystem1\"; then " \
+				"if test ${BOOT_system1_LEFT} -gt 0; then " \
+					"echo \"Found valid slot B, " \
+						"${BOOT_system1_LEFT} attempts remaining\"; " \
+					"setexpr BOOT_system1_LEFT ${BOOT_system1_LEFT} - 1; " \
+					"setenv mmcpart 3; " \
+					"setenv mmcroot 4; " \
+					"setenv raucslot system1; " \
+					"run raucargs; " \
+					"setenv raucstatus success; " \
+				"fi; " \
+			"fi; " \
+		"done; " \
+		"if test -n \"${raucstatus}\"; then " \
+			"env delete raucstatus; " \
+			"saveenv; " \
+			"if run loadimage; then " \
+				"run mmcboot; " \
+			"fi; " \
+		"else " \
+			"echo \"WARN: No valid slot found\"; " \
+			"setenv BOOT_system0_LEFT 3; " \
+			"setenv BOOT_system1_LEFT 3; " \
+			"run mmcargsreset; " \
+			"env delete raucstatus; " \
+			"saveenv; " \
+			"reset; " \
+		"fi;\0" \
 
 #define CONFIG_BOOTCOMMAND \
 	"mmc dev ${mmcdev}; if mmc rescan; then " \
 		"if run loadbootscript; then " \
 			"run bootscript; " \
 		"else " \
-			"if run loadimage; then " \
+			"if test ${doraucboot} = 1; then " \
+				"run raucboot; " \
+			"elif run loadimage; then " \
+				"env delete BOOT_ORDER; " \
+				"env delete BOOT_system0_LEFT; " \
+				"env delete BOOT_system1_LEFT; " \
+				"run mmcargsreset; " \
+				"saveenv; " \
 				"run mmcboot; " \
 			"else run netboot; " \
 			"fi; " \
