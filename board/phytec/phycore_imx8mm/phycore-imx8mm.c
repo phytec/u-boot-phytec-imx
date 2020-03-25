@@ -24,6 +24,7 @@
 #include <power/pmic.h>
 #include <usb.h>
 #include <fsl_sec.h>
+#include <watchdog.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -94,7 +95,6 @@ int board_phy_config(struct phy_device *phydev)
 
 int board_init(void)
 {
-
 	setup_fec();
 
 #ifdef CONFIG_FSL_FSPI
@@ -104,6 +104,7 @@ int board_init(void)
 #ifdef CONFIG_FSL_CAAM
         sec_init();
 #endif
+	hw_watchdog_init();
 
 	return 0;
 }
