@@ -93,10 +93,6 @@
 #define IMX_FEC_BASE			0x30BE0000
 #endif
 
-/*
- * Another approach is add the clocks for inmates into clks_init_on
- * in clk-imx8mm.c, then clk_ingore_unused could be removed.
- */
 #define CONFIG_MFG_ENV_SETTINGS \
 	CONFIG_MFG_ENV_SETTINGS_DEFAULT \
 	"initrd_addr=0x43800000\0" \
