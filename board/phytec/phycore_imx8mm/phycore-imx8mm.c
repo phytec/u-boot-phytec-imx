@@ -93,6 +93,20 @@ int board_phy_config(struct phy_device *phydev)
 	return 0;
 }
 
+int board_usb_init(int index, enum usb_init_type init)
+{
+	debug("board_usb_init %d, type %d\n", index, init);
+
+	return imx8m_usb_power(index, true);
+}
+
+int board_usb_cleanup(int index, enum usb_init_type init)
+{
+	debug("board_usb_cleanup %d, type %d\n", index, init);
+
+	return imx8m_usb_power(index, false);
+}
+
 int board_init(void)
 {
 	setup_fec();
