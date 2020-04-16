@@ -117,6 +117,8 @@
 	"serverip=192.168.3.10\0" \
 	"netmask=255.225.255.0\0" \
 	"ip_dyn=no\0" \
+	"mtdparts=30bb0000.flexspi:4M(u-boot),1M(env),40M(kernel),1M(oftree)\0" \
+	"mtdids=nor0=30bb0000.flexspi\0" \
 	"mmcdev=" __stringify(CONFIG_SYS_MMC_ENV_DEV) "\0" \
 	"mmcpart=" __stringify(CONFIG_SYS_MMC_IMG_LOAD_PART) "\0" \
 	"mmcroot=2\0" \
@@ -234,14 +236,29 @@
 			"saveenv; " \
 			"reset; " \
 		"fi;\0" \
+	"dospiboot=0\0" \
+	"spiboot=echo Booting from SPI NOR...; " \
+		"setenv mmcdev 2; " \
+		"run mmcargs; " \
+		"sf read ${loadaddr} 0x500000 0x2800000; " \
+		"if test ${boot_fdt} = yes || test ${boot_fdt} = try; then " \
+			"if sf read ${fdt_addr} 0x2D00000 0x100000; then " \
+				"booti ${loadaddr} - ${fdt_addr}; " \
+			"else " \
+				"echo WARN: Cannot load the DT; " \
+			"fi; " \
+		"fi;\0" \
 
 #define CONFIG_BOOTCOMMAND \
 	"mmc dev ${mmcdev}; if mmc rescan; then " \
+		"sf probe; " \
 		"if run loadbootscript; then " \
 			"run bootscript; " \
 		"else " \
 			"if test ${doraucboot} = 1; then " \
 				"run raucboot; " \
+			"elif test ${dospiboot} = 1; then " \
+				"run spiboot; " \
 			"elif run loadimage; then " \
 				"env delete BOOT_ORDER; " \
 				"env delete BOOT_system0_LEFT; " \
@@ -271,9 +288,9 @@
 #define CONFIG_ENV_OFFSET_REDUND	(SZ_4M - SZ_128K)
 #define CONFIG_ENV_SIZE			SZ_64K
 #elif defined(CONFIG_ENV_IS_IN_SPI_FLASH)
-#define CONFIG_ENV_SIZE			SZ_4K
+#define CONFIG_ENV_SIZE			SZ_64K
 #define CONFIG_ENV_OFFSET		SZ_4M
-#define CONFIG_ENV_SECT_SIZE		SZ_64K
+#define CONFIG_ENV_SECT_SIZE		SZ_1M
 #define CONFIG_ENV_SPI_BUS		CONFIG_SF_DEFAULT_BUS
 #define CONFIG_ENV_SPI_CS		CONFIG_SF_DEFAULT_CS
 #define CONFIG_ENV_SPI_MODE		CONFIG_SF_DEFAULT_MODE
@@ -317,7 +334,7 @@
 #define CONFIG_SYS_MMC_IMG_LOAD_PART	1
 
 #ifdef CONFIG_FSL_FSPI
-#define FSL_FSPI_FLASH_SIZE		SZ_32M
+#define FSL_FSPI_FLASH_SIZE		SZ_64M
 #define FSL_FSPI_FLASH_NUM		1
 #define FSPI0_BASE_ADDR			0x30bb0000
 #define FSPI0_AMBA_BASE			0x0

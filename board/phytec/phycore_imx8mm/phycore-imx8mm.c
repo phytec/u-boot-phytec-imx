@@ -9,13 +9,17 @@
 #include <errno.h>
 #include <asm/io.h>
 #include <miiphy.h>
+#include <mtd_node.h>
 #include <netdev.h>
 #include <asm/mach-imx/iomux-v3.h>
 #include <asm-generic/gpio.h>
+#include <fdt_support.h>
 #include <fsl_esdhc.h>
+#include <jffs2/load_kernel.h>
 #include <mmc.h>
 #include <asm/arch/imx8mm_pins.h>
 #include <asm/arch/sys_proto.h>
+#include <asm/mach-imx/boot_mode.h>
 #include <asm/mach-imx/gpio.h>
 #include <asm/mach-imx/mxc_i2c.h>
 #include <asm/arch/clock.h>
@@ -123,6 +127,17 @@ int board_init(void)
 	return 0;
 }
 
+int ft_board_setup(void *blob, bd_t *bd)
+{
+	static const struct node_info nodes[] = {
+		{ "micron,mt25qu256aba", MTD_DEV_TYPE_NOR, }, /* SPI NOR flash */
+	};
+
+	fdt_fixup_mtdparts(blob, nodes, ARRAY_SIZE(nodes));
+
+	return 0;
+}
+
 static int check_mmc_autodetect(void)
 {
 	return env_get_yesno("mmcautodetect") > 0;
@@ -140,7 +155,18 @@ void board_late_mmc_env_init(void)
 
 int board_late_init(void)
 {
-	board_late_mmc_env_init();
+	switch(get_boot_device()) {
+	case QSPI_BOOT:
+		env_set_ulong("dospiboot",1);
+		break;
+	case SD2_BOOT:
+	case MMC3_BOOT:
+		board_late_mmc_env_init();
+		break;
+
+	default:
+		break;
+	}
 
 	return 0;
 }
