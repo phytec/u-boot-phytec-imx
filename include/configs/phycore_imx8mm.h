@@ -168,9 +168,25 @@
 		"fi;\0" \
 	"doraucboot=0\0" \
 	"raucslot=system0\0" \
-	"raucargs=setenv mmcargs \"setenv bootargs console=${console} " \
-		"root=/dev/mmcblk${mmcdev}p${mmcroot} rauc.slot=${raucslot} " \
+	"raucdev=2\0" \
+	"raucrootpart=2\0" \
+	"raucpart=1\0" \
+	"raucargs=setenv bootargs console=${console} " \
+		"root=/dev/mmcblk${raucdev}p${raucrootpart} rauc.slot=${raucslot} " \
 		"rootwait rw\";\0" \
+	"loadraucimage=fatload mmc ${raucdev}:${raucpart} ${loadaddr} ${image}\0" \
+	"loadraucfdt=fatload mmc ${raucdev}:${raucpart} ${fdt_addr} ${fdt_file}\0" \
+	"raucemmcboot=echo Booting rauc from emmc ...; " \
+		"run raucargs; " \
+		"if test ${boot_fdt} = yes || test ${boot_fdt} = try; then " \
+			"if run loadraucfdt; then " \
+				"booti ${loadaddr} - ${fdt_addr}; " \
+			"else " \
+				"echo WARN: Cannot load the DT; " \
+			"fi; " \
+		"else " \
+			"echo wait for boot; " \
+		"fi;\0" \
 	"raucboot=echo Booting A/B system ...; " \
 		"test -n \"${BOOT_ORDER}\" || setenv BOOT_ORDER \"system0 system1\"; " \
 		"test -n \"${BOOT_system0_LEFT}\" || setenv BOOT_system0_LEFT 3; " \
@@ -184,8 +200,8 @@
 					"echo \"Found valid slot A, " \
 						"${BOOT_system0_LEFT} attempts remaining\"; " \
 					"setexpr BOOT_system0_LEFT ${BOOT_system0_LEFT} - 1; " \
-					"setenv mmcpart 1; " \
-					"setenv mmcroot 2; " \
+					"setenv raucpart 1; " \
+					"setenv raucrootpart 2; " \
 					"setenv raucslot system0; " \
 					"run raucargs; " \
 					"setenv raucstatus success; " \
@@ -195,8 +211,8 @@
 					"echo \"Found valid slot B, " \
 						"${BOOT_system1_LEFT} attempts remaining\"; " \
 					"setexpr BOOT_system1_LEFT ${BOOT_system1_LEFT} - 1; " \
-					"setenv mmcpart 3; " \
-					"setenv mmcroot 4; " \
+					"setenv raucpart 3; " \
+					"setenv raucrootpart 4; " \
 					"setenv raucslot system1; " \
 					"run raucargs; " \
 					"setenv raucstatus success; " \
@@ -206,8 +222,8 @@
 		"if test -n \"${raucstatus}\"; then " \
 			"env delete raucstatus; " \
 			"saveenv; " \
-			"if run loadimage; then " \
-				"run mmcboot; " \
+			"if run loadraucimage; then " \
+				"run raucemmcboot; " \
 			"fi; " \
 		"else " \
 			"echo \"WARN: No valid slot found\"; " \
@@ -230,7 +246,6 @@
 				"env delete BOOT_ORDER; " \
 				"env delete BOOT_system0_LEFT; " \
 				"env delete BOOT_system1_LEFT; " \
-				"run mmcargsreset; " \
 				"saveenv; " \
 				"run mmcboot; " \
 			"else run netboot; " \
