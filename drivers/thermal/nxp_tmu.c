@@ -158,6 +158,9 @@ int nxp_tmu_get_temp(struct udevice *dev, int *temp)
 			printf("invalid data\n");
 			return ret;
 		}
+
+		printf("Reset CPU to avoid overheating!\n");
+		do_reset(NULL, 0, 0, NULL);
 	}
 
 	*temp = cpu_tmp;
