@@ -146,6 +146,8 @@ int nxp_tmu_get_temp(struct udevice *dev, int *temp)
 		return ret;
 	}
 
+	cpu_tmp = cpu_tmp / 1000;
+
 	while (cpu_tmp >= pdata->alert) {
 		printf("CPU Temperature (%dC) has beyond alert (%dC), close to critical (%dC)",
 		       cpu_tmp, pdata->alert, pdata->critical);
@@ -158,7 +160,7 @@ int nxp_tmu_get_temp(struct udevice *dev, int *temp)
 		}
 	}
 
-	*temp = cpu_tmp / 1000;
+	*temp = cpu_tmp;
 
 	return 0;
 }
@@ -333,7 +335,7 @@ static int nxp_tmu_bind(struct udevice *dev)
 static int nxp_tmu_ofdata_to_platdata(struct udevice *dev)
 {
 	int ret;
-	int trips_np;
+	int maxc, minc;
 
 	struct nxp_tmu_plat *pdata = dev_get_platdata(dev);
 	struct fdtdec_phandle_args args;
@@ -370,17 +372,9 @@ static int nxp_tmu_ofdata_to_platdata(struct udevice *dev)
 
 	pdata->polling_delay = fdtdec_get_int(gd->fdt_blob, dev_of_offset(dev), "polling-delay", 1000);
 
-	trips_np = fdt_subnode_offset(gd->fdt_blob, dev_of_offset(dev), "trips");
-	fdt_for_each_subnode(trips_np, gd->fdt_blob, trips_np) {
-		const char *type;
-		type = fdt_getprop(gd->fdt_blob, trips_np, "type", NULL);
-		if (type) {
-			if (strcmp(type, "critical") == 0)
-				pdata->critical = fdtdec_get_int(gd->fdt_blob, trips_np, "temperature", 85);
-			else if (strcmp(type, "passive") == 0)
-				pdata->alert = fdtdec_get_int(gd->fdt_blob, trips_np, "temperature", 80);
-		}
-	}
+	get_cpu_temp_grade(&minc, &maxc);
+	pdata->critical = maxc - 5;
+	pdata->alert = maxc - 10;
 
 	debug("id %d polling_delay %d, critical %d, alert %d\n",
 		pdata->id, pdata->polling_delay, pdata->critical, pdata->alert);
