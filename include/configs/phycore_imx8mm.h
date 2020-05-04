@@ -152,6 +152,7 @@
 	"netargs=setenv bootargs console=${console} root=/dev/nfs ip=dhcp " \
 		"nfsroot=${serverip}:${nfsroot},v3,tcp\0" \
 	"netboot=echo Booting from net ...; " \
+		"sf probe; " \
 		"run netargs; " \
 		"if test ${ip_dyn} = yes; then " \
 			"setenv get_cmd dhcp; " \
