@@ -117,7 +117,7 @@
 	"serverip=192.168.3.10\0" \
 	"netmask=255.225.255.0\0" \
 	"ip_dyn=no\0" \
-	"mtdparts=30bb0000.flexspi:4M(u-boot),1M(env),40M(kernel),1M(oftree)\0" \
+	"mtdparts=30bb0000.flexspi:4M(u-boot),1M(env),-(none)\0" \
 	"mtdids=nor0=30bb0000.flexspi\0" \
 	"mmcdev=" __stringify(CONFIG_SYS_MMC_ENV_DEV) "\0" \
 	"mmcpart=" __stringify(CONFIG_SYS_MMC_IMG_LOAD_PART) "\0" \
@@ -241,14 +241,9 @@
 	"spiboot=echo Booting from SPI NOR...; " \
 		"setenv mmcdev 2; " \
 		"run mmcargs; " \
-		"sf read ${loadaddr} 0x500000 0x2800000; " \
-		"if test ${boot_fdt} = yes || test ${boot_fdt} = try; then " \
-			"if sf read ${fdt_addr} 0x2D00000 0x100000; then " \
-				"booti ${loadaddr} - ${fdt_addr}; " \
-			"else " \
-				"echo WARN: Cannot load the DT; " \
-			"fi; " \
-		"fi;\0" \
+		"run loadimage; " \
+		"run mmcboot;\0" \
+
 
 #define CONFIG_BOOTCOMMAND \
 	"mmc dev ${mmcdev}; if mmc rescan; then " \
