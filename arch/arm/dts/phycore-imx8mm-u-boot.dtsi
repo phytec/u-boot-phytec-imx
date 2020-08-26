@@ -47,6 +47,10 @@
 	u-boot,dm-spl;
 };
 
+&pinctrl_i2c1 {
+	u-boot,dm-spl;
+};
+
 &pinctrl_uart3 {
 	u-boot,dm-spl;
 };
@@ -80,6 +84,14 @@
 };
 
 &gpio5 {
+	u-boot,dm-spl;
+};
+
+&i2c1 {
+	u-boot,dm-spl;
+};
+
+&{/soc@0/bus@30800000/i2c@30a20000/eeprom@59} {
 	u-boot,dm-spl;
 };
 
