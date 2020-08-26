@@ -129,6 +129,11 @@ config TARGET_VERDIN_IMX8MM
        select SUPPORT_SPL
        select IMX8M_LPDDR4
 
+config TARGET_PHYCORE_IMX8MM
+	bool "PHYTEC PHYCORE i.MX8MM"
+	select IMX8MM
+	select SUPPORT_SPL
+	select IMX8M_LPDDR4
 endchoice
 
 source "board/freescale/imx8mq_evk/Kconfig"
@@ -139,5 +144,6 @@ source "board/freescale/imx8mm_val/Kconfig"
 source "board/freescale/imx8mn_evk/Kconfig"
 source "board/freescale/imx8mp_evk/Kconfig"
 source "board/toradex/verdin-imx8mm/Kconfig"
+source "board/phytec/phycore_imx8mm/Kconfig"
 
 endif
