@@ -202,7 +202,11 @@ __weak int board_phys_sdram_size(phys_size_t *size)
 	if (!size)
 		return -EINVAL;
 
+#ifdef PHYS_SDRAM_SIZE
 	*size = PHYS_SDRAM_SIZE;
+#else
+	*size = imx8m_ddrc_sdram_size();
+#endif
 	return 0;
 }
 
