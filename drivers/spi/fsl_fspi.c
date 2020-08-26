@@ -157,6 +157,7 @@ struct fsl_fspi_priv {
 	u32 num_chipselect;
 	u32 read_dummy;
 	struct fsl_fspi_regs *regs;
+	struct clk clk;
 };
 
 struct fspi_cmd_func_pair {
@@ -1215,16 +1216,15 @@ static int fsl_fspi_probe(struct udevice *bus)
 
 	if (CONFIG_IS_ENABLED(CLK)) {
 		/* Assigned clock already set clock */
-		struct clk fspi_clk;
 		int ret;
 
-		ret = clk_get_by_name(bus, "fspi", &fspi_clk);
+		ret = clk_get_by_name(bus, "fspi", &priv->clk);
 		if (ret < 0) {
 			printf("Can't get fspi clk: %d\n", ret);
 			return ret;
 		}
 
-		ret = clk_enable(&fspi_clk);
+		ret = clk_enable(&priv->clk);
 		if (ret < 0) {
 			printf("Can't enable fspi clk: %d\n", ret);
 			return ret;
@@ -1391,7 +1391,14 @@ static int fsl_fspi_release_bus(struct udevice *dev)
 
 static int fsl_fspi_set_speed(struct udevice *bus, uint speed)
 {
-	/* Nothing to do */
+	struct fsl_fspi_priv *priv;
+	int ret;
+
+	priv = dev_get_priv(bus);
+	ret =  clk_set_rate(&priv->clk, speed);
+	if (ret < 0)
+		return ret;
+
 	return 0;
 }
 
