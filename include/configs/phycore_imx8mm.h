@@ -92,6 +92,7 @@
 #define CONFIG_SYS_INIT_SP_ADDR \
 	(CONFIG_SYS_INIT_RAM_ADDR + CONFIG_SYS_INIT_SP_OFFSET)
 
+#define CONFIG_SYS_MMC_ENV_DEV		2
 #define CONFIG_MMCROOT			"/dev/mmcblk2p2"  /* USDHC3 */
 
 /* Size of malloc() pool */
@@ -126,5 +127,6 @@
 #define CONFIG_FEC_MXC_PHYADDR		0
 #define FEC_QUIRK_ENET_MAC
 #define IMX_FEC_BASE			0x30BE0000
+#define CONFIG_ENV_OVERWRITE
 
 #endif /* __PHYCORE_IMX8MM_H */
