@@ -1,0 +1,9 @@
+phyCORE-i.MX8M Nano
+M:      Teresa Remmet <t.remmet@phytec.de>
+W:      https://www.phytec.eu/product-eu/system-on-modules/phycore-imx-8m-mini-nano/
+S:      Maintained
+F:      arch/arm/dts/phycore-imx8mn.dts
+F:      arch/arm/dts/phycore-imx8mn-u-boot.dtsi
+F:      board/phytec/phycore_imx8mn/
+F:      configs/phycore-imx8mn_defconfig
+F:      include/configs/phycore_imx8mn.h
