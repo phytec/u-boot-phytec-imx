@@ -22,8 +22,48 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+#define EEPROM_I2C_ADDR		0x58
+
+extern struct dram_timing_info dram_timing_1GB;
+
+static int get_imx8mq_ddr_size(void)
+{
+	uint8_t var;
+	int ret;
+
+	i2c_set_bus_num(0);
+	ret = i2c_read(EEPROM_I2C_ADDR, 6, 2, &var, sizeof(var));
+	if (ret < 0) {
+		printf("Unable to read from i2c EEPROM\n");
+		return ret;
+	}
+
+	return (int)var - 48;
+};
+
 static void spl_dram_init(void)
 {
+	int ret;
+
+	ret = get_imx8mq_ddr_size();
+	if (ret < 0)
+		goto err;
+
+	switch (ret) {
+	case 1:
+		ddr_init(&dram_timing_1GB);
+		break;
+	case 3:
+		ddr_init(&dram_timing);
+		break;
+	default:
+		goto err;
+	}
+
+	return;
+err:
+	printf("Could not detect a valid RAM size. Fallback to 2GB ram"
+		"timings.\n");
 	ddr_init(&dram_timing);
 }
 
