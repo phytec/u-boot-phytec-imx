@@ -1,0 +1,8 @@
+phyCORE-i.MX8MQ
+M:      Janine Hagemann <j.hagemann@phytec.de>
+W:      https://www.phytec.eu/product-eu/system-on-modules/phycore-imx-8m/
+S:      Maintained
+F:      arch/arm/dts/phycore-imx8mq.dts
+F:      board/phytec/phycore_imx8mq/
+F:      configs/phycore-imx8mq_defconfig
+F:      include/configs/phycore_imx8mq.h
