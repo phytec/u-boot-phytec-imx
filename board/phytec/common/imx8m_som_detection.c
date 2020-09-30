@@ -5,9 +5,29 @@
  */
 
 #include <common.h>
+#include <asm/mach-imx/mxc_i2c.h>
 #include <dm/device.h>
 #include <dm/uclass.h>
+#include <i2c.h>
 #include <i2c_eeprom.h>
+
+#if !defined(CONFIG_DM_I2C)
+int get_imx8m_ddr_size(int bus_num, int addr)
+{
+	uint8_t var;
+	int ret;
+
+	i2c_set_bus_num(bus_num);
+	ret = i2c_read(addr, 6, 2, &var, sizeof(var));
+	if (ret < 0) {
+		printf("Unable to read from i2c EEPROM\n");
+		return ret;
+	}
+
+	return (int)var - 48;
+};
+
+#else
 
 static struct udevice *phytec_i2c_eeprom_init(char *of_path)
 {
@@ -34,7 +54,7 @@ static struct udevice *phytec_i2c_eeprom_init(char *of_path)
 int get_imx8m_ddr_size(char *of_path)
 {
 	struct udevice *dev;
-	unsigned char var;
+	uint8_t var;
 	int ret;
 
 	dev = phytec_i2c_eeprom_init(of_path);
@@ -49,3 +69,5 @@ int get_imx8m_ddr_size(char *of_path)
 
 	return ((int)var - 48);
 }
+
+#endif
