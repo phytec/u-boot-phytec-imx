@@ -15,9 +15,10 @@
 #include <dm/uclass.h>
 #include <hang.h>
 #include <init.h>
-#include <i2c_eeprom.h>
 #include <log.h>
 #include <spl.h>
+
+#include "../common/imx8m_som_detection.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -39,39 +40,11 @@ int spl_board_boot_device(enum boot_device boot_dev_spl)
 	}
 }
 
-static int get_imx8mm_ddr_size(void)
-{
-	struct udevice *dev;
-	ofnode eeprom;
-	unsigned char var;
-	int ret;
-
-	eeprom = ofnode_path("/soc@0/bus@30800000/i2c@30a20000/eeprom@59");
-	if (!ofnode_valid(eeprom)) {
-		printf("Could not find i2c EEPROM in device tree.\n");
-		return -ENODEV;
-	}
-
-	ret = uclass_get_device_by_ofnode(UCLASS_I2C_EEPROM, eeprom, &dev);
-	if (ret) {
-		printf("i2c EEPROM not found.\n");
-		return ret;
-	}
-
-	ret = i2c_eeprom_read(dev, 6, &var, sizeof(var));
-	if (ret) {
-		printf("Unable to read from i2c EEPROM\n");
-		return ret;
-	}
-
-	return ((int)var - 48);
-}
-
 void spl_dram_init(void)
 {
 	int ret;
 
-	ret =  get_imx8mm_ddr_size();
+	ret =  get_imx8m_ddr_size("/soc@0/bus@30800000/i2c@30a20000/eeprom@59");
 	if (ret < 0)
 		goto err;
 
