@@ -10,6 +10,7 @@
 #include <asm/mach-imx/boot_mode.h>
 #include <env.h>
 #include <miiphy.h>
+#include <watchdog.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -27,6 +28,8 @@ static int setup_fec(void)
 int board_init(void)
 {
 	setup_fec();
+
+	hw_watchdog_init();
 
 	return 0;
 }
