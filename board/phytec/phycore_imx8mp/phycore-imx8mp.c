@@ -6,12 +6,26 @@
 
 #include <common.h>
 #include <asm/arch/sys_proto.h>
+#include <asm/arch/clock.h>
 #include <asm/io.h>
 #include <asm/mach-imx/boot_mode.h>
 #include <env.h>
 #include <miiphy.h>
 
 DECLARE_GLOBAL_DATA_PTR;
+
+static int setup_eqos(void)
+{
+	struct iomuxc_gpr_base_regs *gpr =
+		(struct iomuxc_gpr_base_regs *)IOMUXC_GPR_BASE_ADDR;
+
+	/* set INTF as RGMII, enable RGMII TXC clock */
+	clrsetbits_le32(&gpr->gpr[1],
+			IOMUXC_GPR_GPR1_GPR_ENET_QOS_INTF_SEL_MASK, BIT(16));
+	setbits_le32(&gpr->gpr[1], BIT(19) | BIT(21));
+
+	return set_clk_eqos(ENET_125MHZ);
+}
 
 static int setup_fec(void)
 {
@@ -26,6 +40,8 @@ static int setup_fec(void)
 
 int board_init(void)
 {
+	setup_eqos();
+
 	setup_fec();
 
 	return 0;
