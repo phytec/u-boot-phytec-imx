@@ -1221,6 +1221,7 @@ static int eqos_start(struct udevice *dev)
 	 * don't need to reconnect/reconfigure again
 	 */
 	if (!eqos->phy) {
+		struct ofnode_phandle_args phandle_args;
 		int addr = -1;
 #ifdef CONFIG_DM_ETH_PHY
 		addr = eth_phy_get_addr(dev);
@@ -1234,6 +1235,15 @@ static int eqos_start(struct udevice *dev)
 			pr_err("phy_connect() failed");
 			goto err_stop_resets;
 		}
+
+		if (dev_read_phandle_with_args(dev, "phy-handle", NULL, 0, 0,
+					       &phandle_args)) {
+			debug("Failed to find phy-handle");
+			return -ENODEV;
+		}
+
+		eqos->phy->node = phandle_args.node;
+
 		ret = phy_config(eqos->phy);
 		if (ret < 0) {
 			pr_err("phy_config() failed: %d", ret);
