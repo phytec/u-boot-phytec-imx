@@ -24,6 +24,8 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+extern struct dram_timing_info dram_timing_1gb;
+
 int spl_board_boot_device(enum boot_device boot_dev_spl)
 {
 	switch (boot_dev_spl) {
@@ -51,6 +53,9 @@ void spl_dram_init(void)
 		goto err;
 
 	switch (ret) {
+	case 1:
+		ddr_init(&dram_timing_1gb);
+		break;
 	case 3:
 		ddr_init(&dram_timing);
 		break;
