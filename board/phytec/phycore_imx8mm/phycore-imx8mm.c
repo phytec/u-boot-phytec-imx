@@ -54,3 +54,8 @@ int board_late_init(void)
 
 	return 0;
 }
+
+int mmc_map_to_kernel_blk(int dev_no)
+{
+	return dev_no;
+}
