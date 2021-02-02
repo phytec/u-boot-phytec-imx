@@ -3,6 +3,7 @@
 #include <common.h>
 #include <asm/io.h>
 #include <linux/bitfield.h>
+#include <asm/arch/sys_proto.h>
 
 #if defined(CONFIG_MX53)
 #define MEMCTL_BASE	ESDCTL_BASE_ADDR
@@ -115,7 +116,10 @@ resource_size_t imx_ddrc_sdram_size(void *ddrc, const u32 addrmap[],
 	unsigned int banks, ranks, columns, rows, active_ranks, width;
 	resource_size_t size;
 
-	banks = 2;
+	if (is_imx8mn())
+		banks = 1;
+	else
+		banks = 2;
 	ranks = 0;
 
 	switch (FIELD_GET(DDRC_MSTR_ACTIVE_RANKS, mstr)) {
