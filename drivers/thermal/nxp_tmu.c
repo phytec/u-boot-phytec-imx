@@ -376,7 +376,7 @@ static int nxp_tmu_bind(struct udevice *dev)
 static int nxp_tmu_parse_fdt(struct udevice *dev)
 {
 	int ret;
-	int trips_np;
+	int maxc, minc;
 
 	struct nxp_tmu_plat *pdata = dev_get_platdata(dev);
 	struct fdtdec_phandle_args args;
@@ -411,19 +411,12 @@ static int nxp_tmu_parse_fdt(struct udevice *dev)
 
 	debug("args.args_count %d, id %d\n", args.args_count, pdata->id);
 
-	pdata->polling_delay = fdtdec_get_int(gd->fdt_blob, dev_of_offset(dev), "polling-delay", 1000);
+	/* set critical cooling temp */
+	get_cpu_temp_grade(&minc, &maxc);
+	pdata->critical = (maxc - 5) * 1000;
+	pdata->alert = (maxc - 10) * 1000;
 
-	trips_np = fdt_subnode_offset(gd->fdt_blob, dev_of_offset(dev), "trips");
-	fdt_for_each_subnode(trips_np, gd->fdt_blob, trips_np) {
-		const char *type;
-		type = fdt_getprop(gd->fdt_blob, trips_np, "type", NULL);
-		if (type) {
-			if (strcmp(type, "critical") == 0)
-				pdata->critical = fdtdec_get_int(gd->fdt_blob, trips_np, "temperature", 85);
-			else if (strcmp(type, "passive") == 0)
-				pdata->alert = fdtdec_get_int(gd->fdt_blob, trips_np, "temperature", 80);
-		}
-	}
+	pdata->polling_delay = fdtdec_get_int(gd->fdt_blob, dev_of_offset(dev), "polling-delay", 1000);
 
 	debug("id %d polling_delay %d, critical %d, alert %d\n",
 		pdata->id, pdata->polling_delay, pdata->critical, pdata->alert);
