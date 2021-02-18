@@ -41,9 +41,18 @@
 #define CONFIG_SPL_ABORT_ON_RAW_IMAGE
 #endif
 
+/* UART */
+#if CONFIG_TARGET_PHYCORE_IMX8MP_REV0
+#define CONSOLE_ENV	"ttymxc1"
+#define CONFIG_MXC_UART_BASE		UART2_BASE_ADDR
+#else
+#define CONSOLE_ENV	"ttymxc0"
+#define CONFIG_MXC_UART_BASE		UART1_BASE_ADDR
+#endif
+
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"image=Image\0" \
-	"console=ttymxc1,115200\0" \
+	"console=" CONSOLE_ENV ",115200\0" \
 	"fdt_addr=0x48000000\0" \
 	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0" \
 	"ipaddr=192.168.3.11\0" \
@@ -109,9 +118,6 @@
 #define CONFIG_SYS_SDRAM_BASE		0x40000000
 
 #define PHYS_SDRAM			0x40000000
-
-/* UART */
-#define CONFIG_MXC_UART_BASE		UART2_BASE_ADDR
 
 /* Monitor Command Prompt */
 #define CONFIG_SYS_CBSIZE		SZ_2K
