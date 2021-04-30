@@ -680,4 +680,10 @@ config TEST_FDTDEC
 config LIB_DATE
 	bool
 
+config LMB_MAX_REGIONS
+	int "Number of memory and reserved regions in lmb lib"
+	default 8
+	help
+	  Define the number of supported regions, memory and reserved, in the
+	  library logical memory blocks.
 endmenu
