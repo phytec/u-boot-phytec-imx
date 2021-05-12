@@ -101,4 +101,12 @@
 			"reset; " \
 		"fi;\0"
 
+/* The minimal subset of environment variables that RAUC needs to read/write
+ * from environment storage. This can be used by locked-down builds, i. e. when
+ * u-boot is to be used in a secureboot context.
+ *
+ * The following ruleset will only apply if CONFIG_ENV_WRITEABLE_LIST is set
+ * */
+#define RAUC_REQUIRED_WRITABLE_ENV_FLAGS "BOOT_ORDER:sw,BOOT_system0_LEFT:dw,BOOT_system1_LEFT:dw,doraucboot:dw"
+
 #endif /* __PHYCORE_RAUC_ENV_H */
