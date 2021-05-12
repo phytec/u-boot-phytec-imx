@@ -79,6 +79,7 @@ void env_set_default(const char *s, int flags)
 		debug("Using default environment\n");
 	}
 
+	flags |= H_DEFAULT;
 	if (himport_r(&env_htab, (char *)default_environment,
 			sizeof(default_environment), '\0', flags, 0,
 			0, NULL) == 0)
@@ -97,7 +98,7 @@ int env_set_default_vars(int nvars, char * const vars[], int flags)
 	 * Special use-case: import from default environment
 	 * (and use \0 as a separator)
 	 */
-	flags |= H_NOCLEAR;
+	flags |= H_NOCLEAR | H_DEFAULT;
 	return himport_r(&env_htab, (const char *)default_environment,
 				sizeof(default_environment), '\0',
 				flags, 0, nvars, vars);
