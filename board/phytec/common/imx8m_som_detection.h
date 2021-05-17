@@ -7,9 +7,12 @@
 #ifndef _PHYTEC_IMX8M_DDR_H
 #define _PHYTEC_IMX8M_DDR_H
 
+#define PHYTEC_MAX_OPTIONS 17
+
 enum {
 	PHYTEC_API_REV0 = 0,
 	PHYTEC_API_REV1,
+	PHYTEC_API_REV2,
 };
 
 struct phytec_api0_data {
@@ -22,10 +25,23 @@ struct phytec_api0_data {
 	u8 cksum;		/* checksum */
 } __attribute__ ((__packed__));
 
+struct phytec_api2_data {
+	u8 pcb_rev;		/* PCB revision of SoM */
+	u8 pcb_sub_opt_rev;	/* PCB subrevision and opt revision */
+	u8 som_type;		/* SoM type */
+	u8 som_no;		/* SoM number */
+	u8 ksp_no;		/* KSP information */
+	char opt[PHYTEC_MAX_OPTIONS]; /* SoM options */
+	char bom_rev[2];	/* BOM revision */
+	u8 mac[6];		/* MAC address (optional) */
+	u8 crc8;		/* checksum */
+} __attribute__ ((__packed__));
+
 struct phytec_eeprom_data {
 	u8 api_rev;
 	union {
 		struct phytec_api0_data data_api0;
+		struct phytec_api2_data data_api2;
 	} data;
 } __attribute__ ((__packed__));
 

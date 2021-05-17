@@ -60,7 +60,7 @@ int phytec_eeprom_data_init(char *of_path, int bus_num, int addr)
 		return ret;
 	}
 
-	if (eeprom_data.api_rev > PHYTEC_API_REV1) {
+	if (eeprom_data.api_rev > PHYTEC_API_REV2) {
 		pr_err("%s: EEPROM API revision %u not supported\n",
 		       __func__,
 		       eeprom_data.api_rev);
@@ -78,6 +78,9 @@ char * __maybe_unused phytec_get_imx8m_opt(void)
 	case PHYTEC_API_REV0:
 	case PHYTEC_API_REV1:
 		opt = eeprom_data.data.data_api0.opt;
+		break;
+	case PHYTEC_API_REV2:
+		opt = eeprom_data.data.data_api2.opt;
 		break;
 	default:
 		opt = NULL;
