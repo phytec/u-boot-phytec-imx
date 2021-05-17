@@ -32,11 +32,11 @@ static void spl_dram_init(void)
 {
 	int ret;
 
-	ret = phytec_get_imx8m_ddr_size(0, EEPROM_I2C_ADDR);
+	ret = phytec_eeprom_data_init(0, 0, EEPROM_I2C_ADDR);
 	if (ret < 0)
 		goto err;
 
-	switch (ret) {
+	switch (phytec_get_imx8m_ddr_size()) {
 	case 1:
 		ddr_init(&dram_timing_1GB);
 		break;

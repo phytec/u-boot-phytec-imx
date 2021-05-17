@@ -24,6 +24,8 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+#define EEPROM_I2C_ADDR		0x59
+
 extern struct dram_timing_info dram_timing_1gb;
 
 int spl_board_boot_device(enum boot_device boot_dev_spl)
@@ -48,11 +50,11 @@ void spl_dram_init(void)
 {
 	int ret;
 
-	ret = phytec_get_imx8m_ddr_size(0, 0x59);
+	ret = phytec_eeprom_data_init(0, 0, EEPROM_I2C_ADDR);
 	if (ret < 0)
 		goto err;
 
-	switch (ret) {
+	switch (phytec_get_imx8m_ddr_size()) {
 	case 1:
 		ddr_init(&dram_timing_1gb);
 		break;
