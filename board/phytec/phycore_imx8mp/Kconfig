@@ -9,6 +9,8 @@ config SYS_VENDOR
 config SYS_CONFIG_NAME
 	default "phycore_imx8mp"
 
+source "board/phytec/common/Kconfig"
+
 endif
 
 if TARGET_PHYCORE_IMX8MP_REV0
@@ -21,5 +23,7 @@ config SYS_VENDOR
 
 config SYS_CONFIG_NAME
 	default "phycore_imx8mp"
+
+source "board/phytec/common/Kconfig"
 
 endif

@@ -23,7 +23,11 @@
 #include <power/pca9450.h>
 #include <spl.h>
 
+#include "../common/imx8m_som_detection.h"
+
 DECLARE_GLOBAL_DATA_PTR;
+
+#define EEPROM_I2C_ADDR		0x59
 
 int spl_board_boot_device(enum boot_device boot_dev_spl)
 {
@@ -32,6 +36,24 @@ int spl_board_boot_device(enum boot_device boot_dev_spl)
 
 void spl_dram_init(void)
 {
+	int ret;
+
+	ret = phytec_eeprom_data_init(0, 0, EEPROM_I2C_ADDR);
+	if (ret < 0)
+		goto err;
+
+	switch (phytec_get_imx8m_ddr_size()) {
+	case 3:
+		ddr_init(&dram_timing);
+		break;
+	default:
+		goto err;
+	}
+
+	return;
+
+err:
+	printf("Could not detect correct RAM size. Fallback to default.\n");
 	ddr_init(&dram_timing);
 }
 
