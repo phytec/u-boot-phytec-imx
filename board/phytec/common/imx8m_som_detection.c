@@ -152,3 +152,22 @@ u8 __maybe_unused phytec_get_imx8m_ddr_size(void)
 	debug("%s: ddr id: %u\n", __func__, ddr_id);
 	return ddr_id;
 }
+
+void __maybe_unused phytec_print_som_info(void)
+{
+	struct phytec_api2_data *api2;
+	char pcb_sub_rev;
+
+	if (eeprom_data.api_rev < PHYTEC_API_REV2)
+		return;
+
+	api2 = &eeprom_data.data.data_api2;
+
+	/* Calculate PCB subrevision */
+	pcb_sub_rev = api2->pcb_sub_opt_rev & 0x0f;
+	pcb_sub_rev = pcb_sub_rev ? ((pcb_sub_rev - 1) + 'a') : 0;
+
+	printf("SoM: %s-%03u-%s.%s PCB rev: %u%c\n",
+	       phytec_som_type_str[api2->som_type], api2->som_no,
+	       api2->opt, api2->bom_rev, api2->pcb_rev, pcb_sub_rev);
+}
