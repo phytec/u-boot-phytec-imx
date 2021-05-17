@@ -42,6 +42,8 @@ void spl_dram_init(void)
 	if (ret < 0)
 		goto err;
 
+	phytec_print_som_info();
+
 	switch (phytec_get_imx8m_ddr_size()) {
 	case 3:
 		ddr_init(&dram_timing);
