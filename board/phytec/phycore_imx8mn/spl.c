@@ -12,6 +12,7 @@
 #include <asm/mach-imx/boot_mode.h>
 #include <asm/mach-imx/gpio.h>
 #include <asm/mach-imx/iomux-v3.h>
+#include <asm/mach-imx/mxc_i2c.h>
 #include <asm-generic/gpio.h>
 #include <fsl_esdhc_imx.h>
 #include <mmc.h>
@@ -20,7 +21,11 @@
 #include <log.h>
 #include <spl.h>
 
+#include "../common/imx8m_som_detection.h"
+
 DECLARE_GLOBAL_DATA_PTR;
+
+#define EEPROM_I2C_ADDR		0x59
 
 int spl_board_boot_device(enum boot_device boot_dev_spl)
 {
@@ -29,8 +34,40 @@ int spl_board_boot_device(enum boot_device boot_dev_spl)
 
 void spl_dram_init(void)
 {
+	int ret;
+
+	ret = phytec_eeprom_data_init(0, 0, EEPROM_I2C_ADDR);
+	if (ret < 0)
+		goto err;
+
+	switch (phytec_get_imx8m_ddr_size()) {
+	case 1:
+		ddr_init(&dram_timing);
+		break;
+	default:
+		goto err;
+	}
+
+	return;
+err:
+	printf("Could not detect correct RAM size. Fallback to default.\n");
 	ddr_init(&dram_timing);
 }
+
+#define I2C_PAD_CTRL    (PAD_CTL_DSE6 | PAD_CTL_HYS | PAD_CTL_PUE | PAD_CTL_PE)
+#define PC MUX_PAD_CTRL(I2C_PAD_CTRL)
+struct i2c_pads_info i2c_pad_info1 = {
+	.scl = {
+		.i2c_mode = IMX8MN_PAD_I2C1_SCL__I2C1_SCL | PC,
+		.gpio_mode = IMX8MN_PAD_I2C1_SCL__GPIO5_IO14 | PC,
+		.gp = IMX_GPIO_NR(5, 14),
+	},
+	.sda = {
+		.i2c_mode = IMX8MN_PAD_I2C1_SDA__I2C1_SDA | PC,
+		.gpio_mode = IMX8MN_PAD_I2C1_SDA__GPIO5_IO15 | PC,
+		.gp = IMX_GPIO_NR(5, 15),
+	},
+};
 
 #define USDHC2_CD_GPIO  IMX_GPIO_NR(2, 12)
 
@@ -185,6 +222,8 @@ void board_init_f(ulong dummy)
 	}
 
 	enable_tzc380();
+
+	setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info1);
 
 	/* DDR initialization */
 	spl_dram_init();
