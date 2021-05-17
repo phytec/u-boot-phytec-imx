@@ -12,7 +12,7 @@
 #include <i2c_eeprom.h>
 
 #if !defined(CONFIG_DM_I2C)
-int get_imx8m_ddr_size(int bus_num, int addr)
+int phytec_get_imx8m_ddr_size(int bus_num, int addr)
 {
 	uint8_t var;
 	int ret;
@@ -51,7 +51,7 @@ static struct udevice *phytec_i2c_eeprom_init(char *of_path)
 }
 
 /* Get ddr size setting from EEPROM */
-int get_imx8m_ddr_size(char *of_path)
+int phytec_get_imx8m_ddr_size(char *of_path)
 {
 	struct udevice *dev;
 	uint8_t var;

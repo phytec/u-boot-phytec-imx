@@ -32,7 +32,7 @@ static void spl_dram_init(void)
 {
 	int ret;
 
-	ret = get_imx8m_ddr_size(0, EEPROM_I2C_ADDR);
+	ret = phytec_get_imx8m_ddr_size(0, EEPROM_I2C_ADDR);
 	if (ret < 0)
 		goto err;
 

@@ -48,7 +48,7 @@ void spl_dram_init(void)
 {
 	int ret;
 
-	ret =  get_imx8m_ddr_size(0, 0x59);
+	ret = phytec_get_imx8m_ddr_size(0, 0x59);
 	if (ret < 0)
 		goto err;
 
