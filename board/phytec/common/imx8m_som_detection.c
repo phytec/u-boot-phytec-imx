@@ -6,10 +6,12 @@
 
 #include <common.h>
 #include <asm/mach-imx/mxc_i2c.h>
+#include <asm/arch/sys_proto.h>
 #include <dm/device.h>
 #include <dm/uclass.h>
 #include <i2c.h>
 #include <i2c_eeprom.h>
+#include <u-boot/crc.h>
 
 #include "imx8m_som_detection.h"
 
@@ -40,6 +42,9 @@ static struct udevice __maybe_unused *phytec_i2c_eeprom_init(char *of_path)
 int phytec_eeprom_data_init(char *of_path, int bus_num, int addr)
 {
 	int ret;
+	unsigned int crc;
+	u8 som;
+	char *opt;
 
 #if defined(CONFIG_DM_I2C)
 	struct udevice *dev;
@@ -60,6 +65,11 @@ int phytec_eeprom_data_init(char *of_path, int bus_num, int addr)
 		return ret;
 	}
 
+	if (eeprom_data.api_rev == 0xff) {
+		pr_err("%s: EEPROM is not flashed. Prototype?\n", __func__);
+		return -EINVAL;
+	}
+
 	if (eeprom_data.api_rev > PHYTEC_API_REV2) {
 		pr_err("%s: EEPROM API revision %u not supported\n",
 		       __func__,
@@ -67,7 +77,41 @@ int phytec_eeprom_data_init(char *of_path, int bus_num, int addr)
 		return -EINVAL;
 	}
 
-	return 0;
+	/* We are done here for early revisions */
+	if (eeprom_data.api_rev <= PHYTEC_API_REV1)
+		return 0;
+
+	crc = crc8(0, (const unsigned char *)&eeprom_data, sizeof(eeprom_data));
+	debug("%s: crc: %x\n", __func__, crc);
+
+	if (crc) {
+		pr_err("%s: CRC mismatch. EEPROM data is not usable\n",
+		       __func__);
+		return -EINVAL;
+	}
+
+	som = eeprom_data.data.data_api2.som_no;
+	debug("%s: som id: %u\n", __func__, som);
+	opt = phytec_get_imx8m_opt();
+
+	if (som == PHYTEC_IMX8MP_SOM && is_imx8mp())
+		return 0;
+
+	if (som == PHYTEC_IMX8MM_SOM) {
+		if (((opt[0] - '0') != 0) &&
+		    ((opt[1] - '0') == 0) && is_imx8mm())
+			return 0;
+		else if (((opt[0] - '0') == 0) &&
+			 ((opt[1] - '0') != 0) && is_imx8mn())
+			return 0;
+		goto err;
+	}
+
+	if (som == PHYTEC_IMX8MQ_SOM && is_imx8mq())
+		return 0;
+err:
+	pr_err("%s: SoM ID does not match. Wrong EEPROM data?\n", __func__);
+	return -EINVAL;
 }
 
 char * __maybe_unused phytec_get_imx8m_opt(void)
