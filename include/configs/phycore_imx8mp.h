@@ -44,13 +44,8 @@
 #endif
 
 /* UART */
-#if CONFIG_TARGET_PHYCORE_IMX8MP_REV0
-#define CONSOLE_ENV	"ttymxc1"
-#define CONFIG_MXC_UART_BASE		UART2_BASE_ADDR
-#else
 #define CONSOLE_ENV	"ttymxc0"
 #define CONFIG_MXC_UART_BASE		UART1_BASE_ADDR
-#endif
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"image=Image\0" \
