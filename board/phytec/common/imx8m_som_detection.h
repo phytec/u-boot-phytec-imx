@@ -63,5 +63,6 @@ int phytec_eeprom_data_init(char *of_path, int bus_num, int addr);
 
 char * __maybe_unused phytec_get_imx8m_opt(void);
 u8 __maybe_unused phytec_get_imx8m_ddr_size(void);
+u8 __maybe_unused phytec_get_imx8m_spi(void);
 void __maybe_unused phytec_print_som_info(void);
 #endif
