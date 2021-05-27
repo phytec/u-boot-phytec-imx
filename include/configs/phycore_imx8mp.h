@@ -56,6 +56,9 @@
 	"serverip=192.168.3.10\0" \
 	"netmask=255.225.255.0\0" \
 	"ip_dyn=no\0" \
+	"mtdparts=30bb0000.spi:3840k(u-boot),1M(env),-(none)\0" \
+	"mtdids=nor0=30bb0000.spi\0" \
+	"spiprobe=true\0" \
 	"mmcdev=" __stringify(CONFIG_SYS_MMC_ENV_DEV) "\0" \
 	"mmcpart=" __stringify(CONFIG_SYS_MMC_IMG_LOAD_PART) "\0" \
 	"mmcroot=2\0" \
@@ -99,6 +102,7 @@
 #define CONFIG_BOOTCOMMAND \
 	"mmc dev ${mmcdev}; if mmc rescan; then " \
 		"test -n \"${doraucboot}\" || setenv doraucboot 0; " \
+		"run spiprobe; " \
 		"if test ${doraucboot} = 1; then " \
 			"run raucboot; " \
 		"elif run loadimage; then " \
