@@ -99,13 +99,20 @@
 			"echo WARN: Cannot load the DT; " \
 		"fi;\0" \
 
+#ifdef CONFIG_IMX_HAB
+#define BOOTCOMMAND_APPEND "reset;"
+#else
+#define BOOTCOMMAND_APPEND ""
+#endif
+
 #define CONFIG_BOOTCOMMAND \
 	"mmc dev ${mmcdev}; if mmc rescan; then " \
 		"if run loadimage; then " \
 			   "run mmcboot; " \
 		 "else run netboot; " \
 		 "fi; " \
-	"fi;"
+	"fi; " \
+       BOOTCOMMAND_APPEND
 
 /* Link Definitions */
 #define CONFIG_LOADADDR			0x40480000
