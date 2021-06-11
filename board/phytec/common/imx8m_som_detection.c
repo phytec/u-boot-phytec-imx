@@ -41,10 +41,11 @@ static struct udevice __maybe_unused *phytec_i2c_eeprom_init(char *of_path)
 
 int phytec_eeprom_data_init(char *of_path, int bus_num, int addr)
 {
-	int ret;
+	int ret, i;
 	unsigned int crc;
 	u8 som;
 	char *opt;
+	int *data;
 
 #if defined(CONFIG_DM_I2C)
 	struct udevice *dev;
@@ -67,6 +68,16 @@ int phytec_eeprom_data_init(char *of_path, int bus_num, int addr)
 
 	if (eeprom_data.api_rev == 0xff) {
 		pr_err("%s: EEPROM is not flashed. Prototype?\n", __func__);
+		return -EINVAL;
+	}
+
+	data = (int *)&eeprom_data;
+	for (i = 0; i < sizeof(eeprom_data); i += sizeof(data))
+		if (*data != 0x0)
+			break;
+
+	if (i == sizeof(eeprom_data)) {
+		pr_err("%s: EEPROM data is all zero. Erased?\n", __func__);
 		return -EINVAL;
 	}
 
