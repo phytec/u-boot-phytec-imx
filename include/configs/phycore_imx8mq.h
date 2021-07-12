@@ -11,6 +11,8 @@
 #include <linux/stringify.h>
 #include <asm/arch/imx-regs.h>
 
+#include "phycore_rauc_env.h"
+
 #define CONFIG_SYS_BOOTM_LEN				SZ_32M
 #define CONFIG_SPL_MAX_SIZE				(148 * SZ_1K)
 #define CONFIG_SYS_MONITOR_LEN				SZ_512K
@@ -97,7 +99,9 @@
 			"booti ${loadaddr} - ${fdt_addr}; " \
 		"else " \
 			"echo WARN: Cannot load the DT; " \
-		"fi;\0"
+		"fi;\0" \
+	"raucdev=0\0" \
+	PHYCORE_RAUC_ENV_BOOTLOGIC
 
 #ifdef CONFIG_IMX_HAB
 #define BOOTCOMMAND_APPEND "reset;"
@@ -107,12 +111,20 @@
 
 #define CONFIG_BOOTCOMMAND \
 	"mmc dev ${mmcdev}; if mmc rescan; then " \
-		"if run loadimage; then " \
+		"test -n \"${doraucboot}\" || setenv doraucboot 0; " \
+		"if test ${doraucboot} = 1; then " \
+			"run raucboot; " \
+		"elif run loadimage; then " \
 			"run mmcboot; " \
 		"else run netboot; " \
 		"fi; " \
 	"fi; " \
 	BOOTCOMMAND_APPEND
+
+#ifdef CONFIG_ENV_WRITEABLE_LIST
+/* Set environment flag validation to RAUC's list of env vars that must writable */
+#define CONFIG_ENV_FLAGS_LIST_STATIC	RAUC_REQUIRED_WRITABLE_ENV_FLAGS
+#endif
 
 /* Link Definitions */
 #define CONFIG_LOADADDR			0x40480000
