@@ -11,19 +11,19 @@
 #include <linux/stringify.h>
 #include <asm/arch/imx-regs.h>
 
-#define CONFIG_SYS_BOOTM_LEN		(32 * SZ_1M)
-#define CONFIG_SPL_MAX_SIZE		(148 * 1024)
-#define CONFIG_SYS_MONITOR_LEN		(512 * 1024)
+#define CONFIG_SYS_BOOTM_LEN				SZ_32M
+#define CONFIG_SPL_MAX_SIZE				(148 * SZ_1K)
+#define CONFIG_SYS_MONITOR_LEN				SZ_512K
 #define CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_USE_SECTOR
-#define CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR	0x300
+#define CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR		0x300
 
 #ifdef CONFIG_SPL_BUILD
 #define CONFIG_SPL_STACK		0x187FF0
-#define CONFIG_SPL_BSS_START_ADDR      0x00180000
-#define CONFIG_SPL_BSS_MAX_SIZE        0x2000	/* 8 KB */
-#define CONFIG_SYS_SPL_MALLOC_START    0x42200000
-#define CONFIG_SYS_SPL_MALLOC_SIZE     0x800000	/* 8 KB */
-#define CONFIG_SYS_SPL_PTE_RAM_BASE    0x41580000
+#define CONFIG_SPL_BSS_START_ADDR	0x00180000
+#define CONFIG_SPL_BSS_MAX_SIZE		SZ_8K
+#define CONFIG_SYS_SPL_MALLOC_START	0x42200000
+#define CONFIG_SYS_SPL_MALLOC_SIZE	SZ_8M
+#define CONFIG_SYS_SPL_PTE_RAM_BASE	0x41580000
 
 /* malloc f used before GD_FLG_FULL_MALLOC_INIT set */
 #define CONFIG_MALLOC_F_ADDR		0x182000
@@ -42,31 +42,31 @@
 #define CONFIG_POWER
 #define CONFIG_POWER_I2C
 #define CONFIG_POWER_PFUZE100
-#define CONFIG_POWER_PFUZE100_I2C_ADDR 0x08
+#define CONFIG_POWER_PFUZE100_I2C_ADDR	0x08
 #endif
 
 #define CONFIG_REMAKE_ELF
 
 /* ENET Config */
 /* ENET1 */
-#define CONFIG_ETHPRIME                 "FEC"	/* "eth0"	*/
+#define CONFIG_ETHPRIME			"FEC" /* "eth0" */
 #define CONFIG_FEC_XCV_TYPE		RGMII
 #define CONFIG_FEC_MXC_PHYADDR		1
 #define FEC_QUIRK_ENET_MAC
 #define IMX_FEC_BASE			0x30BE0000
 #define CONFIG_ENV_OVERWRITE
 
-#define CONFIG_EXTRA_ENV_SETTINGS		\
+#define CONFIG_EXTRA_ENV_SETTINGS \
 	"image=Image\0" \
 	"console=ttymxc0,115200\0" \
-	"fdt_addr=0x48000000\0"			\
+	"fdt_addr=0x48000000\0" \
 	"boot_fdt=try\0" \
 	"fdt_file=oftree\0" \
 	"ipaddr=192.168.3.11\0" \
 	"serverip=192.168.3.10\0" \
 	"netmask=255.255.255.0\0" \
 	"ip_dyn=no\0" \
-	"mmcdev="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0" \
+	"mmcdev=" __stringify(CONFIG_SYS_MMC_ENV_DEV) "\0" \
 	"mmcpart=" __stringify(CONFIG_SYS_MMC_IMG_LOAD_PART) "\0" \
 	"mmcroot=2\0" \
 	"mmcautodetect=yes\0" \
@@ -97,7 +97,7 @@
 			"booti ${loadaddr} - ${fdt_addr}; " \
 		"else " \
 			"echo WARN: Cannot load the DT; " \
-		"fi;\0" \
+		"fi;\0"
 
 #ifdef CONFIG_IMX_HAB
 #define BOOTCOMMAND_APPEND "reset;"
@@ -108,47 +108,47 @@
 #define CONFIG_BOOTCOMMAND \
 	"mmc dev ${mmcdev}; if mmc rescan; then " \
 		"if run loadimage; then " \
-			   "run mmcboot; " \
-		 "else run netboot; " \
-		 "fi; " \
+			"run mmcboot; " \
+		"else run netboot; " \
+		"fi; " \
 	"fi; " \
-       BOOTCOMMAND_APPEND
+	BOOTCOMMAND_APPEND
 
 /* Link Definitions */
 #define CONFIG_LOADADDR			0x40480000
 
-#define CONFIG_SYS_LOAD_ADDR           CONFIG_LOADADDR
+#define CONFIG_SYS_LOAD_ADDR		CONFIG_LOADADDR
 
-#define CONFIG_SYS_INIT_RAM_ADDR        0x40000000
-#define CONFIG_SYS_INIT_RAM_SIZE        0x80000
+#define CONFIG_SYS_INIT_RAM_ADDR	0x40000000
+#define CONFIG_SYS_INIT_RAM_SIZE	SZ_512K
 #define CONFIG_SYS_INIT_SP_OFFSET \
 	(CONFIG_SYS_INIT_RAM_SIZE - GENERATED_GBL_DATA_SIZE)
 #define CONFIG_SYS_INIT_SP_ADDR \
 	(CONFIG_SYS_INIT_RAM_ADDR + CONFIG_SYS_INIT_SP_OFFSET)
 
 #define CONFIG_SYS_MMC_ENV_DEV		0
-#define CONFIG_MMCROOT			"/dev/mmcblk1p2"  /* USDHC2 */
+#define CONFIG_MMCROOT			"/dev/mmcblk1p2" /* USDHC2 */
 
 /* Size of malloc() pool */
-#define CONFIG_SYS_MALLOC_LEN		((CONFIG_ENV_SIZE + (2*1024)) * 1024)
+#define CONFIG_SYS_MALLOC_LEN		((CONFIG_ENV_SIZE + SZ_2K) * SZ_1K)
 
-#define CONFIG_SYS_SDRAM_BASE           0x40000000
-#define PHYS_SDRAM                      0x40000000
+#define CONFIG_SYS_SDRAM_BASE		0x40000000
+#define PHYS_SDRAM			0x40000000
 
 #define CONFIG_MXC_UART_BASE		UART1_BASE_ADDR
 
 /* Monitor Command Prompt */
-#define CONFIG_SYS_CBSIZE		1024
+#define CONFIG_SYS_CBSIZE		SZ_1K
 #define CONFIG_SYS_MAXARGS		64
 #define CONFIG_SYS_BARGSIZE		CONFIG_SYS_CBSIZE
 
 #define CONFIG_SYS_FSL_USDHC_NUM	2
-#define CONFIG_SYS_FSL_ESDHC_ADDR       0
+#define CONFIG_SYS_FSL_ESDHC_ADDR	0
 
 #define CONFIG_SYS_MMC_IMG_LOAD_PART	1
 
 /* I2C Configs */
-#define CONFIG_SYS_I2C_SPEED		  100000
+#define CONFIG_SYS_I2C_SPEED		100000
 
 /* USB configs */
 #ifndef CONFIG_SPL_BUILD
