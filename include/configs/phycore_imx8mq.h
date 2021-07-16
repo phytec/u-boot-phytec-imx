@@ -82,7 +82,8 @@
 			"booti ${loadaddr} - ${fdt_addr}; " \
 		"else " \
 			"echo WARN: Cannot load the DT; " \
-		"fi; " \
+		"fi;\0" \
+	"nfsroot=/nfs\0" \
 	"netargs=setenv bootargs console=${console} root=/dev/nfs ip=${nfsip} " \
 		"nfsroot=${serverip}:${nfsroot},v3,tcp\0" \
 	"netboot=echo Booting from net ...; " \
