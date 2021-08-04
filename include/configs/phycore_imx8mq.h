@@ -184,4 +184,9 @@
 #define CONFIG_USBD_HS
 #define CONFIG_USB_GADGET_VBUS_DRAW 2
 
+/* SPI flash*/
+#define CONFIG_SYS_FSL_QSPI_AHB
+#define FSL_QSPI_FLASH_SIZE     (SZ_32M)
+#define FSL_QSPI_FLASH_NUM      1
+
 #endif

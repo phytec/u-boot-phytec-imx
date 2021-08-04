@@ -45,6 +45,12 @@ int board_early_init_f(void)
 	return 0;
 }
 
+int board_qspi_init(void)
+{
+	set_clk_qspi();
+	return 0;
+}
+
 static int setup_fec(void)
 {
 	struct iomuxc_gpr_base_regs *gpr =
@@ -151,6 +157,7 @@ void imx8mq_set_bootsource(void)
 
 int board_init(void)
 {
+	board_qspi_init();
 	setup_fec();
 	init_usb_clk();
 
