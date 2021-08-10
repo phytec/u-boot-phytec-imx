@@ -34,6 +34,8 @@ int spl_board_boot_device(enum boot_device boot_dev_spl)
 	return BOOT_DEVICE_BOOTROM;
 }
 
+extern struct dram_timing_info dram_timing_4gb;
+
 void spl_dram_init(void)
 {
 	int ret;
@@ -47,6 +49,9 @@ void spl_dram_init(void)
 	switch (phytec_get_imx8m_ddr_size()) {
 	case 3:
 		ddr_init(&dram_timing);
+		break;
+	case 5:
+		ddr_init(&dram_timing_4gb);
 		break;
 	default:
 		goto err;
