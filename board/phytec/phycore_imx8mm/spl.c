@@ -27,6 +27,7 @@ DECLARE_GLOBAL_DATA_PTR;
 #define EEPROM_I2C_ADDR		0x59
 
 extern struct dram_timing_info dram_timing_1gb;
+extern struct dram_timing_info dram_timing_4gb;
 
 int spl_board_boot_device(enum boot_device boot_dev_spl)
 {
@@ -62,6 +63,9 @@ void spl_dram_init(void)
 		break;
 	case 3:
 		ddr_init(&dram_timing);
+		break;
+	case 5:
+		ddr_init(&dram_timing_4gb);
 		break;
 	default:
 		goto err;
