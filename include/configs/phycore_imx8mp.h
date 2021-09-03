@@ -103,7 +103,7 @@
 
 #define CONFIG_BOOTCOMMAND \
 	"mmc dev ${mmcdev}; if mmc rescan; then " \
-		"test -n \"${doraucboot}\" || setenv doraucboot 0; " \
+		"env exists doraucboot || setenv doraucboot 0 && saveenv;" \
 		"run spiprobe; " \
 		"if test ${doraucboot} = 1; then " \
 			"run raucboot; " \
