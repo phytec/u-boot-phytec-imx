@@ -1,0 +1,54 @@
+// SPDX-License-Identifier: GPL-2.0+ OR MIT
+/* Copyright (C) 2018-2021 PHYTEC America, LLC */
+
+&i2c4 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_i2c4>;
+	clock-frequency = <100000>;
+	status = "okay";
+
+	pebdrpi_eeprom: eeprom@56 {
+		compatible = "atmel,24c32";
+		reg = <0x56>;
+		pagesize = <32>;
+	};
+};
+
+&uart1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart1>;
+	assigned-clocks = <&clks IMX7D_UART1_ROOT_SRC>;
+	assigned-clock-parents = <&clks IMX7D_PLL_SYS_MAIN_240M_CLK>;
+	status = "okay";
+};
+
+&uart2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart2>;
+	assigned-clocks = <&clks IMX7D_UART2_ROOT_SRC>;
+	assigned-clock-parents = <&clks IMX7D_PLL_SYS_MAIN_240M_CLK>;
+	status = "okay";
+};
+
+&iomuxc {
+	pinctrl_i2c4: i2c4grp {
+		fsl,pins = <
+			MX7D_PAD_I2C4_SCL__I2C4_SCL	0x4000007e
+			MX7D_PAD_I2C4_SDA__I2C4_SDA	0x4000007e
+		>;
+	};
+
+	pinctrl_uart1: uart1grp {
+		fsl,pins = <
+			MX7D_PAD_UART1_RX_DATA__UART1_DCE_RX	0x7e
+			MX7D_PAD_UART1_TX_DATA__UART1_DCE_TX	0x7e
+		>;
+	};
+
+	pinctrl_uart2: uart2grp {
+		fsl,pins = <
+			MX7D_PAD_UART2_RX_DATA__UART2_DCE_RX	0x7e
+			MX7D_PAD_UART2_TX_DATA__UART2_DCE_TX	0x7e
+		>;
+	};
+};

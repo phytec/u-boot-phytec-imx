@@ -1,0 +1,44 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/* Copyright (C) 2015-2021 PHYTEC America, LLC */
+
+/dts-v1/;
+
+#include "imx7-phycore-som.dtsi"	/* SOM */
+#include "imx7-pba-c-09.dtsi"		/* Carrier board */
+#include "imx7-peb-d-rpi.dtsi"		/* PEB-D-RPI module */
+
+&cpu1 {
+	status = "disabled";
+};
+
+&fec1 {
+	status = "disabled";
+};
+
+&fec2 {
+	status = "disabled";
+};
+
+&gpmi {
+	status = "okay";
+};
+
+&i2c_rtc {
+	status = "disabled";
+};
+
+&qflash0 {
+	status = "disabled";
+};
+
+&qspi1 {
+	status = "disabled";
+};
+
+&usbotg2 {
+	status = "disabled";
+};
+
+&usdhc3 {
+	status = "disabled";
+};

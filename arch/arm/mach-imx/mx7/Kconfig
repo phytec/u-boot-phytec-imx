@@ -114,6 +114,14 @@ config TARGET_COLIBRI_IMX7
 	select DM_THERMAL
 	imply CMD_DM
 
+config TARGET_PHYCORE_IMX7
+	bool "phycore-imx7"
+	select BOARD_LATE_INIT
+	select DM
+	select DM_THERMAL
+	select MX7D
+	imply CMD_DM
+
 endchoice
 
 config SYS_SOC
@@ -126,6 +134,7 @@ source "board/freescale/mx7d_12x12_ddr3_val/Kconfig"
 source "board/freescale/mx7d_19x19_ddr3_val/Kconfig"
 source "board/freescale/mx7d_19x19_lpddr3_val/Kconfig"
 source "board/novtech/meerkat96/Kconfig"
+source "board/phytec/phycore_imx7/Kconfig"
 source "board/technexion/pico-imx7d/Kconfig"
 source "board/toradex/colibri_imx7/Kconfig"
 source "board/warp7/Kconfig"
