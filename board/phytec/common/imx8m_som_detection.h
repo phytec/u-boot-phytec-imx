@@ -18,6 +18,17 @@ enum {
 	PHYTEC_API_REV2,
 };
 
+static const char * const phytec_som_type_str[] = {
+	"PCM",
+	"PCL",
+	"KSM",
+	"KSP",
+	"PCM-KSP",
+	"PCM-KSM",
+	"PCL-KSP",
+	"PCL-KSM",
+};
+
 struct phytec_api0_data {
 	u8 pcb_rev;		/* PCB revision of SoM */
 	u8 som_type;		/* SoM type */
@@ -52,4 +63,5 @@ int phytec_eeprom_data_init(char *of_path, int bus_num, int addr);
 
 char * __maybe_unused phytec_get_imx8m_opt(void);
 u8 __maybe_unused phytec_get_imx8m_ddr_size(void);
+void __maybe_unused phytec_print_som_info(void);
 #endif
