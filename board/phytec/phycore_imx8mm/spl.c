@@ -24,7 +24,8 @@ extern struct dram_timing_info dram_timing_4gb;
 
 DECLARE_GLOBAL_DATA_PTR;
 
-#define EEPROM_I2C_ADDR		0x59
+#define EEPROM_ADDR		0x51
+#define EEPROM_ADDR_FALLBACK	0x59
 
 int spl_board_boot_device(enum boot_device boot_dev_spl)
 {
@@ -48,9 +49,17 @@ static void spl_dram_init(void)
 {
 	int ret;
 
-	ret = phytec_eeprom_data_init(0, EEPROM_I2C_ADDR);
-	if (ret < 0)
-		goto err;
+	ret = phytec_eeprom_data_init(0, EEPROM_ADDR);
+	if (ret) {
+		printf("phytec_eeprom_data_init: init failed. "
+		       "Trying fall back address 0x%x\n", EEPROM_ADDR_FALLBACK);
+		ret = phytec_eeprom_data_init(0,
+					      EEPROM_ADDR_FALLBACK);
+		if (ret)
+			goto err;
+	}
+
+	printf("phytec_eeprom_data_init: init successful\n");
 
 	phytec_print_som_info();
 
