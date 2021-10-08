@@ -164,6 +164,27 @@ u8 __maybe_unused phytec_get_imx8m_ddr_size(void)
 	return ddr_id;
 }
 
+/*
+ * Filter SPI-NOR flash information. All i.MX8M boards have this at
+ * the same location.
+ * returns: 0x0 if no SPI is poulated. Otherwise a board depended
+ * code for the size. 0xff when the data is invalid.
+ */
+u8 __maybe_unused phytec_get_imx8m_spi(void)
+{
+	char *opt;
+	u8 spi;
+
+	opt = phytec_get_imx8m_opt();
+	if (opt)
+		spi = opt[4] - '0';
+	else
+		spi = 0xff;
+
+	debug("%s: spi: %u\n", __func__, spi);
+	return spi;
+}
+
 void __maybe_unused phytec_print_som_info(void)
 {
 	struct phytec_api2_data *api2;
