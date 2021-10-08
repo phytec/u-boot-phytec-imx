@@ -733,6 +733,12 @@ config LIB_ELF
 	  Support basic elf loading/validating functions.
 	  This supports for 32 bit and 64 bit versions.
 
+config LMB_MAX_REGIONS
+	int "Number of memory and reserved regions in lmb lib"
+	default 8
+	help
+	  Define the number of supported regions, memory and reserved, in the
+	  library logical memory blocks.
 endmenu
 
 config PHANDLE_CHECK_SEQ
