@@ -83,6 +83,17 @@ struct bd_info;
 
  /* gd->flags reserves high 16 bits for arch-specific flags */
 #define GD_FLG_ARCH_IMX_USB_BOOT		0x80000000	 /* Only used for MX6/7, If set, the u-boot is booting from USB serial download */
+#ifdef CONFIG_IMX8M
+phys_size_t imx8m_ddrc_sdram_size(void);
+phys_size_t imx_ddrc_sdram_size(void *ddrc, const u32 addrmap[],
+				u8 col_max, const u8 col_b[],
+				unsigned int col_b_num,
+				u8 row_max, const u8 row_b[],
+				unsigned int row_b_num,
+				bool reduced_address_space);
+unsigned int imx_ddrc_count_bits(unsigned int bits, const u8 config[],
+				 unsigned int config_num);
+#endif
 
 #ifdef CONFIG_MX6
 #define IMX6_SRC_GPR10_BMODE			BIT(28)
