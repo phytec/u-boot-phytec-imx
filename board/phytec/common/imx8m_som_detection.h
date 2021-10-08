@@ -59,7 +59,7 @@ struct phytec_eeprom_data {
 	} data;
 } __attribute__ ((__packed__));
 
-int phytec_eeprom_data_init(char *of_path, int bus_num, int addr);
+int phytec_eeprom_data_init(int bus_num, int addr);
 
 char * __maybe_unused phytec_get_imx8m_opt(void);
 u8 __maybe_unused phytec_get_imx8m_ddr_size(void);
