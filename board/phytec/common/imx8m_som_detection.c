@@ -10,36 +10,13 @@
 #include <dm/device.h>
 #include <dm/uclass.h>
 #include <i2c.h>
-#include <i2c_eeprom.h>
 #include <u-boot/crc.h>
 
 #include "imx8m_som_detection.h"
 
 struct phytec_eeprom_data eeprom_data;
 
-static struct udevice __maybe_unused *phytec_i2c_eeprom_init(char *of_path)
-{
-	int ret;
-	struct udevice *dev;
-	ofnode eeprom;
-
-	eeprom = ofnode_path(of_path);
-	if (!ofnode_valid(eeprom)) {
-		pr_err("%s: Could not find i2c EEPROM in device tree.\n",
-		       __func__);
-		return NULL;
-	}
-
-	ret = uclass_get_device_by_ofnode(UCLASS_I2C_EEPROM, eeprom, &dev);
-	if (ret) {
-		pr_err("%s: i2c EEPROM not found.\n", __func__);
-		return NULL;
-	}
-
-	return dev;
-}
-
-int phytec_eeprom_data_init(char *of_path, int bus_num, int addr)
+int phytec_eeprom_data_init(int bus_num, int addr)
 {
 	int ret, i;
 	unsigned int crc;
@@ -50,12 +27,14 @@ int phytec_eeprom_data_init(char *of_path, int bus_num, int addr)
 #if defined(CONFIG_DM_I2C)
 	struct udevice *dev;
 
-	dev = phytec_i2c_eeprom_init(of_path);
-	if (!dev)
-		return -ENODEV;
+	ret = i2c_get_chip_for_busnum(bus_num, addr, 2, &dev);
+	if (ret) {
+		pr_err("%s: i2c EEPROM not found: %i.\n", __func__, ret);
+		return ret;
+	}
 
-	ret = i2c_eeprom_read(dev, 0, (uint8_t *)&eeprom_data,
-			      sizeof(eeprom_data));
+	ret = dm_i2c_read(dev, 0, (uint8_t *)&eeprom_data,
+			  sizeof(eeprom_data));
 #else
 	i2c_set_bus_num(bus_num);
 	ret =  i2c_read(addr, 0, 2, (uint8_t *)&eeprom_data,
