@@ -17,7 +17,14 @@
 #include <log.h>
 #include <spl.h>
 
+#include "../common/imx8m_som_detection.h"
+
+extern struct dram_timing_info dram_timing_1gb;
+extern struct dram_timing_info dram_timing_4gb;
+
 DECLARE_GLOBAL_DATA_PTR;
+
+#define EEPROM_I2C_ADDR		0x59
 
 int spl_board_boot_device(enum boot_device boot_dev_spl)
 {
@@ -39,6 +46,35 @@ int spl_board_boot_device(enum boot_device boot_dev_spl)
 
 static void spl_dram_init(void)
 {
+	int ret;
+
+	ret = phytec_eeprom_data_init(0, EEPROM_I2C_ADDR);
+	if (ret < 0)
+		goto err;
+
+	phytec_print_som_info();
+
+	switch (phytec_get_imx8m_ddr_size()) {
+	case 1:
+		dram_timing_1gb.ddrphy_cfg[82].val = 0x3;
+		dram_timing_1gb.ddrphy_cfg[83].val = 0x3;
+		ddr_init(&dram_timing_1gb);
+		break;
+	case 3:
+		ddr_init(&dram_timing);
+		break;
+	case 5:
+		dram_timing_4gb.ddrphy_cfg[82].val = 0x3;
+		dram_timing_4gb.ddrphy_cfg[83].val = 0x3;
+		ddr_init(&dram_timing_4gb);
+		break;
+	default:
+		goto err;
+	}
+
+	return;
+err:
+	printf("Could not detect correct RAM size. Fallback to default.\n");
 	ddr_init(&dram_timing);
 }
 
