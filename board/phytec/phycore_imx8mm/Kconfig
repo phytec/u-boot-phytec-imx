@@ -3,6 +3,8 @@ if TARGET_PHYCORE_IMX8MM
 config SYS_BOARD
 	default "phycore_imx8mm"
 
+source "board/phytec/common/Kconfig"
+
 config SYS_VENDOR
 	default "phytec"
 
