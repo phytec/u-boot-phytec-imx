@@ -185,7 +185,7 @@ static long lmb_add_region(struct lmb_region *rgn, phys_addr_t base, phys_size_t
 
 	if (coalesced)
 		return coalesced;
-	if (rgn->cnt >= MAX_LMB_REGIONS)
+	if (rgn->cnt >= CONFIG_LMB_MAX_REGIONS)
 		return -1;
 
 	/* Couldn't coalesce the LMB, so add it to the sorted table. */
