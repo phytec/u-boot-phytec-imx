@@ -164,6 +164,29 @@ u8 __maybe_unused phytec_get_imx8m_spi(void)
 	return spi;
 }
 
+/*
+ * Filter ethernet phy information. All i.MX8M boards have this at
+ * the same location.
+ * returns: 0x0 if no ethernet phy is poulated. 0x1 if it is populated.
+ * 0xff when the data is invalid.
+ */
+u8 __maybe_unused phytec_get_imx8m_eth(void)
+{
+	char *opt;
+	u8 eth;
+
+	opt = phytec_get_imx8m_opt();
+	if (opt) {
+		eth = opt[5] - '0';
+		eth &= 0x1;
+	} else {
+		eth = 0xff;
+	}
+
+	debug("%s: eth: %u\n", __func__, eth);
+	return eth;
+}
+
 void __maybe_unused phytec_print_som_info(void)
 {
 	struct phytec_api2_data *api2;
