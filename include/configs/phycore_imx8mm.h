@@ -40,7 +40,10 @@
 	"console=ttymxc2,115200\0" \
 	"fdt_addr=0x48000000\0" \
 	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0" \
-	"ip_dyn=yes\0" \
+	"ipaddr=192.168.3.11\0" \
+	"serverip=192.168.3.10\0" \
+	"netmask=255.225.255.0\0" \
+	"ip_dyn=no\0" \
 	"mtdparts=30bb0000.spi:3840k(u-boot),128k(env),128k(env_redund),-(none)\0" \
 	"mtdids=nor0=30bb0000.spi\0" \
 	"spiprobe=true\0" \
