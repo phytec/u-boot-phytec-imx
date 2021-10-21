@@ -378,8 +378,8 @@ static int imx_tmu_parse_fdt(struct udevice *dev)
 {
 	struct imx_tmu_plat *pdata = dev_get_plat(dev), *p_parent_data;
 	struct ofnode_phandle_args args;
-	ofnode trips_np;
 	int ret;
+	int maxc, minc;
 
 	debug("%s dev name %s\n", __func__, dev->name);
 
@@ -411,22 +411,12 @@ static int imx_tmu_parse_fdt(struct udevice *dev)
 
 	debug("args.args_count %d, id %d\n", args.args_count, pdata->id);
 
+	/* set critical cooling temp */
+	get_cpu_temp_grade(&minc, &maxc);
+	pdata->critical = (maxc - 5) * 1000;
+	pdata->alert = (maxc - 10) * 1000;
+
 	pdata->polling_delay = dev_read_u32_default(dev, "polling-delay", 1000);
-
-	trips_np = ofnode_path("/thermal-zones/cpu-thermal/trips");
-	ofnode_for_each_subnode(trips_np, trips_np) {
-		const char *type;
-
-		type = ofnode_get_property(trips_np, "type", NULL);
-		if (!type)
-			continue;
-		if (!strcmp(type, "critical"))
-			pdata->critical = ofnode_read_u32_default(trips_np, "temperature", 85);
-		else if (strcmp(type, "passive") == 0)
-			pdata->alert = ofnode_read_u32_default(trips_np, "temperature", 80);
-		else
-			continue;
-	}
 
 	debug("id %d polling_delay %d, critical %d, alert %d\n",
 	      pdata->id, pdata->polling_delay, pdata->critical, pdata->alert);
