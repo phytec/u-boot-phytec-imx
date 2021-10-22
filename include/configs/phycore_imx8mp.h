@@ -59,15 +59,17 @@
 			"echo WARN: Cannot load the DT; " \
 		"fi;\0 " \
 	"nfsroot=/nfs\0" \
-	"netargs=setenv bootargs console=${console} root=/dev/nfs ip=dhcp " \
+	"netargs=setenv bootargs console=${console} root=/dev/nfs ip=${nfsip} " \
 		"nfsroot=${serverip}:${nfsroot},v3,tcp\0" \
 	"netboot=echo Booting from net ...; " \
-		"run netargs; " \
 		"if test ${ip_dyn} = yes; then " \
+			"setenv nfsip dhcp; " \
 			"setenv get_cmd dhcp; " \
 		"else " \
+			"setenv nfsip ${ipaddr}:${serverip}::${netmask}::eth0:on; " \
 			"setenv get_cmd tftp; " \
 		"fi; " \
+		"run netargs; " \
 		"${get_cmd} ${loadaddr} ${image}; " \
 		"if ${get_cmd} ${fdt_addr} ${fdt_file}; then " \
 			"booti ${loadaddr} - ${fdt_addr}; " \
