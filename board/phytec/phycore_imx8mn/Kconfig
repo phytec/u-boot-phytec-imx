@@ -1,0 +1,10 @@
+if TARGET_PHYCORE_IMX8MN
+config SYS_BOARD
+	default "phycore_imx8mn"
+
+config SYS_VENDOR
+	default "phytec"
+
+config SYS_CONFIG_NAME
+	default "phycore_imx8mn"
+endif
