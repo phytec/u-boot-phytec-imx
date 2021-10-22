@@ -7,4 +7,7 @@ config SYS_VENDOR
 
 config SYS_CONFIG_NAME
 	default "phycore_imx8mn"
+
+source "board/phytec/common/Kconfig"
+
 endif
