@@ -20,7 +20,12 @@
 #include <log.h>
 #include <spl.h>
 
+#include "../common/imx8m_som_detection.h"
+
 DECLARE_GLOBAL_DATA_PTR;
+
+#define EEPROM_ADDR		0x51
+#define EEPROM_ADDR_FALLBACK	0x59
 
 int spl_board_boot_device(enum boot_device boot_dev_spl)
 {
@@ -29,6 +34,33 @@ int spl_board_boot_device(enum boot_device boot_dev_spl)
 
 void spl_dram_init(void)
 {
+	int ret;
+
+	ret = phytec_eeprom_data_init(0, EEPROM_ADDR);
+	if (ret) {
+		printf("phytec_eeprom_data_init: init failed. "
+		       "Trying fall back address 0x%x\n", EEPROM_ADDR_FALLBACK);
+		ret = phytec_eeprom_data_init(0,
+					      EEPROM_ADDR_FALLBACK);
+		if (ret)
+			goto err;
+	}
+
+	printf("phytec_eeprom_data_init: init successful\n");
+
+	phytec_print_som_info();
+
+	switch (phytec_get_imx8m_ddr_size()) {
+	case 1:
+		ddr_init(&dram_timing);
+		break;
+	default:
+		goto err;
+	}
+
+	return;
+err:
+	printf("Could not detect correct RAM size. Fallback to default.\n");
 	ddr_init(&dram_timing);
 }
 
