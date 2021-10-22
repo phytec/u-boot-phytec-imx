@@ -93,6 +93,7 @@
 		compatible = "atmel,24c32";
 		reg = <0x59>;
 		u-boot,i2c-offset-len = <2>;
+		size = <32>;
 	};
 };
 
