@@ -1627,9 +1627,12 @@ enum env_location env_get_location(enum env_operation op, int prio)
 	enum boot_device dev = get_boot_device();
 	enum env_location env_loc = ENVL_UNKNOWN;
 
-	if (prio)
+	if (prio > 1)
 		return env_loc;
-
+#if defined(CONFIG_ENV_IS_NOWHERE)
+	if(prio == 1)
+		return ENVL_NOWHERE;
+#endif
 	switch (dev) {
 #ifdef CONFIG_ENV_IS_IN_SPI_FLASH
 	case QSPI_BOOT:
