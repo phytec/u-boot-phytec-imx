@@ -93,6 +93,7 @@ static int do_bootm_subcommand(struct cmd_tbl *cmdtp, int flag, int argc,
 
 int do_bootm(struct cmd_tbl *cmdtp, int flag, int argc, char *const argv[])
 {
+	__maybe_unused void *buf;
 #ifdef CONFIG_NEEDS_MANUAL_RELOC
 	static int relocated = 0;
 
@@ -177,6 +178,17 @@ int do_bootm(struct cmd_tbl *cmdtp, int flag, int argc, char *const argv[])
 #ifdef CONFIG_ANDROID_BOOT_IMAGE
 	case IMAGE_FORMAT_ANDROID:
 		/* Do this authentication in boota command */
+		break;
+#endif
+#ifdef CONFIG_FIT
+	case IMAGE_FORMAT_FIT:
+		buf = (void *)map_sysmem(image_load_addr, 0);
+		size_t size = fit_get_size(buf);
+		unmap_sysmem(buf);
+		if (authenticate_image(image_load_addr, size) != 0) {
+			printf("Authenticate FIT image Fail, Please check\n");
+			return 1;
+		}
 		break;
 #endif
 	default:
