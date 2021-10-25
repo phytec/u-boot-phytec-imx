@@ -82,13 +82,13 @@
 		"else " \
 			"echo WARN: Cannot load the DT; " \
 		"fi;\0" \
-	"doraucboot=0\0" \
 	"raucdev=2\0" \
 	PHYCORE_RAUC_ENV_BOOTLOGIC
 
 #define CONFIG_BOOTCOMMAND \
 	"mmc dev ${mmcdev}; if mmc rescan; then " \
 		"run spiprobe; " \
+		"test -n \"${doraucboot}\" || setenv doraucboot 0; " \
 		"if test ${doraucboot} = 1; then " \
 			"run raucboot; " \
 		"elif run loadimage; then " \
