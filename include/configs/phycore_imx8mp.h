@@ -10,6 +10,8 @@
 #include <linux/sizes.h>
 #include <asm/arch/imx-regs.h>
 
+#include "phycore_rauc_env.h"
+
 #define CONFIG_SYS_BOOTM_LEN		SZ_64M
 
 #define CONFIG_SPL_MAX_SIZE		(152 * SZ_1K)
@@ -76,10 +78,15 @@
 		"else " \
 			"echo WARN: Cannot load the DT; " \
 		"fi;\0" \
+	"doraucboot=0\0" \
+	"raucdev=2\0" \
+	PHYCORE_RAUC_ENV_BOOTLOGIC
 
 #define CONFIG_BOOTCOMMAND \
 	"mmc dev ${mmcdev}; if mmc rescan; then " \
-		"if run loadimage; then " \
+		"if test ${doraucboot} = 1; then " \
+			"run raucboot; " \
+		"elif run loadimage; then " \
 			"run mmcboot; " \
 		"else run netboot; " \
 		"fi; " \
