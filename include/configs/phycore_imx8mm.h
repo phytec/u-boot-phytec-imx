@@ -94,7 +94,7 @@
 #define CONFIG_BOOTCOMMAND \
 	"mmc dev ${mmcdev}; if mmc rescan; then " \
 		"run spiprobe; " \
-		"test -n \"${doraucboot}\" || setenv doraucboot 0; " \
+		"env exists doraucboot || setenv doraucboot 0 && saveenv;" \
 		"if test ${doraucboot} = 1; then " \
 			"run raucboot; " \
 		"elif run loadimage; then " \
