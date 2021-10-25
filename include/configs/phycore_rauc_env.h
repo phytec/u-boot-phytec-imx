@@ -47,8 +47,11 @@
 	"loadraucfdt=fatload mmc ${raucdev}:${raucbootpart} ${fdt_addr} ${fdt_file}\0" \
 	"raucemmcboot=echo Booting A/B system from eMMC...; " \
 		"if run loadraucimage; then " \
+			"run raucargs; " \
+			"if test ${dofitboot} = 1; then; " \
+			"	bootm; " \
+			"fi; " \
 			"if run loadraucfdt; then " \
-				"run raucargs; " \
 				"booti ${loadaddr} - ${fdt_addr}; " \
 			"else " \
 				"echo WARN: Cannot load device tree; " \
