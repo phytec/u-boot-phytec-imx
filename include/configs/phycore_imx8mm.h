@@ -85,6 +85,12 @@
 	"raucdev=2\0" \
 	PHYCORE_RAUC_ENV_BOOTLOGIC
 
+#ifdef CONFIG_IMX_HAB
+#define BOOTCOMMAND_APPEND "reset;"
+#else
+#define BOOTCOMMAND_APPEND ""
+#endif
+
 #define CONFIG_BOOTCOMMAND \
 	"mmc dev ${mmcdev}; if mmc rescan; then " \
 		"run spiprobe; " \
@@ -95,7 +101,8 @@
 			"run mmcboot; " \
 		"else run netboot; " \
 		"fi; " \
-	"fi;"
+	"fi; " \
+	BOOTCOMMAND_APPEND
 
 #ifdef CONFIG_ENV_WRITEABLE_LIST
 /* Set environment flag validation to RAUC's list of env vars that must writable */
