@@ -1629,7 +1629,7 @@ enum env_location env_get_location(enum env_operation op, int prio)
 
 	if (prio > 1)
 		return env_loc;
-#if defined(CONFIG_ENV_IS_NOWHERE)
+#if defined(CONFIG_ENV_IS_NOWHERE) && defined(CONFIG_ENV_APPEND)
 	if(prio == 1)
 		return ENVL_NOWHERE;
 #endif
