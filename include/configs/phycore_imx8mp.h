@@ -55,6 +55,9 @@
 	"loadfdt=fatload mmc ${mmcdev}:${mmcpart} ${fdt_addr} ${fdt_file}\0" \
 	"mmcboot=echo Booting from mmc ...; " \
 		"run mmcargs; " \
+		"if test ${dofitboot} = 1; then " \
+		"	bootm; " \
+		"fi; " \
 		"if run loadfdt; then " \
 			"booti ${loadaddr} - ${fdt_addr}; " \
 		"else " \
@@ -78,6 +81,7 @@
 		"else " \
 			"echo WARN: Cannot load the DT; " \
 		"fi;\0" \
+	"dofitboot=0\0" \
 	"raucdev=2\0" \
 	PHYCORE_RAUC_ENV_BOOTLOGIC
 
