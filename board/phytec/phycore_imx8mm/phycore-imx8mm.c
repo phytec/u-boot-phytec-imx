@@ -27,7 +27,7 @@ int ft_board_setup(void *blob, struct bd_info *bd)
 {
 	u8 spi = phytec_get_imx8m_spi();
 	/* Do nothing if no SPI is poulated or data invalid */
-	if (spi == 0 && spi == 0xff)
+	if (spi == 0 || spi == 0xff)
 		return 0;
 
 	static const struct node_info nodes[] = {
