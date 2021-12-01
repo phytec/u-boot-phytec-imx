@@ -158,6 +158,14 @@ int do_poweroff(struct cmd_tbl *cmdtp, int flag, int argc, char *const argv[])
 }
 #endif
 
+void do_smc_shutdown(void)
+{
+	psci_method = PSCI_METHOD_SMC;
+	disable_interrupts();
+	invoke_psci_fn(PSCI_0_2_FN_SYSTEM_OFF, 0, 0, 0);
+	enable_interrupts();
+}
+
 static const struct udevice_id psci_of_match[] = {
 	{ .compatible = "arm,psci" },
 	{ .compatible = "arm,psci-0.2" },
