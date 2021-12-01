@@ -332,8 +332,8 @@ ulong board_get_usable_ram_top(ulong total_size)
 	 * space below the 4G address boundary (which is 3GiB big),
 	 * even when the effective available memory is bigger.
 	 */
-	if (top_addr > 0x80000000)
-		top_addr = 0x80000000;
+	if (top_addr > 0x100000000)
+		top_addr = 0x100000000;
 
 	/*
 	 * rom_pointer[0] stores the TEE memory start address.
