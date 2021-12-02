@@ -37,19 +37,6 @@ int ft_board_setup(void *blob, bd_t *bd)
 	return 0;
 }
 
-static int setup_eqos(void)
-{
-	struct iomuxc_gpr_base_regs *gpr =
-		(struct iomuxc_gpr_base_regs *)IOMUXC_GPR_BASE_ADDR;
-
-	/* set INTF as RGMII, enable RGMII TXC clock */
-	clrsetbits_le32(&gpr->gpr[1],
-			IOMUXC_GPR_GPR1_GPR_ENET_QOS_INTF_SEL_MASK, BIT(16));
-	setbits_le32(&gpr->gpr[1], BIT(19) | BIT(21));
-
-	return set_clk_eqos(ENET_125MHZ);
-}
-
 static int setup_fec(void)
 {
 	struct iomuxc_gpr_base_regs *gpr =
@@ -68,8 +55,6 @@ int board_init(void)
 	ret = phytec_eeprom_data_init(EEPROM_I2C_PATH, 0, 0);
 	if (ret)
 		printf("%s: EEPROM data init failed\n", __func__);
-
-	setup_eqos();
 
 	setup_fec();
 
