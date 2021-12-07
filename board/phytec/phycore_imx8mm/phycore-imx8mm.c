@@ -23,6 +23,66 @@ DECLARE_GLOBAL_DATA_PTR;
 #define EEPROM_ADDR		0x51
 #define EEPROM_ADDR_FALLBACK	0x59
 
+#ifdef CONFIG_OF_BOARD_FIXUP
+static int fdt_disable_node(void *blob, const char *compatible)
+{
+	int node, ret;
+
+	node = fdt_node_offset_by_compatible(blob, -1, compatible);
+	if (node < 0) {
+		printf("%s: Can not find \"%s\" comaptible.\n",
+		       __func__, compatible);
+		return node;
+	}
+
+	ret = fdt_increase_size(blob, 5);
+	if (ret) {
+		printf("%s: Could not increase fdt size. Leave default.\n",
+		       __func__);
+		return ret;
+	}
+
+	ret = fdt_status_disabled(blob, node);
+
+	return ret;
+}
+
+int board_fix_fdt(void *blob)
+{
+	int ret;
+	struct phytec_eeprom_data data;
+	u8 opt;
+
+	/* We have no access to global variables here */
+	ret = _phytec_eeprom_data_init(&data, 0, EEPROM_ADDR);
+	if (ret) {
+		_phytec_eeprom_data_init(&data, 0, EEPROM_ADDR_FALLBACK);
+		if (ret)
+			printf("%s: EEPROM data init failed\n", __func__);
+	}
+
+	/* Disable fspi node if SPI flash if not populated */
+	opt = _phytec_get_imx8m_spi(&data);
+	if (!opt) {
+		ret = fdt_disable_node(blob, "nxp,imx8mm-fspi");
+		if (ret)
+			printf("%s: Could not disable SPI-NOR flash %i\n",
+			       __func__, ret);
+	}
+
+	/* Disable fec node if eth phy is not populated */
+	opt = _phytec_get_imx8m_eth(&data);
+	if (!opt) {
+		ret = fdt_disable_node(blob, "fsl,imx8mm-fec");
+		if (ret)
+			printf("%s: Could not disable fec node %i\n",
+			       __func__, ret);
+	}
+
+	return 0;
+}
+#endif
+
 int ft_board_setup(void *blob, struct bd_info *bd)
 {
 	u8 spi = phytec_get_imx8m_spi();
