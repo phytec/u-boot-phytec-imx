@@ -54,7 +54,7 @@ int board_init(void)
 
 	ret = phytec_eeprom_data_init(0, EEPROM_ADDR);
 	if (ret) {
-		phytec_eeprom_data_init(0, EEPROM_ADDR_FALLBACK);
+		ret = phytec_eeprom_data_init(0, EEPROM_ADDR_FALLBACK);
 		if (ret)
 			printf("%s: EEPROM data init failed\n", __func__);
 	}
