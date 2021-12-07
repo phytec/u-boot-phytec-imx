@@ -147,7 +147,7 @@ u8 __maybe_unused _phytec_get_imx8m_ddr_size(struct phytec_eeprom_data *data)
 	if (opt)
 		ddr_id = opt[2] - '0';
 	else
-		ddr_id = 0xff;
+		ddr_id = PHYTEC_EEPROM_INVAL;
 
 	debug("%s: ddr id: %u\n", __func__, ddr_id);
 	return ddr_id;
@@ -157,7 +157,7 @@ u8 __maybe_unused _phytec_get_imx8m_ddr_size(struct phytec_eeprom_data *data)
  * Filter SPI-NOR flash information. All i.MX8M boards have this at
  * the same location.
  * returns: 0x0 if no SPI is poulated. Otherwise a board depended
- * code for the size. 0xff when the data is invalid.
+ * code for the size. PHYTEC_EEPROM_INVAL when the data is invalid.
  */
 u8 __maybe_unused _phytec_get_imx8m_spi(struct phytec_eeprom_data *data)
 {
@@ -171,7 +171,7 @@ u8 __maybe_unused _phytec_get_imx8m_spi(struct phytec_eeprom_data *data)
 	if (opt)
 		spi = opt[4] - '0';
 	else
-		spi = 0xff;
+		spi = PHYTEC_EEPROM_INVAL;
 
 	debug("%s: spi: %u\n", __func__, spi);
 	return spi;
@@ -181,7 +181,7 @@ u8 __maybe_unused _phytec_get_imx8m_spi(struct phytec_eeprom_data *data)
  * Filter ethernet phy information. All i.MX8M boards have this at
  * the same location.
  * returns: 0x0 if no ethernet phy is poulated. 0x1 if it is populated.
- * 0xff when the data is invalid.
+ * PHYTEC_EEPROM_INVAL when the data is invalid.
  */
 u8 __maybe_unused _phytec_get_imx8m_eth(struct phytec_eeprom_data *data)
 {
@@ -196,7 +196,7 @@ u8 __maybe_unused _phytec_get_imx8m_eth(struct phytec_eeprom_data *data)
 		eth = opt[5] - '0';
 		eth &= 0x1;
 	} else {
-		eth = 0xff;
+		eth = PHYTEC_EEPROM_INVAL;
 	}
 
 	debug("%s: eth: %u\n", __func__, eth);

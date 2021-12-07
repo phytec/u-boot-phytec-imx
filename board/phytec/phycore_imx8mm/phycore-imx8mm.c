@@ -27,7 +27,7 @@ int ft_board_setup(void *blob, struct bd_info *bd)
 {
 	u8 spi = phytec_get_imx8m_spi();
 	/* Do nothing if no SPI is poulated or data invalid */
-	if (spi == 0 || spi == 0xff)
+	if (spi == 0 || spi == PHYTEC_EEPROM_INVAL)
 		return 0;
 
 	static const struct node_info nodes[] = {
@@ -77,7 +77,7 @@ int board_late_init(void)
 
 	spi = phytec_get_imx8m_spi();
 
-	if (spi != 0 && spi != 0xff)
+	if (spi != 0 && spi != PHYTEC_EEPROM_INVAL)
 		env_set("spiprobe", "sf probe");
 
 	switch (get_boot_device()) {
