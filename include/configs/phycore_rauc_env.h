@@ -32,6 +32,12 @@
  *  2. Run "boot".
  */
 
+#ifdef CONFIG_MX7
+#define KERNEL_BOOT_CMD "bootz"
+#else
+#define KERNEL_BOOT_CMD "booti"
+#endif
+
 #define PHYCORE_RAUC_ENV_BOOTLOGIC \
 	"raucslot=system0\0" \
 	"raucbootpart=1\0" \
@@ -40,7 +46,7 @@
 	"raucrootpart0=5\0" \
 	"raucbootpart1=2\0" \
 	"raucrootpart1=6\0" \
-	"raucargs=setenv bootargs console=${console} " \
+	"raucargs=setenv bootargs console=${console},${baudrate} " \
 		"root=/dev/mmcblk${raucdev}p${raucrootpart} " \
 		"rauc.slot=${raucslot} rootwait rw\0" \
 	"loadraucimage=fatload mmc ${raucdev}:${raucbootpart} ${loadaddr} ${image}\0" \
@@ -52,7 +58,7 @@
 			"	bootm; " \
 			"fi; " \
 			"if run loadraucfdt; then " \
-				"booti ${loadaddr} - ${fdt_addr}; " \
+				KERNEL_BOOT_CMD " ${loadaddr} - ${fdt_addr}; " \
 			"else " \
 				"echo WARN: Cannot load device tree; " \
 			"fi; " \
