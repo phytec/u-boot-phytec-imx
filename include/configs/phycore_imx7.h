@@ -7,6 +7,7 @@
 #define __PHYCORE_IMX7_H
 
 #include "mx7_common.h"
+#include "phycore_rauc_env.h"
 
 #ifdef CONFIG_PCM_061_MT41K64M16TW107IT
 #define PHYS_SDRAM_SIZE			SZ_256M
@@ -133,7 +134,10 @@
 	"loadfdt=fatload mmc ${mmcdev}:${mmcpart} ${fdt_addr} ${fdt_file}\0" \
 	"mmcboot=echo Booting from mmc ...; " \
 		"mmc dev ${mmcdev}; if mmc rescan; then " \
-			"if run loadbootscript; then " \
+			"env exists doraucboot || setenv doraucboot 0 && saveenv;" \
+			"if test ${doraucboot} = 1; then " \
+				"run raucboot; " \
+			"elif run loadbootscript; then " \
 				"run bootscript; " \
 			"else " \
 				"run mmcbootcmd; " \
@@ -188,7 +192,15 @@
 			"fi; " \
 		"else " \
 			"bootz; " \
-		"fi;\0"
+		"fi;\0" \
+	"raucdev=0\0" \
+	PHYCORE_RAUC_ENV_BOOTLOGIC
+
+#ifdef CONFIG_ENV_WRITEABLE_LIST
+/* Set environment flag validation to RAUC's list of env vars that must writable */
+#define CONFIG_ENV_FLAGS_LIST_STATIC	RAUC_REQUIRED_WRITABLE_ENV_FLAGS
+#endif
+
 #ifdef CONFIG_NAND_BOOT
 #define CONFIG_BOOTCOMMAND \
 	"run nandboot"
