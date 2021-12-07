@@ -59,11 +59,22 @@ struct phytec_eeprom_data {
 	} data;
 } __attribute__ ((__packed__));
 
-int phytec_eeprom_data_init(int bus_num, int addr);
+int _phytec_eeprom_data_init(struct phytec_eeprom_data *data,
+			     int bus_num, int addr);
 
-char * __maybe_unused phytec_get_imx8m_opt(void);
-u8 __maybe_unused phytec_get_imx8m_ddr_size(void);
-u8 __maybe_unused phytec_get_imx8m_spi(void);
-u8 __maybe_unused phytec_get_imx8m_eth(void);
-void __maybe_unused phytec_print_som_info(void);
+char * __maybe_unused _phytec_get_imx8m_opt(struct phytec_eeprom_data *data);
+u8 __maybe_unused _phytec_get_imx8m_ddr_size(struct phytec_eeprom_data *data);
+u8 __maybe_unused _phytec_get_imx8m_spi(struct phytec_eeprom_data *data);
+u8 __maybe_unused _phytec_get_imx8m_eth(struct phytec_eeprom_data *data);
+void __maybe_unused _phytec_print_som_info(struct phytec_eeprom_data *data);
+
+#define phytec_eeprom_data_init(bus_num, addr) \
+	(_phytec_eeprom_data_init(NULL, bus_num, addr))
+
+#define phytec_get_imx8m_opt() _phytec_get_imx8m_opt(NULL)
+#define phytec_get_imx8m_ddr_size() _phytec_get_imx8m_ddr_size(NULL)
+#define phytec_get_imx8m_spi() _phytec_get_imx8m_spi(NULL)
+#define phytec_get_imx8m_eth() _phytec_get_imx8m_eth(NULL)
+#define phytec_print_som_info() _phytec_print_som_info(NULL)
+
 #endif

@@ -16,13 +16,17 @@
 
 struct phytec_eeprom_data eeprom_data;
 
-int phytec_eeprom_data_init(int bus_num, int addr)
+int _phytec_eeprom_data_init(struct phytec_eeprom_data *data,
+			     int bus_num, int addr)
 {
 	int ret, i;
 	unsigned int crc;
 	u8 som;
 	char *opt;
-	int *data;
+	int *ptr;
+
+	if (!data)
+		data = &eeprom_data;
 
 #if defined(CONFIG_DM_I2C)
 	struct udevice *dev;
@@ -33,45 +37,45 @@ int phytec_eeprom_data_init(int bus_num, int addr)
 		return ret;
 	}
 
-	ret = dm_i2c_read(dev, 0, (uint8_t *)&eeprom_data,
-			  sizeof(eeprom_data));
+	ret = dm_i2c_read(dev, 0, (uint8_t *)data,
+			  sizeof(struct phytec_eeprom_data));
 #else
 	i2c_set_bus_num(bus_num);
-	ret =  i2c_read(addr, 0, 2, (uint8_t *)&eeprom_data,
-			sizeof(eeprom_data));
+	ret = i2c_read(addr, 0, 2, (uint8_t *)data,
+		       sizeof(struct phytec_eeprom_data));
 #endif
 	if (ret) {
 		pr_err("%s: Unable to read EEPROM data\n", __func__);
 		return ret;
 	}
 
-	if (eeprom_data.api_rev == 0xff) {
+	if (data->api_rev == 0xff) {
 		pr_err("%s: EEPROM is not flashed. Prototype?\n", __func__);
 		return -EINVAL;
 	}
 
-	data = (int *)&eeprom_data;
-	for (i = 0; i < sizeof(eeprom_data); i += sizeof(data))
-		if (*data != 0x0)
+	ptr = (int *)data;
+	for (i = 0; i < sizeof(struct phytec_eeprom_data); i += sizeof(ptr))
+		if (*ptr != 0x0)
 			break;
 
-	if (i == sizeof(eeprom_data)) {
+	if (i == sizeof(struct phytec_eeprom_data)) {
 		pr_err("%s: EEPROM data is all zero. Erased?\n", __func__);
 		return -EINVAL;
 	}
 
-	if (eeprom_data.api_rev > PHYTEC_API_REV2) {
+	if (data->api_rev > PHYTEC_API_REV2) {
 		pr_err("%s: EEPROM API revision %u not supported\n",
-		       __func__,
-		       eeprom_data.api_rev);
+			__func__, data->api_rev);
 		return -EINVAL;
 	}
 
 	/* We are done here for early revisions */
-	if (eeprom_data.api_rev <= PHYTEC_API_REV1)
+	if (data->api_rev <= PHYTEC_API_REV1)
 		return 0;
 
-	crc = crc8(0, (const unsigned char *)&eeprom_data, sizeof(eeprom_data));
+	crc = crc8(0, (const unsigned char *)data,
+		   sizeof(struct phytec_eeprom_data));
 	debug("%s: crc: %x\n", __func__, crc);
 
 	if (crc) {
@@ -80,9 +84,9 @@ int phytec_eeprom_data_init(int bus_num, int addr)
 		return -EINVAL;
 	}
 
-	som = eeprom_data.data.data_api2.som_no;
+	som = data->data.data_api2.som_no;
 	debug("%s: som id: %u\n", __func__, som);
-	opt = phytec_get_imx8m_opt();
+	opt = _phytec_get_imx8m_opt(data);
 
 	if (som == PHYTEC_IMX8MP_SOM && is_imx8mp())
 		return 0;
@@ -104,17 +108,20 @@ err:
 	return -EINVAL;
 }
 
-char * __maybe_unused phytec_get_imx8m_opt(void)
+char * __maybe_unused _phytec_get_imx8m_opt(struct phytec_eeprom_data *data)
 {
 	char *opt;
 
-	switch (eeprom_data.api_rev) {
+	if (!data)
+		data = &eeprom_data;
+
+	switch (data->api_rev) {
 	case PHYTEC_API_REV0:
 	case PHYTEC_API_REV1:
-		opt = eeprom_data.data.data_api0.opt;
+		opt = data->data.data_api0.opt;
 		break;
 	case PHYTEC_API_REV2:
-		opt = eeprom_data.data.data_api2.opt;
+		opt = data->data.data_api2.opt;
 		break;
 	default:
 		opt = NULL;
@@ -128,12 +135,15 @@ char * __maybe_unused phytec_get_imx8m_opt(void)
  * So far all PHYTEC i.MX8M boards have RAM size definition at the
  * same location.
  */
-u8 __maybe_unused phytec_get_imx8m_ddr_size(void)
+u8 __maybe_unused _phytec_get_imx8m_ddr_size(struct phytec_eeprom_data *data)
 {
 	char *opt;
 	u8 ddr_id;
 
-	opt = phytec_get_imx8m_opt();
+	if (!data)
+		data = &eeprom_data;
+
+	opt = _phytec_get_imx8m_opt(data);
 	if (opt)
 		ddr_id = opt[2] - '0';
 	else
@@ -149,12 +159,15 @@ u8 __maybe_unused phytec_get_imx8m_ddr_size(void)
  * returns: 0x0 if no SPI is poulated. Otherwise a board depended
  * code for the size. 0xff when the data is invalid.
  */
-u8 __maybe_unused phytec_get_imx8m_spi(void)
+u8 __maybe_unused _phytec_get_imx8m_spi(struct phytec_eeprom_data *data)
 {
 	char *opt;
 	u8 spi;
 
-	opt = phytec_get_imx8m_opt();
+	if (!data)
+		data = &eeprom_data;
+
+	opt = _phytec_get_imx8m_opt(data);
 	if (opt)
 		spi = opt[4] - '0';
 	else
@@ -170,12 +183,15 @@ u8 __maybe_unused phytec_get_imx8m_spi(void)
  * returns: 0x0 if no ethernet phy is poulated. 0x1 if it is populated.
  * 0xff when the data is invalid.
  */
-u8 __maybe_unused phytec_get_imx8m_eth(void)
+u8 __maybe_unused _phytec_get_imx8m_eth(struct phytec_eeprom_data *data)
 {
 	char *opt;
 	u8 eth;
 
-	opt = phytec_get_imx8m_opt();
+	if (!data)
+		data = &eeprom_data;
+
+	opt = _phytec_get_imx8m_opt(data);
 	if (opt) {
 		eth = opt[5] - '0';
 		eth &= 0x1;
@@ -187,16 +203,19 @@ u8 __maybe_unused phytec_get_imx8m_eth(void)
 	return eth;
 }
 
-void __maybe_unused phytec_print_som_info(void)
+void __maybe_unused _phytec_print_som_info(struct phytec_eeprom_data *data)
 {
 	struct phytec_api2_data *api2;
 	char pcb_sub_rev;
 	unsigned int ksp_no;
 
-	if (eeprom_data.api_rev < PHYTEC_API_REV2)
+	if (!data)
+		data = &eeprom_data;
+
+	if (data->api_rev < PHYTEC_API_REV2)
 		return;
 
-	api2 = &eeprom_data.data.data_api2;
+	api2 = &data->data.data_api2;
 
 	/* Calculate PCB subrevision */
 	pcb_sub_rev = api2->pcb_sub_opt_rev & 0x0f;
