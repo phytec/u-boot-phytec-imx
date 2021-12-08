@@ -169,6 +169,11 @@ int board_late_init(void)
 	return 0;
 }
 
+int mmc_map_to_kernel_blk(int dev_no)
+{
+	return dev_no;
+}
+
 int board_phys_sdram_size(phys_size_t *size)
 {
 	if (!size)
