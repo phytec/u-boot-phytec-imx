@@ -35,11 +35,11 @@
 #define PHYCORE_RAUC_ENV_BOOTLOGIC \
 	"raucslot=system0\0" \
 	"raucbootpart=1\0" \
-	"raucrootpart=2\0" \
+	"raucrootpart=5\0" \
 	"raucbootpart0=1\0" \
-	"raucrootpart0=2\0" \
-	"raucbootpart1=3\0" \
-	"raucrootpart1=4\0" \
+	"raucrootpart0=5\0" \
+	"raucbootpart1=2\0" \
+	"raucrootpart1=6\0" \
 	"raucargs=setenv bootargs console=${console} " \
 		"root=/dev/mmcblk${raucdev}p${raucrootpart} " \
 		"rauc.slot=${raucslot} rootwait rw\0" \
