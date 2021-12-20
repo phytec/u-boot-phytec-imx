@@ -39,7 +39,7 @@
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"image=Image\0" \
-	"console=ttymxc2,115200\0" \
+	"console=ttymxc2\0" \
 	"fdt_addr=0x48000000\0" \
 	"fdto_addr=0x49000000\0" \
 	"bootenv_addr=0x49100000\0" \
@@ -57,7 +57,7 @@
 	"mmcpart=" __stringify(CONFIG_SYS_MMC_IMG_LOAD_PART) "\0" \
 	"mmcroot=2\0" \
 	"mmcautodetect=yes\0" \
-	"mmcargs=setenv bootargs console=${console} " \
+	"mmcargs=setenv bootargs console=${console},${baudrate} " \
 		"root=/dev/mmcblk${mmcdev}p${mmcroot} fsck.repair=yes rootwait rw \0" \
 	"loadimage=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${image}\0" \
 	"loadfdt=fatload mmc ${mmcdev}:${mmcpart} ${fdt_addr} ${fdt_file}\0" \
@@ -94,7 +94,7 @@
 			"echo WARN: Cannot load the DT; " \
 		"fi;\0 " \
 	"nfsroot=/nfs\0" \
-	"netargs=setenv bootargs console=${console} root=/dev/nfs ip=${nfsip} " \
+	"netargs=setenv bootargs console=${console},${baudrate} root=/dev/nfs ip=${nfsip} " \
 		"nfsroot=${serverip}:${nfsroot},v3,tcp\0" \
 	"net_load_bootenv=${get_cmd} ${bootenv_addr} ${bootenv}\0" \
 	"net_load_overlay=${get_cmd} ${fdto_addr} ${overlay}\0" \
