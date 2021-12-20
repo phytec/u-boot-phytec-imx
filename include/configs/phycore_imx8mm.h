@@ -81,6 +81,15 @@
 	"nfsroot=/nfs\0" \
 	"netargs=setenv bootargs console=${console} root=/dev/nfs ip=${nfsip} " \
 		"nfsroot=${serverip}:${nfsroot},v3,tcp\0" \
+	"net_load_overlay=${get_cmd} ${fdto_addr} ${overlay}\0" \
+	"net_apply_overlays=fdt address ${fdt_addr}; " \
+		"for overlay in $overlays; " \
+		"do; " \
+			"if run net_load_overlay; then " \
+				"fdt resize ${filesize}; " \
+				"fdt apply ${fdto_addr}; " \
+			"fi; " \
+		"done;\0" \
 	"netboot=echo Booting from net ...; " \
 		"if test ${ip_dyn} = yes; then " \
 			"setenv nfsip dhcp; " \
@@ -92,6 +101,7 @@
 		"run netargs; " \
 		"${get_cmd} ${loadaddr} ${image}; " \
 		"if ${get_cmd} ${fdt_addr} ${fdt_file}; then " \
+			"run net_apply_overlays; " \
 			"booti ${loadaddr} - ${fdt_addr}; " \
 		"else " \
 			"echo WARN: Cannot load the DT; " \
