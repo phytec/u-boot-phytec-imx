@@ -41,7 +41,7 @@
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"image=Image\0" \
-	"console=ttymxc0,115200\0" \
+	"console=ttymxc0\0" \
 	"fdt_addr=0x48000000\0" \
 	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0" \
 	"ip_dyn=yes\0" \
@@ -49,7 +49,7 @@
 	"mmcpart=" __stringify(CONFIG_SYS_MMC_IMG_LOAD_PART) "\0" \
 	"mmcroot=2\0" \
 	"mmcautodetect=yes\0" \
-	"mmcargs=setenv bootargs console=${console} " \
+	"mmcargs=setenv bootargs console=${console},${baudrate} " \
 		"root=/dev/mmcblk${mmcdev}p${mmcroot} fsck.repair=yes rootwait rw\0" \
 	"loadimage=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${image}\0" \
 	"loadfdt=fatload mmc ${mmcdev}:${mmcpart} ${fdt_addr} ${fdt_file}\0" \
@@ -64,7 +64,7 @@
 			"echo WARN: Cannot load the DT; " \
 		"fi;\0 " \
 	"nfsroot=/nfs\0" \
-	"netargs=setenv bootargs console=${console} root=/dev/nfs ip=${nfsip} " \
+	"netargs=setenv bootargs console=${console},${baudrate} root=/dev/nfs ip=${nfsip} " \
 		"nfsroot=${serverip}:${nfsroot},v3,tcp\0" \
 	"netboot=echo Booting from net ...; " \
 		"if test ${ip_dyn} = yes; then " \
