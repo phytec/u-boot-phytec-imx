@@ -63,18 +63,22 @@
 	"loadfdt=fatload mmc ${mmcdev}:${mmcpart} ${fdt_addr} ${fdt_file}\0" \
 	"mmc_load_overlay=fatload mmc ${mmcdev}:${mmcpart} ${fdto_addr} ${overlay}\0" \
 	"mmc_apply_overlays=fdt address ${fdt_addr}; "	\
-		"setenv extension_overlay_addr ${fdto_addr}; " \
-		"setenv extension_overlay_cmd \'fatload mmc ${mmcdev}:${mmcpart} " \
-			"${fdto_addr} ${extension_overlay_name}\'; " \
-		"extension scan; " \
-		"extension apply all; " \
-		"for overlay in $overlays; " \
-		"do; " \
-			"if run mmc_load_overlay; then " \
-				"fdt resize ${filesize}; " \
-				"fdt apply ${fdto_addr}; " \
-			"fi; " \
-		"done;\0" \
+		"if test ${no_extensions} = 0; then " \
+			"setenv extension_overlay_addr ${fdto_addr}; " \
+			"setenv extension_overlay_cmd \'fatload mmc ${mmcdev}:${mmcpart} " \
+				"${fdto_addr} ${extension_overlay_name}\'; " \
+			"extension scan; " \
+			"extension apply all; " \
+		"fi; " \
+		"if test ${no_overlays} = 0; then " \
+			"for overlay in $overlays; " \
+			"do; " \
+				"if run mmc_load_overlay; then " \
+					"fdt resize ${filesize}; " \
+					"fdt apply ${fdto_addr}; " \
+				"fi; " \
+			"done;" \
+		"fi;\0 " \
 	"mmcboot=echo Booting from mmc ...; " \
 		"if run mmc_load_bootenv; then " \
 			"env import -t ${bootenv_addr} ${filesize}; " \
@@ -95,18 +99,22 @@
 	"net_load_bootenv=${get_cmd} ${bootenv_addr} ${bootenv}\0" \
 	"net_load_overlay=${get_cmd} ${fdto_addr} ${overlay}\0" \
 	"net_apply_overlays=fdt address ${fdt_addr}; " \
-		"setenv extension_overlay_addr ${fdto_addr}; " \
-		"setenv extension_overlay_cmd \'${get_cmd} ${fdto_addr} " \
-			"${extension_overlay_name}\'; " \
-		"extension scan; " \
-		"extension apply all; " \
-		"for overlay in $overlays; " \
-		"do; " \
-			"if run net_load_overlay; then " \
-				"fdt resize ${filesize}; " \
-				"fdt apply ${fdto_addr}; " \
-			"fi; " \
-		"done;\0" \
+		"if test ${no_extensions} = 0; then " \
+			"setenv extension_overlay_addr ${fdto_addr}; " \
+			"setenv extension_overlay_cmd \'${get_cmd} ${fdto_addr} " \
+				"${extension_overlay_name}\'; " \
+			"extension scan; " \
+			"extension apply all; " \
+		"fi; " \
+		"if test ${no_overlays} = 0; then " \
+			"for overlay in $overlays; " \
+			"do; " \
+				"if run net_load_overlay; then " \
+					"fdt resize ${filesize}; " \
+					"fdt apply ${fdto_addr}; " \
+				"fi; " \
+			"done;" \
+		"fi;\0 " \
 	"netboot=echo Booting from net ...; " \
 		"if test ${ip_dyn} = yes; then " \
 			"setenv nfsip dhcp; " \
