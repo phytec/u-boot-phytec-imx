@@ -11,8 +11,10 @@
 #include <asm/mach-imx/boot_mode.h>
 #include <env.h>
 #include <env_internal.h>
+#include <extension_board.h>
 #include <fdt_support.h>
 #include <jffs2/load_kernel.h>
+#include <malloc.h>
 #include <miiphy.h>
 #include <mtd_node.h>
 
@@ -163,6 +165,49 @@ int board_phys_sdram_size(phys_size_t *size)
 
 	return 0;
 }
+
+#ifdef CONFIG_CMD_EXTENSION
+static struct extension *add_extension(const char *name, const char *overlay,
+				       const char *other)
+{
+	struct extension *extension;
+
+	extension = calloc(1, sizeof(struct extension));
+	snprintf(extension->name, sizeof(extension->name), name);
+	snprintf(extension->overlay, sizeof(extension->overlay), overlay);
+	snprintf(extension->other, sizeof(extension->other), other);
+	snprintf(extension->owner, sizeof(extension->owner), "PHYTEC");
+
+	return extension;
+}
+
+int extension_board_scan(struct list_head *extension_list)
+{
+	struct extension *extension = NULL;
+	int ret = 0;
+	u8 option;
+
+	option = phytec_get_imx8m_eth();
+	if (!option) {
+		extension = add_extension("phyCORE-i.MX8MM no eth phy",
+					  "imx8mm-phycore-no-eth.dtbo",
+					  "eth phy not populated on SoM");
+		list_add_tail(&extension->list, extension_list);
+		ret++;
+	}
+
+	option = phytec_get_imx8m_spi();
+	if (!option) {
+		extension = add_extension("phyCORE-i.MX8MM no SPI flash",
+					  "imx8mm-phycore-no-spiflash.dtbo",
+					  "SPI flash not populated on SoM");
+		list_add_tail(&extension->list, extension_list);
+		ret++;
+	}
+
+	return ret;
+}
+#endif
 
 enum env_location env_get_location(enum env_operation op, int prio)
 {
