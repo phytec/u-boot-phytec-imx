@@ -110,8 +110,8 @@
 	BOOTCOMMAND_APPEND
 
 #ifdef CONFIG_ENV_WRITEABLE_LIST
-/* Set environment flag validation to RAUC's list of env vars that must writable */
-#define CONFIG_ENV_FLAGS_LIST_STATIC RAUC_REQUIRED_WRITABLE_ENV_FLAGS
+/* Set environment flag validation to a list of env vars that must be writable */
+#define CONFIG_ENV_FLAGS_LIST_STATIC RAUC_REQUIRED_WRITABLE_ENV_FLAGS",dofitboot:dw"
 #endif
 
 /* Link Definitions */
