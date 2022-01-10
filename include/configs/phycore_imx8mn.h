@@ -86,7 +86,6 @@
 		"else " \
 			"echo WARN: Cannot load the DT; " \
 		"fi;\0" \
-	"dofitboot=0\0" \
 	"raucdev=2\0" \
 	PHYCORE_RAUC_ENV_BOOTLOGIC
 
@@ -99,6 +98,7 @@
 #define CONFIG_BOOTCOMMAND \
 	"mmc dev ${mmcdev}; if mmc rescan; then " \
 		"run spiprobe; " \
+		"env exists dofitboot || setenv dofitboot 0;" \
 		"env exists doraucboot || setenv doraucboot 0 && saveenv;" \
 		"if test ${doraucboot} = 1; then " \
 			"run raucboot; " \
