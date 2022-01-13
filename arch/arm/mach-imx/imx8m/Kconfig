@@ -266,6 +266,7 @@ config TARGET_PHYCORE_IMX8MN
 	select IMX8MN
 	select SUPPORT_SPL
 	select IMX8M_LPDDR4
+	select SUPPORT_EXTENSION_SCAN
 endchoice
 
 source "board/freescale/imx8mq_evk/Kconfig"
