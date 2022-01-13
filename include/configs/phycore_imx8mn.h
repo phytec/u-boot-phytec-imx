@@ -43,11 +43,14 @@
 	"console=ttymxc2\0" \
 	"fdt_addr=0x48000000\0" \
 	"fdto_addr=0x49000000\0" \
+	"bootenv_addr=0x49100000\0" \
 	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0" \
 	"ipaddr=192.168.3.11\0" \
 	"serverip=192.168.3.10\0" \
 	"netmask=255.225.255.0\0" \
 	"ip_dyn=no\0" \
+	"bootenv=bootenv.txt\0" \
+	"mmc_load_bootenv=fatload mmc ${mmcdev}:${mmcpart} ${bootenv_addr} ${bootenv}\0" \
 	"mtdparts=30bb0000.spi:3840k(u-boot),128k(env),128k(env_redund),-(none)\0" \
 	"mtdids=nor0=30bb0000.spi\0" \
 	"spiprobe=true\0" \
@@ -61,14 +64,19 @@
 	"loadfdt=fatload mmc ${mmcdev}:${mmcpart} ${fdt_addr} ${fdt_file}\0" \
 	"mmc_load_overlay=fatload mmc ${mmcdev}:${mmcpart} ${fdto_addr} ${overlay}\0" \
 	"mmc_apply_overlays=fdt address ${fdt_addr}; " \
-		"for overlay in $overlays; " \
-		"do; " \
-			"if run mmc_load_overlay; then " \
-				"fdt resize ${filesize}; " \
-				"fdt apply ${fdto_addr}; " \
-			"fi; " \
-		"done;\0" \
+		"if test ${no_overlays} = 0; then " \
+			"for overlay in $overlays; " \
+			"do; " \
+				"if run mmc_load_overlay; then " \
+					"fdt resize ${filesize}; " \
+					"fdt apply ${fdto_addr}; " \
+				"fi; " \
+			"done;" \
+		"fi;\0 " \
 	"mmcboot=echo Booting from mmc ...; " \
+		"if run mmc_load_bootenv; then " \
+			"env import -t ${bootenv_addr} ${filesize}; " \
+		"fi; " \
 		"run mmcargs; " \
 		"if test ${dofitboot} = 1; then " \
 		"	bootm; " \
@@ -82,15 +90,18 @@
 	"nfsroot=/nfs\0" \
 	"netargs=setenv bootargs console=${console},${baudrate} root=/dev/nfs ip=${nfsip} " \
 		"nfsroot=${serverip}:${nfsroot},v3,tcp\0" \
+	"net_load_bootenv=${get_cmd} ${bootenv_addr} ${bootenv}\0" \
 	"net_load_overlay=${get_cmd} ${fdto_addr} ${overlay}\0" \
 	"net_apply_overlays=fdt address ${fdt_addr}; " \
-		"for overlay in $overlays; " \
-		"do; " \
-			"if run net_load_overlay; then " \
-				"fdt resize ${filesize}; " \
-				"fdt apply ${fdto_addr}; " \
-			"fi; " \
-		"done;\0" \
+		"if test ${no_overlays} = 0; then " \
+			"for overlay in $overlays; " \
+			"do; " \
+				"if run net_load_overlay; then " \
+					"fdt resize ${filesize}; " \
+					"fdt apply ${fdto_addr}; " \
+				"fi; " \
+			"done;" \
+		"fi;\0 " \
 	"netboot=echo Booting from net ...; " \
 		"if test ${ip_dyn} = yes; then " \
 			"setenv nfsip dhcp; " \
@@ -98,6 +109,9 @@
 		"else " \
 			"setenv nfsip ${ipaddr}:${serverip}::${netmask}::eth0:on; " \
 			"setenv get_cmd tftp; " \
+		"fi; " \
+		"if run net_load_bootenv; then " \
+			"env import -t ${bootenv_addr} ${filesize}; " \
 		"fi; " \
 		"run netargs; " \
 		"${get_cmd} ${loadaddr} ${image}; " \
