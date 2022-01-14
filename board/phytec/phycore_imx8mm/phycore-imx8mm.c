@@ -233,7 +233,6 @@ enum env_location env_get_location(enum env_operation op, int prio)
 		case SD3_BOOT:
 		case MMC2_BOOT:
 		case MMC3_BOOT:
-		case USB_BOOT:
 			env_loc =  ENVL_MMC;
 			break;
 		default:
