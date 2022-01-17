@@ -166,7 +166,7 @@
 		"\0" \
 	"nandboot=echo Booting from nand ...; " \
 		"run nandargs; " \
-		"nand read ${loadaddr} 0x4000000 0x800000;"\
+		"nand read ${loadaddr} 0x4000000 0x1000000;"\
 		"nand read ${fdt_addr} 0x5000000 0x100000;"\
 		"bootz ${loadaddr} - ${fdt_addr}\0" \
 	"netargs=setenv bootargs console=${console},${baudrate} " \
