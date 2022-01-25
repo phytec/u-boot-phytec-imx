@@ -104,6 +104,14 @@
 	status = "okay";
 };
 
+/* USB */
+&usbotg2 {
+	dr_mode = "host";
+	picophy,pre-emp-curr-control = <3>;
+	picophy,dc-vol-level-adjust = <7>;
+	status = "okay";
+};
+
 /* sd-card */
 &usdhc2 {
 	pinctrl-names = "default", "state_100mhz", "state_200mhz";

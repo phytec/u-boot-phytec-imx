@@ -17,6 +17,7 @@
 #include <malloc.h>
 #include <miiphy.h>
 #include <mtd_node.h>
+#include <usb.h>
 
 #include "../common/imx8m_som_detection.h"
 
@@ -98,6 +99,18 @@ int ft_board_setup(void *blob, struct bd_info *bd)
 
 	fdt_fixup_mtdparts(blob, nodes, ARRAY_SIZE(nodes));
 
+	return 0;
+}
+
+int board_usb_init(int index, enum usb_init_type init)
+{
+	imx8m_usb_power(index, true);
+	return 0;
+}
+
+int board_usb_cleanup(int index, enum usb_init_type init)
+{
+	imx8m_usb_power(index, false);
 	return 0;
 }
 
