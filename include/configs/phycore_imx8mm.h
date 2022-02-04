@@ -80,13 +80,26 @@
 				"fi; " \
 			"done;" \
 		"fi;\0 " \
+	"fit_create_overlay_conf_spec=fdt address ${loadaddr}; "	\
+		"fdt get value default_fit_conf /configurations/ default;" \
+		"overlay_specs=\"${loadaddr}:#${default_fit_conf}\";"\
+		"for overlay in $overlays; " \
+			"do; " \
+				"overlay_specs=${overlay_specs}#${overlay}; " \
+			"done; " \
+		"env set bootm_fit_conf_spec ${overlay_specs};\0 " \
 	"mmcboot=echo Booting from mmc ...; " \
 		"if run mmc_load_bootenv; then " \
 			"env import -t ${bootenv_addr} ${filesize}; " \
 		"fi; " \
 		"run mmcargs; " \
 		"if test ${dofitboot} = 1; then " \
-		"	bootm; " \
+			"if test ${no_overlays} = 0; then " \
+				"run fit_create_overlay_conf_spec; " \
+				"bootm ${bootm_fit_conf_spec};" \
+			"else " \
+				"bootm; " \
+			"fi; " \
 		"fi; " \
 		"if run loadfdt; then " \
 			"run mmc_apply_overlays; " \
