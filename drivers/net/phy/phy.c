@@ -542,6 +542,9 @@ int phy_init(void)
 #ifdef CONFIG_PHY_MSCC
 	phy_mscc_init();
 #endif
+#ifdef CONFIG_PHY_ADIN
+	phy_adin_init();
+#endif
 #ifdef CONFIG_PHY_FIXED
 	phy_fixed_init();
 #endif
