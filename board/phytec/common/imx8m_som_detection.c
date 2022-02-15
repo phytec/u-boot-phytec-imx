@@ -28,7 +28,7 @@ int _phytec_eeprom_data_init(struct phytec_eeprom_data *data,
 	if (!data)
 		data = &eeprom_data;
 
-#if defined(CONFIG_DM_I2C)
+#if CONFIG_IS_ENABLED(DM_I2C)
 	struct udevice *dev;
 
 	ret = i2c_get_chip_for_busnum(bus_num, addr, 2, &dev);
