@@ -12,4 +12,13 @@ config SYS_CONFIG_NAME
 config SYS_TEXT_BASE
 	default 0x87800000
 
+menu "phyCORE-i.MX7 DDR3/L configuration (SPL)"
+	depends on SPL
+
+config PCM_061_SPL_DDR3_1V5
+	default n
+	bool "Set PMIC SW3 to 1.5V for DDR3 (defaults to 1.35V for DDR3L)"
+
+endmenu
+
 endif

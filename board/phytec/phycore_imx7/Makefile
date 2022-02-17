@@ -1,7 +1,9 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 #
-# (C) Copyright 2015-2021 PHYTEC America, LLC
-#
-# Based on board/freescale/mx7dsabresd/Makefile
+# (C) Copyright 2015-2022 PHYTEC America, LLC
 
-obj-y  := phycore-imx7.o
+ifdef CONFIG_SPL_BUILD
+obj-y	:= spl.o
+else
+obj-y	:= phycore-imx7.o
+endif

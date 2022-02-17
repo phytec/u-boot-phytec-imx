@@ -1,10 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-/*
- * Copyright (C) 2015-2021 PHYTEC America, LLC
- *
- * Based on board/freescale/mx7dsabresd/mx7dsabresd.c
- *
- */
+/* Copyright (C) 2015-2022 PHYTEC America, LLC */
 
 #include <asm/arch/clock.h>
 #include <asm/arch/mx7-pins.h>
@@ -13,8 +8,11 @@
 #include <common.h>
 #include <mmc.h>
 #include <miiphy.h>
+#if !defined(CONFIG_SPL) && defined(CONFIG_DM_PMIC)
+/* only init PMIC in U-Boot if SPL is not used */
 #include <power/pmic.h>
 #include <power/pfuze3000_pmic.h>
+#endif
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -186,6 +184,8 @@ int board_init(void)
 	return 0;
 }
 
+#if !defined(CONFIG_SPL) && defined(CONFIG_DM_PMIC)
+/* only init PMIC in U-Boot if SPL is not used */
 int power_init_board(void)
 {
 	struct udevice *dev;
@@ -205,6 +205,7 @@ int power_init_board(void)
 
 	return 0;
 }
+#endif
 
 #ifdef CONFIG_ENV_IS_IN_MMC
 static int check_mmc_autodetect(void)

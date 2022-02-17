@@ -1,7 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0+ */
-/*
- * Copyright (C) 2017-2021 PHYTEC America, LLC
- */
+/* Copyright (C) 2017-2022 PHYTEC America, LLC */
 
 #ifndef __PHYCORE_IMX7_H
 #define __PHYCORE_IMX7_H
@@ -39,9 +37,6 @@
 #endif
 
 #define CONFIG_FEC_MXC_MDIO_BASE	ENET_IPS_BASE_ADDR
-
-/* I2C configs */
-#define CONFIG_SYS_I2C_SPEED		100000
 
 #ifdef CONFIG_FSL_QSPI
 /* Set to QSPI1 A flash at default */
@@ -253,4 +248,20 @@
 
 #define CONFIG_IMX_THERMAL
 
+#ifdef CONFIG_SPL_BUILD
+/* I2C */
+#undef CONFIG_DM_I2C
+#define CONFIG_SYS_I2C
+#define CONFIG_SYS_I2C_MXC_I2C1
+#define CONFIG_SYS_I2C_SPEED		100000
+
+/* PMIC */
+#define CONFIG_POWER
+#define CONFIG_POWER_I2C
+#define CONFIG_POWER_PFUZE3000
+#define CONFIG_POWER_PFUZE3000_I2C_ADDR	0x08
+
+#include "imx7_spl.h"
+
+#endif /* CONFIG_SPL */
 #endif /* __PHYCORE_IMX7_H */

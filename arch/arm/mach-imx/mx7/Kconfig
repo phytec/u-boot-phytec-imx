@@ -120,6 +120,7 @@ config TARGET_PHYCORE_IMX7
 	select DM
 	select DM_THERMAL
 	select MX7D
+	select SUPPORT_SPL
 	imply CMD_DM
 
 endchoice
