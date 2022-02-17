@@ -47,6 +47,33 @@ void spl_dram_init(void)
 	phytec_print_som_info();
 
 	switch (phytec_get_imx8m_ddr_size()) {
+	case 2:
+		dram_timing.ddrc_cfg[3].val = 0x1233;
+		dram_timing.ddrc_cfg[5].val = 0x5b0087;
+		dram_timing.ddrc_cfg[6].val = 0x61027f10;
+		dram_timing.ddrc_cfg[7].val = 0x7b0;
+		dram_timing.ddrc_cfg[11].val = 0xf30000;
+		dram_timing.ddrc_cfg[23].val = 0x8d;
+		dram_timing.ddrc_cfg[44].val = 0xf070707;
+		dram_timing.ddrc_cfg[58].val = 0x1031;
+		dram_timing.ddrc_cfg[61].val = 0xc0012;
+		dram_timing.ddrc_cfg[76].val = 0x13;
+		dram_timing.ddrc_cfg[83].val = 0x1031;
+		dram_timing.ddrc_cfg[86].val = 0x30005;
+		dram_timing.ddrc_cfg[101].val = 0x5;
+		dram_timing.ddrphy_cfg[75].val = 0x1e3;
+		dram_timing.ddrphy_cfg[77].val = 0x1e3;
+		dram_timing.ddrphy_cfg[79].val = 0x1e3;
+		dram_timing.fsp_msg[0].fsp_cfg[11].val = 0xf3;
+		dram_timing.fsp_msg[0].fsp_cfg[16].val = 0xf3;
+		dram_timing.fsp_msg[0].fsp_cfg[23].val = 0xf32d;
+		dram_timing.fsp_msg[0].fsp_cfg[29].val = 0xf32d;
+		dram_timing.fsp_msg[3].fsp_cfg[12].val = 0xf3;
+		dram_timing.fsp_msg[3].fsp_cfg[17].val = 0xf3;
+		dram_timing.fsp_msg[3].fsp_cfg[24].val = 0xf32d;
+		dram_timing.fsp_msg[3].fsp_cfg[30].val = 0xf32d;
+		ddr_init(&dram_timing);
+		break;
 	case 3:
 		ddr_init(&dram_timing);
 		break;
