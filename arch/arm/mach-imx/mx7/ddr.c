@@ -80,8 +80,16 @@ void mx7_dram_cfg(struct ddrc *ddrc_regs_val, struct ddrc_mp *ddrc_mp_val,
 	writel(ddr_phy_regs_val->phy_con4, &ddr_phy_regs->phy_con4);
 	writel(ddr_phy_regs_val->mdll_con0, &ddr_phy_regs->mdll_con0);
 	writel(ddr_phy_regs_val->drvds_con0, &ddr_phy_regs->drvds_con0);
+	if (ddr_phy_regs_val->lvl_con0)
+		writel(ddr_phy_regs_val->lvl_con0, &ddr_phy_regs->lvl_con0);
 	writel(ddr_phy_regs_val->offset_wr_con0, &ddr_phy_regs->offset_wr_con0);
 	writel(ddr_phy_regs_val->offset_rd_con0, &ddr_phy_regs->offset_rd_con0);
+	if (ddr_phy_regs_val->lvl_con0) {
+		writel(DDR_PHY_LVL_CON3_CTRL_WRLVL_RESYNC_ENABLE,
+			&ddr_phy_regs->lvl_con3);
+		writel(DDR_PHY_LVL_CON3_CTRL_WRLVL_RESYNC_DISABLE,
+			&ddr_phy_regs->lvl_con3);
+	}
 	writel(ddr_phy_regs_val->cmd_sdll_con0 |
 	       DDR_PHY_CMD_SDLL_CON0_CTRL_RESYNC_MASK,
 	       &ddr_phy_regs->cmd_sdll_con0);
