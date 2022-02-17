@@ -12,19 +12,4 @@ config SYS_CONFIG_NAME
 config SYS_TEXT_BASE
 	default 0x87800000
 
-choice
-	prompt "Select DDR3L Configuration"
-	default PCM_061_MT41K256M16TW107IT
-
-	config PCM_061_MT41K64M16TW107IT
-		bool "256MiB (2x 64M16)"
-
-	config PCM_061_MT41K128M16JT125IT
-		bool "512MiB (2x 128M16)"
-
-	config PCM_061_MT41K256M16TW107IT
-		bool "1GiB (2x 256M16)"
-
-endchoice
-
 endif

@@ -9,16 +9,6 @@
 #include "mx7_common.h"
 #include "phycore_rauc_env.h"
 
-#ifdef CONFIG_PCM_061_MT41K64M16TW107IT
-#define PHYS_SDRAM_SIZE			SZ_256M
-#elif defined CONFIG_PCM_061_MT41K128M16JT125IT
-#define PHYS_SDRAM_SIZE			SZ_512M
-#elif defined CONFIG_PCM_061_MT41K256M16TW107IT
-#define PHYS_SDRAM_SIZE			SZ_1G
-#else
-#define PHYS_SDRAM_SIZE			SZ_1G
-#endif
-
 #define CONFIG_MXC_UART_BASE		UART1_IPS_BASE_ADDR
 
 /* Size of malloc() pool */
