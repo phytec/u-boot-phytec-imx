@@ -93,7 +93,7 @@ static void setup_gpmi_nand(void)
 static void setup_iomux_uart(void)
 {
 #ifndef CONFIG_CONS_INDEX
-#define CONFIG_CONS_INDEX 5
+#define CONFIG_CONS_INDEX 1
 #endif
 	switch (CONFIG_CONS_INDEX) {
 	case 1:
