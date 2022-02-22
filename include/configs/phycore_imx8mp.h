@@ -43,8 +43,12 @@
 	"image=Image\0" \
 	"console=ttymxc0\0" \
 	"fdt_addr=0x48000000\0" \
+	"fdto_addr=0x49000000\0" \
+	"bootenv_addr=0x49100000\0" \
 	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0" \
 	"ip_dyn=yes\0" \
+	"bootenv=bootenv.txt\0" \
+	"mmc_load_bootenv=fatload mmc ${mmcdev}:${mmcpart} ${bootenv_addr} ${bootenv}\0" \
 	"mmcdev=" __stringify(CONFIG_SYS_MMC_ENV_DEV) "\0" \
 	"mmcpart=" __stringify(CONFIG_SYS_MMC_IMG_LOAD_PART) "\0" \
 	"mmcroot=2\0" \
@@ -53,12 +57,27 @@
 		"root=/dev/mmcblk${mmcdev}p${mmcroot} fsck.repair=yes rootwait rw\0" \
 	"loadimage=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${image}\0" \
 	"loadfdt=fatload mmc ${mmcdev}:${mmcpart} ${fdt_addr} ${fdt_file}\0" \
+	"mmc_load_overlay=fatload mmc ${mmcdev}:${mmcpart} ${fdto_addr} ${overlay}\0" \
+	"mmc_apply_overlays=fdt address ${fdt_addr}; "  \
+		"if test ${no_overlays} = 0; then " \
+			"for overlay in $overlays; " \
+			"do; " \
+				"if run mmc_load_overlay; then " \
+					"fdt resize ${filesize}; " \
+					"fdt apply ${fdto_addr}; " \
+				"fi; " \
+			"done;" \
+		"fi;\0 " \
 	"mmcboot=echo Booting from mmc ...; " \
+		"if run mmc_load_bootenv; then " \
+			"env import -t ${bootenv_addr} ${filesize}; " \
+		"fi; " \
 		"run mmcargs; " \
 		"if test ${dofitboot} = 1; then " \
 		"	bootm; " \
 		"fi; " \
 		"if run loadfdt; then " \
+			"run mmc_apply_overlays; " \
 			"booti ${loadaddr} - ${fdt_addr}; " \
 		"else " \
 			"echo WARN: Cannot load the DT; " \
@@ -66,6 +85,18 @@
 	"nfsroot=/nfs\0" \
 	"netargs=setenv bootargs console=${console},${baudrate} root=/dev/nfs ip=${nfsip} " \
 		"nfsroot=${serverip}:${nfsroot},v3,tcp\0" \
+	"net_load_bootenv=${get_cmd} ${bootenv_addr} ${bootenv}\0" \
+	"net_load_overlay=${get_cmd} ${fdto_addr} ${overlay}\0" \
+	"net_apply_overlays=fdt address ${fdt_addr}; " \
+			"if test ${no_overlays} = 0; then " \
+			"for overlay in $overlays; " \
+			"do; " \
+				"if run net_load_overlay; then " \
+					"fdt resize ${filesize}; " \
+					"fdt apply ${fdto_addr}; " \
+				"fi; " \
+			"done;" \
+		"fi;\0 " \
 	"netboot=echo Booting from net ...; " \
 		"if test ${ip_dyn} = yes; then " \
 			"setenv nfsip dhcp; " \
@@ -74,9 +105,13 @@
 			"setenv nfsip ${ipaddr}:${serverip}::${netmask}::eth0:on; " \
 			"setenv get_cmd tftp; " \
 		"fi; " \
+		"if run net_load_bootenv; then " \
+			"env import -t ${bootenv_addr} ${filesize}; " \
+		"fi; " \
 		"run netargs; " \
 		"${get_cmd} ${loadaddr} ${image}; " \
 		"if ${get_cmd} ${fdt_addr} ${fdt_file}; then " \
+			"run net_apply_overlays; " \
 			"booti ${loadaddr} - ${fdt_addr}; " \
 		"else " \
 			"echo WARN: Cannot load the DT; " \
