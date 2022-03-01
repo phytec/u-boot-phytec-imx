@@ -167,6 +167,9 @@ u8 __maybe_unused _phytec_get_imx8m_spi(struct phytec_eeprom_data *data)
 	if (!data)
 		data = &eeprom_data;
 
+	if (data->api_rev < PHYTEC_API_REV2)
+		return PHYTEC_EEPROM_INVAL;
+
 	opt = _phytec_get_imx8m_opt(data);
 	if (opt)
 		spi = opt[4] - '0';
@@ -190,6 +193,9 @@ u8 __maybe_unused _phytec_get_imx8m_eth(struct phytec_eeprom_data *data)
 
 	if (!data)
 		data = &eeprom_data;
+
+	if (data->api_rev < PHYTEC_API_REV2)
+		return PHYTEC_EEPROM_INVAL;
 
 	opt = _phytec_get_imx8m_opt(data);
 	if (opt) {
