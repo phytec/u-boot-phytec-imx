@@ -89,6 +89,7 @@
 			"done; " \
 		"env set bootm_fit_conf_spec ${overlay_specs};\0 " \
 	"mmcboot=echo Booting from mmc ...; " \
+		"run spiprobe; " \
 		"if run mmc_load_bootenv; then " \
 			"env import -t ${bootenv_addr} ${filesize}; " \
 		"fi; " \
@@ -130,6 +131,7 @@
 			"done;" \
 		"fi;\0 " \
 	"netboot=echo Booting from net ...; " \
+		"run spiprobe; " \
 		"if test ${ip_dyn} = yes; then " \
 			"setenv nfsip dhcp; " \
 			"setenv get_cmd dhcp; " \
@@ -159,7 +161,6 @@
 
 #define CONFIG_BOOTCOMMAND \
 	"mmc dev ${mmcdev}; if mmc rescan; then " \
-		"run spiprobe; " \
 		"env exists dofitboot || setenv dofitboot 0;" \
 		"env exists doraucboot || setenv doraucboot 0 && saveenv;" \
 		"if test ${doraucboot} = 1; then " \
