@@ -5,6 +5,7 @@
 #define __PHYCORE_IMX7_H
 
 #include "mx7_common.h"
+#include "imx7_spl.h"
 #include "phycore_rauc_env.h"
 
 #define CONFIG_MXC_UART_BASE		UART1_IPS_BASE_ADDR
@@ -261,7 +262,6 @@
 #define CONFIG_POWER_PFUZE3000
 #define CONFIG_POWER_PFUZE3000_I2C_ADDR	0x08
 
-#include "imx7_spl.h"
 
-#endif /* CONFIG_SPL */
+#endif /* CONFIG_SPL_BUILD */
 #endif /* __PHYCORE_IMX7_H */
