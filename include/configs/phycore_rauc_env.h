@@ -51,13 +51,32 @@
 		"rauc.slot=${raucslot} rootwait rw\0" \
 	"loadraucimage=fatload mmc ${raucdev}:${raucbootpart} ${loadaddr} ${image}\0" \
 	"loadraucfdt=fatload mmc ${raucdev}:${raucbootpart} ${fdt_addr} ${fdt_file}\0" \
+	"loadrauc_bootenv=fatload mmc ${raucdev}:${raucbootpart} ${bootenv_addr} ${bootenv}\0" \
+	"rauc_apply_overlays=fdt address ${fdt_addr}; "	\
+		"if test ${no_extensions} = 0; then " \
+			"setenv extension_overlay_addr ${fdto_addr}; " \
+			"setenv extension_overlay_cmd \'fatload mmc ${raucdev}:${raucbootpart} " \
+				"${fdto_addr} ${extension_overlay_name}\'; " \
+			"extension scan; " \
+			"extension apply all; " \
+		"fi; " \
+		"if test ${no_overlays} = 0; then " \
+			"for overlay in $overlays; do " \
+				"if run mmc_load_overlay; then " \
+					"fdt resize ${filesize}; " \
+					"fdt apply ${fdto_addr}; " \
+				"fi; " \
+			"done;" \
+		"fi;\0" \
 	"raucemmcboot=echo Booting A/B system from eMMC...; " \
+		"if run loadrauc_bootenv; then " \
+			"env import -t ${bootenv_addr} ${filesize}; " \
+		"fi; " \
 		"if run loadraucimage; then " \
 			"run raucargs; " \
-			"if test ${dofitboot} = 1; then; " \
-			"	bootm; " \
-			"fi; " \
+			"run fit_test_and_run_boot; " \
 			"if run loadraucfdt; then " \
+				"run rauc_apply_overlays; " \
 				KERNEL_BOOT_CMD " ${loadaddr} - ${fdt_addr}; " \
 			"else " \
 				"echo WARN: Cannot load device tree; " \
