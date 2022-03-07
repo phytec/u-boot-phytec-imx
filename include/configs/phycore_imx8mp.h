@@ -11,6 +11,7 @@
 #include <asm/arch/imx-regs.h>
 
 #include "phycore_rauc_env.h"
+#include "phycore_fitimage_env.h"
 
 #define CONFIG_SYS_BOOTM_LEN		SZ_64M
 
@@ -73,9 +74,7 @@
 			"env import -t ${bootenv_addr} ${filesize}; " \
 		"fi; " \
 		"run mmcargs; " \
-		"if test ${dofitboot} = 1; then " \
-		"	bootm; " \
-		"fi; " \
+		"run fit_test_and_run_boot; " \
 		"if run loadfdt; then " \
 			"run mmc_apply_overlays; " \
 			"booti ${loadaddr} - ${fdt_addr}; " \
@@ -117,7 +116,8 @@
 			"echo WARN: Cannot load the DT; " \
 		"fi;\0" \
 	"raucdev=2\0" \
-	PHYCORE_RAUC_ENV_BOOTLOGIC
+	PHYCORE_RAUC_ENV_BOOTLOGIC \
+	PHYCORE_FITIMAGE_ENV_BOOTLOGIC
 
 #ifdef CONFIG_IMX_HAB
 #define BOOTCOMMAND_APPEND "reset;"
