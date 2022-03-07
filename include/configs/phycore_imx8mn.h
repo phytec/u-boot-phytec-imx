@@ -12,6 +12,7 @@
 #include <asm/arch/imx-regs.h>
 
 #include "phycore_rauc_env.h"
+#include "phycore_fitimage_env.h"
 
 #define CONFIG_SYS_BOOTM_LEN		SZ_64M
 #define CONFIG_SPL_MAX_SIZE		(208 * SZ_1K)
@@ -80,27 +81,12 @@
 				"fi; " \
 			"done;" \
 		"fi;\0 " \
-	"fit_create_overlay_conf_spec=fdt address ${loadaddr}; "	\
-		"fdt get value default_fit_conf /configurations/ default;" \
-		"overlay_specs=\"${loadaddr}:#${default_fit_conf}\";"\
-		"for overlay in $overlays; " \
-			"do; " \
-				"overlay_specs=${overlay_specs}#${overlay}; " \
-			"done; " \
-		"env set bootm_fit_conf_spec ${overlay_specs};\0 " \
 	"mmcboot=echo Booting from mmc ...; " \
 		"if run mmc_load_bootenv; then " \
 			"env import -t ${bootenv_addr} ${filesize}; " \
 		"fi; " \
 		"run mmcargs; " \
-		"if test ${dofitboot} = 1; then " \
-			"if test ${no_overlays} = 0; then " \
-				"run fit_create_overlay_conf_spec; " \
-				"bootm ${bootm_fit_conf_spec};" \
-			"else " \
-				"bootm; " \
-			"fi; " \
-		"fi; " \
+		"run fit_test_and_run_boot; " \
 		"if run loadfdt; then " \
 			"run mmc_apply_overlays; " \
 			"booti ${loadaddr} - ${fdt_addr}; " \
@@ -149,7 +135,8 @@
 			"echo WARN: Cannot load the DT; " \
 		"fi;\0" \
 	"raucdev=2\0" \
-	PHYCORE_RAUC_ENV_BOOTLOGIC
+	PHYCORE_RAUC_ENV_BOOTLOGIC \
+	PHYCORE_FITIMAGE_ENV_BOOTLOGIC
 
 #ifdef CONFIG_IMX_HAB
 #define BOOTCOMMAND_APPEND "reset;"
