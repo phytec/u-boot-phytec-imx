@@ -10,6 +10,17 @@
 		wdt = <&wdog1>;
 		u-boot,dm-spl;
 	};
+
+	aliases {
+		usbgadget0 = &usbg1;
+	};
+
+	usbg1: usbg1 {
+		compatible = "fsl,imx27-usb-gadget";
+		dr_mode = "peripheral";
+		chipidea,usb = <&usbotg1>;
+		status = "okay";
+	};
 };
 
 &{/soc@0} {
