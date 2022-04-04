@@ -21,6 +21,13 @@ config IMX_TAMPER
 	help
 	  Set "Y" to enable the tamper commands
 
+config SYS_TEXT_BASE
+	default 0x87800000
+
+config SPL_TEXT_BASE
+	depends on SPL
+	default 0x00912000
+
 choice
 	prompt "MX7 board select"
 	optional
