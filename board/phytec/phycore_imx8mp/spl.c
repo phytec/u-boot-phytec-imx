@@ -33,8 +33,6 @@ int spl_board_boot_device(enum boot_device boot_dev_spl)
 	return BOOT_DEVICE_BOOTROM;
 }
 
-extern struct dram_timing_info dram_timing_4gb;
-
 void spl_dram_init(void)
 {
 	int ret;
@@ -85,7 +83,18 @@ void spl_dram_init(void)
 		ddr_init(&dram_timing);
 		break;
 	case 5:
-		ddr_init(&dram_timing_4gb);
+		/* 4GB */
+		dram_timing.ddrc_cfg[2].val = 0xa3080020;
+		dram_timing.ddrc_cfg[39].val = 0x17;
+		dram_timing.fsp_msg[0].fsp_cfg[9].val = 0x310;
+		dram_timing.fsp_msg[0].fsp_cfg[21].val = 0x3;
+		dram_timing.fsp_msg[1].fsp_cfg[10].val = 0x310;
+		dram_timing.fsp_msg[1].fsp_cfg[22].val = 0x3;
+		dram_timing.fsp_msg[2].fsp_cfg[10].val = 0x310;
+		dram_timing.fsp_msg[2].fsp_cfg[22].val = 0x3;
+		dram_timing.fsp_msg[3].fsp_cfg[10].val = 0x310;
+		dram_timing.fsp_msg[3].fsp_cfg[22].val = 0x3;
+		ddr_init(&dram_timing);
 		break;
 	default:
 		goto err;
