@@ -53,6 +53,7 @@ void spl_dram_init(void)
 
 	switch (phytec_get_imx8m_ddr_size()) {
 	case 2:
+		/* 1GB */
 		dram_timing.ddrc_cfg[3].val = 0x1233;
 		dram_timing.ddrc_cfg[5].val = 0x5b0087;
 		dram_timing.ddrc_cfg[6].val = 0x61027f10;
@@ -80,6 +81,7 @@ void spl_dram_init(void)
 		ddr_init(&dram_timing);
 		break;
 	case 3:
+		/* 2GB */
 		ddr_init(&dram_timing);
 		break;
 	case 5:
