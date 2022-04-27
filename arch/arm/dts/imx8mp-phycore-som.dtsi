@@ -83,6 +83,7 @@
 		interrupts = <18 IRQ_TYPE_LEVEL_LOW>;
 
 		regulators {
+
 			buck1: BUCK1 {
 				regulator-compatible = "BUCK1";
 				regulator-min-microvolt = <600000>;
@@ -169,6 +170,12 @@
 		compatible = "atmel,24c32";
 		reg = <0x51>;
 		pagesize = <32>;
+	};
+
+	eeprom@59 {
+		compatible = "atmel,24c32";
+		reg = <0x59>;
+		size = <32>;
 	};
 
 	rv3028: rtc@52 {
