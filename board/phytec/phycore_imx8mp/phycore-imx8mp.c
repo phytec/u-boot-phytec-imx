@@ -43,8 +43,8 @@ static int setup_fec(void)
 	struct iomuxc_gpr_base_regs *gpr =
 		(struct iomuxc_gpr_base_regs *)IOMUXC_GPR_BASE_ADDR;
 
-	/* Use 125M anatop REF_CLK1 for ENET1, not from external */
-	clrsetbits_le32(&gpr->gpr[1], 0x2000, 0);
+	/* Enable RGMII TX clk output */
+	setbits_le32(&gpr->gpr[1],BIT(22));
 
 	return 0;
 }
