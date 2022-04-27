@@ -50,6 +50,9 @@
 	"ip_dyn=yes\0" \
 	"bootenv=bootenv.txt\0" \
 	"mmc_load_bootenv=fatload mmc ${mmcdev}:${mmcpart} ${bootenv_addr} ${bootenv}\0" \
+	"mtdparts=30bb0000.spi:3840k(u-boot),128k(env),128k(env_redund),-(none)\0" \
+	"mtdids=nor0=30bb0000.spi\0" \
+	"spiprobe=true\0" \
 	"mmcdev=" __stringify(CONFIG_SYS_MMC_ENV_DEV) "\0" \
 	"mmcpart=" __stringify(CONFIG_SYS_MMC_IMG_LOAD_PART) "\0" \
 	"mmcroot=2\0" \
@@ -70,6 +73,7 @@
 			"done;" \
 		"fi;\0 " \
 	"mmcboot=echo Booting from mmc ...; " \
+		"run spiprobe; " \
 		"if run mmc_load_bootenv; then " \
 			"env import -t ${bootenv_addr} ${filesize}; " \
 		"fi; " \
@@ -97,6 +101,7 @@
 			"done;" \
 		"fi;\0 " \
 	"netboot=echo Booting from net ...; " \
+		"run spiprobe; " \
 		"if test ${ip_dyn} = yes; then " \
 			"setenv nfsip dhcp; " \
 			"setenv get_cmd dhcp; " \
@@ -129,6 +134,7 @@
 	"mmc dev ${mmcdev}; if mmc rescan; then " \
 		"env exists dofitboot || setenv dofitboot 0;" \
 		"env exists doraucboot || setenv doraucboot 0 && saveenv;" \
+		"run spiprobe; " \
 		"if test ${doraucboot} = 1; then " \
 			"run raucboot; " \
 		"elif run loadimage; then " \
