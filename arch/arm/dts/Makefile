@@ -866,6 +866,7 @@ dtb-$(CONFIG_ARCH_IMX8M) += \
 	imx8mm-verdin.dtb \
 	phycore-imx8mm.dtb \
 	phycore-imx8mn.dtb \
+	phycore-imx8mn-1532.1.dtb \
 	imx8mn-ddr3l-evk.dtb \
 	imx8mn-ddr4-evk.dtb \
 	imx8mn-evk.dtb \
