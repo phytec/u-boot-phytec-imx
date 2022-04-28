@@ -129,10 +129,20 @@
 };
 
 &usdhc2 {
+	assigned-clocks = <&clk IMX8MM_CLK_USDHC2>;
+	assigned-clock-parents = <&clk IMX8MM_SYS_PLL1_400M>;
+	assigned-clock-rates = <400000000>;
+	sd-uhs-ddr50;
+	sd-uhs-sdr104;
 	u-boot,dm-spl;
 };
 
 &usdhc3 {
+	assigned-clocks = <&clk IMX8MM_CLK_USDHC3>;
+	assigned-clock-parents = <&clk IMX8MM_SYS_PLL1_400M>;
+	assigned-clock-rates = <400000000>;
+	mmc-hs400-enhanced-strobe;
+	mmc-hs400-1_8v;
 	u-boot,dm-spl;
 };
 
