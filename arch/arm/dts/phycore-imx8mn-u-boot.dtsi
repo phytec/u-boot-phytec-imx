@@ -5,6 +5,17 @@
  */
 
 / {
+	aliases {
+		usbgadget0 = &usbg1;
+	};
+
+	usbg1: usbg1 {
+		compatible = "fsl,imx27-usb-gadget";
+		chipidea,usb = <&usbotg1>;
+		dr_mode = "peripheral";
+		status = "okay";
+	};
+
 	wdt-reboot {
 		compatible = "wdt-reboot";
 		wdt = <&wdog1>;
