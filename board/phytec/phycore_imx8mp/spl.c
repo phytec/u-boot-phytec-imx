@@ -37,17 +37,9 @@ void spl_dram_init(void)
 {
 	int ret;
 
-	ret = phytec_eeprom_data_init(0, EEPROM_ADDR);
-	if (ret) {
-		printf("phytec_eeprom_data_init: init failed. "
-		       "Trying fall back address 0x%x\n", EEPROM_ADDR_FALLBACK);
-		ret = phytec_eeprom_data_init(0, EEPROM_ADDR_FALLBACK);
-
-		if (ret)
-			goto err;
-	}
-
-	printf("phytec_eeprom_data_init: init successful\n");
+	ret = phytec_eeprom_data_setup(0, EEPROM_ADDR, EEPROM_ADDR_FALLBACK);
+	if (ret)
+		goto err;
 
 	phytec_print_som_info();
 
