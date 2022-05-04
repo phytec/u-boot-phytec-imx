@@ -16,6 +16,26 @@
 
 struct phytec_eeprom_data eeprom_data;
 
+int _phytec_eeprom_data_setup(struct phytec_eeprom_data *data,
+			      int bus_num, int addr, int addr_fallback)
+{
+	int ret;
+
+	ret = _phytec_eeprom_data_init(data, bus_num, addr);
+	if (ret) {
+		pr_err("%s: init failed. Trying fall back address 0x%x\n",
+		       __func__, addr_fallback);
+		ret = _phytec_eeprom_data_init(data, bus_num, addr_fallback);
+	}
+
+	if (ret)
+		pr_err("%s: EEPROM data init failed\n", __func__);
+	else
+		pr_info("%s: init successful\n", __func__);
+
+	return ret;
+}
+
 int _phytec_eeprom_data_init(struct phytec_eeprom_data *data,
 			     int bus_num, int addr)
 {

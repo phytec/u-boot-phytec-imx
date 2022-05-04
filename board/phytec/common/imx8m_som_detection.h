@@ -61,6 +61,8 @@ struct phytec_eeprom_data {
 	} data;
 } __attribute__ ((__packed__));
 
+int _phytec_eeprom_data_setup(struct phytec_eeprom_data *data,
+			      int bus_num, int addr, int addr_fallback);
 int _phytec_eeprom_data_init(struct phytec_eeprom_data *data,
 			     int bus_num, int addr);
 
@@ -70,6 +72,8 @@ u8 __maybe_unused _phytec_get_imx8m_spi(struct phytec_eeprom_data *data);
 u8 __maybe_unused _phytec_get_imx8m_eth(struct phytec_eeprom_data *data);
 void __maybe_unused _phytec_print_som_info(struct phytec_eeprom_data *data);
 
+#define phytec_eeprom_data_setup(bus_num, addr, addr_fallback) \
+	(_phytec_eeprom_data_setup(NULL, bus_num, addr, addr_fallback))
 #define phytec_eeprom_data_init(bus_num, addr) \
 	(_phytec_eeprom_data_init(NULL, bus_num, addr))
 
