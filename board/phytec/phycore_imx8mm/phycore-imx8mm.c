@@ -57,12 +57,9 @@ int board_fix_fdt(void *blob)
 	u8 opt;
 
 	/* We have no access to global variables here */
-	ret = _phytec_eeprom_data_init(&data, 0, EEPROM_ADDR);
-	if (ret) {
-		_phytec_eeprom_data_init(&data, 0, EEPROM_ADDR_FALLBACK);
-		if (ret)
-			printf("%s: EEPROM data init failed\n", __func__);
-	}
+	ret = _phytec_eeprom_data_setup(&data, 0, EEPROM_ADDR, EEPROM_ADDR_FALLBACK);
+	if (ret)
+		return 0;
 
 	/* Disable fspi node if SPI flash if not populated */
 	opt = _phytec_get_imx8m_spi(&data);
@@ -127,14 +124,7 @@ static int setup_fec(void)
 
 int board_init(void)
 {
-	int ret;
-
-	ret = phytec_eeprom_data_init(0, EEPROM_ADDR);
-	if (ret) {
-		ret = phytec_eeprom_data_init(0, EEPROM_ADDR_FALLBACK);
-		if (ret)
-			printf("%s: EEPROM data init failed\n", __func__);
-	}
+	phytec_eeprom_data_setup(0, EEPROM_ADDR, EEPROM_ADDR_FALLBACK);
 
 	setup_fec();
 
