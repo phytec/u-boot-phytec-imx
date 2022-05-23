@@ -75,14 +75,17 @@ static void spl_dram_init(void)
 
 	switch (size) {
 	case 1:
+		/* 1GB RAM */
 		dram_timing_1gb.ddrphy_cfg[82].val = 0x3;
 		dram_timing_1gb.ddrphy_cfg[83].val = 0x3;
 		ddr_init(&dram_timing_1gb);
 		break;
 	case 3:
+		/* 2GB RAM */
 		ddr_init(&dram_timing);
 		break;
 	case 5:
+		/* 4GB RAM */
 		dram_timing_4gb.ddrphy_cfg[82].val = 0x3;
 		dram_timing_4gb.ddrphy_cfg[83].val = 0x3;
 		ddr_init(&dram_timing_4gb);
