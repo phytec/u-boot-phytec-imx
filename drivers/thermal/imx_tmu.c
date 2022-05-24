@@ -192,7 +192,7 @@ int imx_tmu_get_temp(struct udevice *dev, int *temp)
 		ret = read_temperature(dev, &cpu_tmp);
 		if (ret)
 			return ret;
-		if (is_imx8mm() || is_imx8mn()) {
+		if (is_imx8mm() || is_imx8mn() || is_imx8mp()) {
 			if (cpu_tmp >= pdata->critical) {
 				printf("CPU Temperature (%dC) reaches critical temperature.\n", cpu_tmp);
 				printf("Shutting down ...\n");
