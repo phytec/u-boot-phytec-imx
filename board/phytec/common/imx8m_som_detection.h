@@ -68,6 +68,7 @@ int _phytec_eeprom_data_init(struct phytec_eeprom_data *data,
 
 char * __maybe_unused _phytec_get_imx8m_opt(struct phytec_eeprom_data *data);
 u8 __maybe_unused _phytec_get_imx8m_ddr_size(struct phytec_eeprom_data *data);
+u8 __maybe_unused _phytec_get_imx8mp_rtc(struct phytec_eeprom_data *data);
 u8 __maybe_unused _phytec_get_imx8m_spi(struct phytec_eeprom_data *data);
 u8 __maybe_unused _phytec_get_imx8m_eth(struct phytec_eeprom_data *data);
 void __maybe_unused _phytec_print_som_info(struct phytec_eeprom_data *data);
@@ -79,6 +80,7 @@ void __maybe_unused _phytec_print_som_info(struct phytec_eeprom_data *data);
 
 #define phytec_get_imx8m_opt() _phytec_get_imx8m_opt(NULL)
 #define phytec_get_imx8m_ddr_size() _phytec_get_imx8m_ddr_size(NULL)
+#define phytec_get_imx8mp_rtc() _phytec_get_imx8mp_rtc(NULL)
 #define phytec_get_imx8m_spi() _phytec_get_imx8m_spi(NULL)
 #define phytec_get_imx8m_eth() _phytec_get_imx8m_eth(NULL)
 #define phytec_print_som_info() _phytec_print_som_info(NULL)

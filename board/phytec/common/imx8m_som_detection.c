@@ -229,6 +229,34 @@ u8 __maybe_unused _phytec_get_imx8m_eth(struct phytec_eeprom_data *data)
 	return eth;
 }
 
+/*
+ * Filter RTC information.
+ * returns: 0 if no RTC is poulated. 1 if it is populated.
+ * PHYTEC_EEPROM_INVAL when the data is invalid.
+ */
+u8 __maybe_unused _phytec_get_imx8mp_rtc(struct phytec_eeprom_data *data)
+{
+	char *opt;
+	u8 rtc;
+
+	if (!data)
+		data = &eeprom_data;
+
+	if (data->api_rev < PHYTEC_API_REV2)
+		return PHYTEC_EEPROM_INVAL;
+
+	opt = _phytec_get_imx8m_opt(data);
+	if (opt) {
+		rtc = opt[5] - '0';
+		rtc &= 0x4;
+		rtc = !(rtc >> 2);
+	} else {
+		rtc = PHYTEC_EEPROM_INVAL;
+	}
+	debug("%s: rtc: %u\n", __func__, rtc);
+	return rtc;
+}
+
 void __maybe_unused _phytec_print_som_info(struct phytec_eeprom_data *data)
 {
 	struct phytec_api2_data *api2;
