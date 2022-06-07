@@ -25,6 +25,7 @@ static const unsigned char bank_lookup[] = {3, 2};
 #define DDRC_MSTR_LPDDR4                       BIT(5)
 #define DDRC_MSTR_DATA_BUS_WIDTH               GENMASK(13, 12)
 #define DDRC_MSTR_ACTIVE_RANKS                 GENMASK(27, 24)
+#define DDRC_MSTR_DEVICE_CONFIG			GENMASK(31, 30)
 
 #define DDRC_ADDRMAP0_CS_BIT1                  GENMASK(12,  8)
 
@@ -113,7 +114,7 @@ resource_size_t imx_ddrc_sdram_size(void *ddrc, const u32 addrmap[],
 				    unsigned int col_b_num,
 				    u8 row_max, const u8 row_b[],
 				    unsigned int row_b_num,
-				    bool reduced_address_space)
+				    bool reduced_address_space, bool is_imx8)
 {
 	const u32 mstr = readl(ddrc + DDRC_MSTR);
 	unsigned int banks, ranks, columns, rows, active_ranks, width;
@@ -139,15 +140,20 @@ resource_size_t imx_ddrc_sdram_size(void *ddrc, const u32 addrmap[],
 		BUG();
 	}
 
+	/* Bus width in bytes, 0 means half byte or 4-bit mode */
+	if (is_imx8)
+		width = (1 << FIELD_GET(DDRC_MSTR_DEVICE_CONFIG, mstr)) >> 1;
+	else
+		width = 4;
+
 	switch (FIELD_GET(DDRC_MSTR_DATA_BUS_WIDTH, mstr)) {
 	case 0b00:	/* Full DQ bus  */
-		width = 4;
 		break;
 	case 0b01:	/* Half DQ bus  */
-		width = 2;
+		width >>= 1;
 		break;
 	case 0b10:	/* Quarter DQ bus  */
-		width = 1;
+		width >>= 2;
 		break;
 	default:
 		BUG();
@@ -173,7 +179,15 @@ resource_size_t imx_ddrc_sdram_size(void *ddrc, const u32 addrmap[],
 	columns	= imx_ddrc_count_bits(col_max, col_b, col_b_num);
 	rows	= imx_ddrc_count_bits(row_max, row_b, row_b_num);
 
-	size = ((u64)(1 << banks) * width << (rows + columns)) << ranks;
+	/*
+	 * Special case when bus width is 0 or x4 mode,
+	 * calculate the mem size and then divide the size by 2.
+	 */
+	if (width)
+		size = ((u64)(1 << banks) * width << (rows + columns));
+	else
+		size = ((u64)(1 << banks) << (rows + columns)) >> 1;
+	size <<= ranks;
 
 	return reduced_address_space ? size * 3 / 4 : size;
 }
@@ -221,5 +235,5 @@ resource_size_t imx8m_ddrc_sdram_size(void)
 	return imx_ddrc_sdram_size(mem_base, addrmap,
 					12, col_b, ARRAY_SIZE(col_b),
 					16, row_b, ARRAY_SIZE(row_b),
-					reduced_address_space);
+					reduced_address_space, true);
 }

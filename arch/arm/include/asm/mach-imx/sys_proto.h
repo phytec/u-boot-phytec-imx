@@ -91,7 +91,8 @@ phys_size_t imx_ddrc_sdram_size(void *ddrc, const u32 addrmap[],
 				unsigned int col_b_num,
 				u8 row_max, const u8 row_b[],
 				unsigned int row_b_num,
-				bool reduced_address_space);
+				bool reduced_address_space,
+				bool is_imx8m);
 #endif
 
 #ifdef CONFIG_MX6
