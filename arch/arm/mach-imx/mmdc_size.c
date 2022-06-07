@@ -180,7 +180,8 @@ resource_size_t imx8m_ddrc_sdram_size(void)
 		readl(mem_base + DDRC_ADDRMAP(4)),
 		readl(mem_base + DDRC_ADDRMAP(5)),
 		readl(mem_base + DDRC_ADDRMAP(6)),
-		readl(mem_base + DDRC_ADDRMAP(7))
+		readl(mem_base + DDRC_ADDRMAP(7)),
+		readl(mem_base + DDRC_ADDRMAP(8))
 	};
 
 	const u8 col_b[] = {
@@ -195,6 +196,8 @@ resource_size_t imx8m_ddrc_sdram_size(void)
 	};
 
 	const u8 row_b[] = {
+		FIELD_GET(DDRC_ADDRMAP7_ROW_B17, addrmap[7]),
+		FIELD_GET(DDRC_ADDRMAP7_ROW_B16, addrmap[7]),
 		FIELD_GET(DDRC_ADDRMAP6_ROW_B15, addrmap[6]),
 		FIELD_GET(DDRC_ADDRMAP6_ROW_B14, addrmap[6]),
 		FIELD_GET(DDRC_ADDRMAP6_ROW_B13, addrmap[6]),
