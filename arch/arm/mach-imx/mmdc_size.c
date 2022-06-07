@@ -127,10 +127,7 @@ resource_size_t imx_ddrc_sdram_size(void *ddrc, const u32 addrmap[DDRC_ADDRMAP_L
 	unsigned int banks, ranks, columns, rows, active_ranks, width;
 	resource_size_t size;
 
-	if (is_imx8mn())
-		banks = 1;
-	else
-		banks = 2;
+	banks = 2;
 	ranks = 0;
 
 	switch (FIELD_GET(DDRC_MSTR_ACTIVE_RANKS, mstr)) {
@@ -148,10 +145,14 @@ resource_size_t imx_ddrc_sdram_size(void *ddrc, const u32 addrmap[DDRC_ADDRMAP_L
 	}
 
 	/* Bus width in bytes, 0 means half byte or 4-bit mode */
-	if (is_imx8 && !(mstr & DDRC_MSTR_LPDDR4))
+	if (is_imx8 && !(mstr & DDRC_MSTR_LPDDR4)) {
 		width = (1 << FIELD_GET(DDRC_MSTR_DEVICE_CONFIG, mstr)) >> 1;
-	else
-		width = 4;
+	} else {
+		if (is_imx8mn())
+			width = 2;
+		else
+			width = 4;
+	}
 
 	switch (FIELD_GET(DDRC_MSTR_DATA_BUS_WIDTH, mstr)) {
 	case 0b00:	/* Full DQ bus  */
