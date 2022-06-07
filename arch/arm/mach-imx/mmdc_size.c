@@ -206,7 +206,7 @@ resource_size_t imx8m_ddrc_sdram_size(void)
 		FIELD_GET(DDRC_ADDRMAP6_LPDDR4_6GB_12GB_24GB, addrmap[6]);
 
 	return imx_ddrc_sdram_size(mem_base, addrmap,
-					12, col_b, sizeof(col_b),
-					16, row_b, sizeof(row_b),
+					12, col_b, ARRAY_SIZE(col_b),
+					16, row_b, ARRAY_SIZE(row_b),
 					reduced_address_space);
 }
