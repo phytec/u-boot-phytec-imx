@@ -103,8 +103,12 @@ unsigned int imx_ddr_size(void)
 static unsigned int imx_ddrc_count_bits(unsigned int bits, const u8 config[],
 					unsigned int config_num)
 {
-	for (int i = 0; i < config_num && config[i] == 0b1111; i++)
-		bits--;
+	unsigned int i;
+
+	for (i = 0; i < config_num; i++) {
+		if (config[i] == 0b1111)
+			bits--;
+	}
 
 	return bits;
 }
