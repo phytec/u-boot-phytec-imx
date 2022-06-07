@@ -241,6 +241,6 @@ resource_size_t imx8m_ddrc_sdram_size(void)
 
 	return imx_ddrc_sdram_size(mem_base, addrmap,
 					12, col_b, ARRAY_SIZE(col_b),
-					16, row_b, ARRAY_SIZE(row_b),
+					18, row_b, ARRAY_SIZE(row_b),
 					reduced_address_space, true);
 }
