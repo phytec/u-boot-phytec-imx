@@ -55,6 +55,9 @@ static const unsigned char bank_lookup[] = {3, 2};
 #define DDRC_ADDRMAP8_BG_B0			GENMASK(4,  0)
 
 #define MEMCTL_BASE    0x3d400000
+
+#define DDRC_ADDRMAP_LENGTH	9
+
 #endif
 
 /* these MMDC registers are common to the IMX53 and IMX6 */
@@ -113,7 +116,7 @@ static unsigned int imx_ddrc_count_bits(unsigned int bits, const u8 config[],
 	return bits;
 }
 
-resource_size_t imx_ddrc_sdram_size(void *ddrc, const u32 addrmap[],
+resource_size_t imx_ddrc_sdram_size(void *ddrc, const u32 addrmap[DDRC_ADDRMAP_LENGTH],
 				    u8 col_max, const u8 col_b[],
 				    unsigned int col_b_num,
 				    u8 row_max, const u8 row_b[],
@@ -200,7 +203,7 @@ resource_size_t imx8m_ddrc_sdram_size(void)
 {
 	void __iomem *mem_base = (void __iomem *)MEMCTL_BASE;
 
-	const u32 addrmap[] = {
+	const u32 addrmap[DDRC_ADDRMAP_LENGTH] = {
 		readl(mem_base + DDRC_ADDRMAP(0)),
 		readl(mem_base + DDRC_ADDRMAP(1)),
 		readl(mem_base + DDRC_ADDRMAP(2)),
