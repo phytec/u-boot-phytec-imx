@@ -36,14 +36,29 @@ int spl_board_boot_device(enum boot_device boot_dev_spl)
 void spl_dram_init(void)
 {
 	int ret;
+	int size = 0xf;
 
 	ret = phytec_eeprom_data_setup(0, EEPROM_ADDR, EEPROM_ADDR_FALLBACK);
-	if (ret)
+	if (ret && !IS_ENABLED(CONFIG_PHYCORE_IMX8MP_RAM_SIZE_FIX))
 		goto err;
 
-	phytec_print_som_info();
+	if (!ret) {
+		printf("phytec_eeprom_data_init: init successful\n");
+		phytec_print_som_info();
+	}
 
-	switch (phytec_get_imx8m_ddr_size()) {
+	if (IS_ENABLED(CONFIG_PHYCORE_IMX8MP_RAM_SIZE_FIX)) {
+		if (IS_ENABLED(CONFIG_PHYCORE_IMX8MP_RAM_SIZE_1GB))
+			size = 2;
+		else if (IS_ENABLED(CONFIG_PHYCORE_IMX8MP_RAM_SIZE_2GB))
+			size = 3;
+		else if (IS_ENABLED(CONFIG_PHYCORE_IMX8MP_RAM_SIZE_4GB))
+			size = 5;
+	} else {
+		size = phytec_get_imx8m_ddr_size();
+	}
+
+	switch (size) {
 	case 2:
 		/* 1GB */
 		dram_timing.ddrc_cfg[3].val = 0x1233;
