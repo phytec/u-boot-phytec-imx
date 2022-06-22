@@ -55,12 +55,13 @@ static void spl_dram_init(void)
 	int size = 0xf;
 
 	ret = phytec_eeprom_data_setup(0, EEPROM_ADDR, EEPROM_ADDR_FALLBACK);
-	if (ret)
+	if (ret && !IS_ENABLED(CONFIG_PHYCORE_IMX8MM_RAM_SIZE_FIX))
 		goto err;
 
-	printf("phytec_eeprom_data_init: init successful\n");
-
-	phytec_print_som_info();
+	if (!ret) {
+		printf("phytec_eeprom_data_init: init successful\n");
+		phytec_print_som_info();
+	}
 
 	if (IS_ENABLED(CONFIG_PHYCORE_IMX8MM_RAM_SIZE_FIX)) {
 		if (IS_ENABLED(CONFIG_PHYCORE_IMX8MM_RAM_SIZE_1GB))
