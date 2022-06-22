@@ -52,11 +52,21 @@
 	u-boot,dm-spl;
 };
 
+&pinctrl_fec {
+	u-boot,dm-pre-reloc;
+};
+
+&pinctrl_flexspi0 {
+	u-boot,dm-pre-reloc;
+};
+
 &pinctrl_i2c1 {
+	u-boot,dm-pre-reloc;
 	u-boot,dm-spl;
 };
 
 &pinctrl_i2c1_gpio {
+	u-boot,dm-pre-reloc;
 	u-boot,dm-spl;
 };
 
@@ -89,6 +99,14 @@
 	u-boot,dm-spl;
 };
 
+&fec {
+	u-boot,dm-pre-reloc;
+};
+
+&flexspi {
+	u-boot,dm-pre-reloc;
+};
+
 &gpio1 {
 	u-boot,dm-spl;
 };
@@ -114,6 +132,7 @@
 };
 
 &i2c1 {
+	u-boot,dm-pre-reloc;
 	u-boot,dm-spl;
 };
 
