@@ -24,6 +24,9 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+#define EEPROM_ADDR		0x51
+#define EEPROM_ADDR_FALLBACK	0x59
+
 extern struct dram_timing_info dram_timing_1gb;
 
 int spl_board_boot_device(enum boot_device boot_dev_spl)
@@ -47,12 +50,32 @@ int spl_board_boot_device(enum boot_device boot_dev_spl)
 void spl_dram_init(void)
 {
 	int ret;
+	int size = 0xf;
 
-	ret =  get_imx8m_ddr_size(0, 0x59);
-	if (ret < 0)
-		goto err;
+	if (IS_ENABLED(CONFIG_PHYTEC_IMX8M_SOM_DETECTION)) {
+		ret = phytec_eeprom_data_setup(0, EEPROM_ADDR,
+					       EEPROM_ADDR_FALLBACK);
+		if (ret)
+			goto err;
 
-	switch (ret) {
+		printf("phytec_eeprom_data_init: init successful\n");
+
+		phytec_print_som_info();
+	}
+
+	if (IS_ENABLED(CONFIG_PHYCORE_IMX8MM_RAM_SIZE_FIX)) {
+		if (IS_ENABLED(CONFIG_PHYCORE_IMX8MM_RAM_SIZE_1GB))
+			size = 1;
+		else if (IS_ENABLED(CONFIG_PHYCORE_IMX8MM_RAM_SIZE_2GB))
+			size = 3;
+	} else {
+		if (IS_ENABLED(CONFIG_PHYTEC_IMX8M_SOM_DETECTION))
+			size = phytec_get_imx8m_ddr_size();
+		else
+			printf("SoM detection disabled. Please set fix RAM size!\n");
+	}
+
+	switch (size) {
 	case 1:
 		ddr_init(&dram_timing_1gb);
 		break;
