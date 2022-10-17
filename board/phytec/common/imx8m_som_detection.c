@@ -21,6 +21,9 @@ int _phytec_eeprom_data_setup(struct phytec_eeprom_data *data,
 {
 	int ret;
 
+	if (!IS_ENABLED(CONFIG_PHYTEC_IMX8M_SOM_DETECTION))
+		return -ENOSYS;
+
 	ret = _phytec_eeprom_data_init(data, bus_num, addr);
 	if (ret) {
 		pr_err("%s: init failed. Trying fall back address 0x%x\n",
@@ -160,6 +163,9 @@ u8 __maybe_unused _phytec_get_imx8m_ddr_size(struct phytec_eeprom_data *data)
 	char *opt;
 	u8 ddr_id;
 
+	if (!IS_ENABLED(CONFIG_PHYTEC_IMX8M_SOM_DETECTION))
+		return PHYTEC_EEPROM_INVAL;
+
 	if (!data)
 		data = &eeprom_data;
 
@@ -183,6 +189,9 @@ u8 __maybe_unused _phytec_get_imx8m_spi(struct phytec_eeprom_data *data)
 {
 	char *opt;
 	u8 spi;
+
+	if (!IS_ENABLED(CONFIG_PHYTEC_IMX8M_SOM_DETECTION))
+		return PHYTEC_EEPROM_INVAL;
 
 	if (!data)
 		data = &eeprom_data;
@@ -210,6 +219,9 @@ u8 __maybe_unused _phytec_get_imx8m_eth(struct phytec_eeprom_data *data)
 {
 	char *opt;
 	u8 eth;
+
+	if (!IS_ENABLED(CONFIG_PHYTEC_IMX8M_SOM_DETECTION))
+		return PHYTEC_EEPROM_INVAL;
 
 	if (!data)
 		data = &eeprom_data;
@@ -262,6 +274,9 @@ void __maybe_unused _phytec_print_som_info(struct phytec_eeprom_data *data)
 	struct phytec_api2_data *api2;
 	char pcb_sub_rev;
 	unsigned int ksp_no;
+
+	if (!IS_ENABLED(CONFIG_PHYTEC_IMX8M_SOM_DETECTION))
+		return;
 
 	if (!data)
 		data = &eeprom_data;
