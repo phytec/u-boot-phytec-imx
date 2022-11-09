@@ -273,7 +273,7 @@ void __maybe_unused _phytec_print_som_info(struct phytec_eeprom_data *data)
 {
 	struct phytec_api2_data *api2;
 	char pcb_sub_rev;
-	unsigned int ksp_no;
+	unsigned int ksp_no, sub_som_type1, sub_som_type2;
 
 	if (!IS_ENABLED(CONFIG_PHYTEC_IMX8M_SOM_DETECTION))
 		return;
@@ -304,9 +304,31 @@ void __maybe_unused _phytec_print_som_info(struct phytec_eeprom_data *data)
 		       phytec_som_type_str[api2->som_type], ksp_no);
 	/* print standard product based KSP/KSM strings */
 	} else {
-		printf("SoM: %s-%03u-%03u ",
-		       phytec_som_type_str[api2->som_type],
-		       api2->som_no, api2->ksp_no);
+		switch(api2->som_type) {
+		case 4:
+			sub_som_type1 = 0;
+			sub_som_type2 = 3;
+			break;
+		case 5:
+			sub_som_type1 = 0;
+			sub_som_type2 = 2;
+			break;
+		case 6:
+			sub_som_type1 = 1;
+			sub_som_type2 = 3;
+			break;
+		case 7:
+			sub_som_type1 = 1;
+			sub_som_type2 = 2;
+			break;
+		default:
+			break;
+		};
+
+		printf("SoM: %s-%03u-%s-%03u ",
+		       phytec_som_type_str[sub_som_type1],
+		       api2->som_no, phytec_som_type_str[sub_som_type2],
+		       api2->ksp_no);
 	}
 
 	printf("Option: %s BOM rev: %s PCB rev: %u%c\n", api2->opt,

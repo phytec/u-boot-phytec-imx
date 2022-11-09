@@ -25,10 +25,6 @@ static const char * const phytec_som_type_str[] = {
 	"PCL",
 	"KSM",
 	"KSP",
-	"PCM-KSP",
-	"PCM-KSM",
-	"PCL-KSP",
-	"PCL-KSM",
 };
 
 struct phytec_api0_data {
