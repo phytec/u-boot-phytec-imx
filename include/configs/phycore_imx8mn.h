@@ -84,8 +84,10 @@
 			"done;" \
 		"fi;\0 " \
 	"mmcboot=echo Booting from mmc ...; " \
-		"if run mmc_load_bootenv; then " \
-			"env import -t ${bootenv_addr} ${filesize}; " \
+		"if test ${no_bootenv} = 0; then " \
+			"if run mmc_load_bootenv; then " \
+				"env import -t ${bootenv_addr} ${filesize}; " \
+			"fi; " \
 		"fi; " \
 		"run mmcargs; " \
 		"run fit_test_and_run_boot; " \
@@ -125,8 +127,10 @@
 			"setenv nfsip ${ipaddr}:${serverip}::${netmask}::eth0:on; " \
 			"setenv get_cmd tftp; " \
 		"fi; " \
-		"if run net_load_bootenv; then " \
-			"env import -t ${bootenv_addr} ${filesize}; " \
+		"if test ${no_bootenv} = 0; then " \
+			"if run net_load_bootenv; then " \
+				"env import -t ${bootenv_addr} ${filesize}; " \
+			"fi; " \
 		"fi; " \
 		"run netargs; " \
 		"${get_cmd} ${loadaddr} ${image}; " \
