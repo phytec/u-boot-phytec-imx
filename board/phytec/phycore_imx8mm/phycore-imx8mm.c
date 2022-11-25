@@ -99,6 +99,26 @@ int ft_board_setup(void *blob, struct bd_info *bd)
 	return 0;
 }
 
+static u32 phy_id = 0xffffffff;
+
+int board_phy_config(struct phy_device *phydev)
+{
+	switch (phydev->phy_id) {
+	case 0x2000a231:
+		printf("DP83867\n");
+		phy_id = phydev->phy_id;
+		break;
+	case 0x283bc30:
+		printf("ADIN1300\n");
+		phy_id = phydev->phy_id;
+		break;
+	}
+
+	if (phydev->drv->config)
+		return phydev->drv->config(phydev);
+	return 0;
+}
+
 int board_usb_init(int index, enum usb_init_type init)
 {
 	imx8m_usb_power(index, true);
