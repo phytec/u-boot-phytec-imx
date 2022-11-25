@@ -224,6 +224,15 @@ int extension_board_scan(struct list_head *extension_list)
 		ret++;
 	}
 
+	/* ADIN1300 overlay */
+	if (phy_id == 0x283bc30) {
+		extension = add_extension("phyCORE-i.MX8MM eth PHY ADIN1300",
+					  "imx8mm-phycore-adin1300.dtbo",
+					  "ADIN1300 eth PHY populated");
+		list_add_tail(&extension->list, extension_list);
+		ret++;
+	}
+
 	option = phytec_get_imx8m_spi();
 	if (!option) {
 		extension = add_extension("phyCORE-i.MX8MM no SPI flash",
