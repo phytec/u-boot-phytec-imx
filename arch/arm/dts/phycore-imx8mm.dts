@@ -38,7 +38,7 @@
 	phy-handle = <&ethphy0>;
 	phy-reset-gpios = <&gpio1 7 GPIO_ACTIVE_HIGH>;
 	phy-reset-duration = <1>;
-	phy-reset-post-delay = <1>;
+	phy-reset-post-delay = <5>;
 	status = "okay";
 
 	mdio {
