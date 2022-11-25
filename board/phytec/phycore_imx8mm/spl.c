@@ -19,6 +19,7 @@
 #include <hang.h>
 #include <init.h>
 #include <i2c.h>
+#include <linux/delay.h>
 #include <log.h>
 #include <spl.h>
 
@@ -249,11 +250,22 @@ static int eth_phy_det(void)
 #define PMIC_PF8121A_LDO3_RUN_VOL_REG	0x94
 #define PMIC_PF8121A_LDO_OUT_3_3_V	0xb
 
+#define PHY_RESET	IMX_GPIO_NR(1, 7)
+
+static iomux_v3_cfg_t const phy_reset_pads[] = {
+	IMX8MM_PAD_GPIO1_IO07_GPIO1_IO7	| MUX_PAD_CTRL(NO_PAD_CTRL),
+};
+
 static int power_init_board(void)
 {
 	int phy_det;
 	int ret;
 	u8 ldo3;
+
+	/* Make sure that the phy is in reset when we read the config */
+	imx_iomux_v3_setup_multiple_pads(phy_reset_pads, ARRAY_SIZE(phy_reset_pads));
+	gpio_request(PHY_RESET, "phy_reset");
+	gpio_direction_output(PHY_RESET, 1);
 
 	phy_det = eth_phy_det();
 	/* Do not increase the LDO3 voltage for DP83867 phy. */
@@ -269,6 +281,11 @@ static int power_init_board(void)
 		printf("error writing pmic: %i\n", ret);
 		return ret;
 	}
+
+	/* wait until voltage is settled */
+	udelay(500);
+
+	gpio_direction_output(PHY_RESET, 0);
 
 	return 0;
 }
