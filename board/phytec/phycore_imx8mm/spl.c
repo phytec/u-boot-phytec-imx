@@ -18,6 +18,7 @@
 #include <mmc.h>
 #include <hang.h>
 #include <init.h>
+#include <i2c.h>
 #include <log.h>
 #include <spl.h>
 
@@ -205,6 +206,73 @@ int board_mmc_getcd(struct mmc *mmc)
 	return 0;
 }
 
+#define PHY_DET_0	IMX_GPIO_NR(1,  0)
+#define PHY_DET_1	IMX_GPIO_NR(1, 16)
+
+#define PHY_DET_GPIO_PAD_CTRL (PAD_CTL_DSE6 | PAD_CTL_FSEL3 | PAD_CTL_PE)
+
+static iomux_v3_cfg_t const phy_det_pads[] = {
+	IMX8MM_PAD_GPIO1_IO00_GPIO1_IO0 | MUX_PAD_CTRL(PHY_DET_GPIO_PAD_CTRL),
+	IMX8MM_PAD_ENET_MDC_GPIO1_IO16 | MUX_PAD_CTRL(PHY_DET_GPIO_PAD_CTRL),
+};
+
+/*
+ * PHY_DET_1	PHY_DET_0
+ *    1		   0	   ADIN1300 (3,3V)
+ *    0		   1	   DP83867  (2,5V)
+ *
+ *    Depending on the connected eth phy we have to
+ *    increase LDO3 of the PMIC from 2,5V to 3,3V to
+ *    make the eth phys functional.
+ */
+static int eth_phy_det(void)
+{
+	int phy_det = 0;
+
+	imx_iomux_v3_setup_multiple_pads(phy_det_pads, ARRAY_SIZE(phy_det_pads));
+
+	gpio_request(PHY_DET_0, "phy_det_0");
+	gpio_direction_input(PHY_DET_0);
+
+	gpio_request(PHY_DET_1, "phy_det_1");
+	gpio_direction_input(PHY_DET_1);
+
+	phy_det |= !!gpio_get_value(PHY_DET_0);
+	phy_det |= !!gpio_get_value(PHY_DET_1) << 1;
+
+	debug("phy_det: %x\n", phy_det);
+	return phy_det;
+}
+
+#define PMIC_PF8121A_I2C_BUS		0x0
+#define PMIC_PF8121A_I2C_ADDR		0x8
+#define PMIC_PF8121A_LDO3_RUN_VOL_REG	0x94
+#define PMIC_PF8121A_LDO_OUT_3_3_V	0xb
+
+static int power_init_board(void)
+{
+	int phy_det;
+	int ret;
+	u8 ldo3;
+
+	phy_det = eth_phy_det();
+	/* Do not increase the LDO3 voltage for DP83867 phy. */
+	if (phy_det == 0x1)
+		return 0;
+
+	i2c_set_bus_num(PMIC_PF8121A_I2C_BUS);
+
+	ldo3 = PMIC_PF8121A_LDO_OUT_3_3_V;
+	ret =  i2c_write(PMIC_PF8121A_I2C_ADDR, PMIC_PF8121A_LDO3_RUN_VOL_REG,
+			 1, &ldo3, 1);
+	if (ret) {
+		printf("error writing pmic: %i\n", ret);
+		return ret;
+	}
+
+	return 0;
+}
+
 void spl_board_init(void)
 {
 #ifndef CONFIG_SPL_USB_SDP_SUPPORT
@@ -271,6 +339,8 @@ void board_init_f(ulong dummy)
 	enable_tzc380();
 
 	setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info1);
+
+	power_init_board();
 
 	/* DDR initialization */
 	spl_dram_init();
