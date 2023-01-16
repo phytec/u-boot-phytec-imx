@@ -155,7 +155,7 @@
 #define CONFIG_BOOTCOMMAND \
 	"mmc dev ${mmcdev}; if mmc rescan; then " \
 		"env exists dofitboot || setenv dofitboot 0;" \
-		"env exists doraucboot || setenv doraucboot 0 && saveenv;" \
+		"env exists doraucboot || setenv doraucboot 0;" \
 		"if test ${doraucboot} = 1; then " \
 			"run raucboot; " \
 		"elif run loadimage; then " \
