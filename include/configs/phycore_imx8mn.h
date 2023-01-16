@@ -154,7 +154,7 @@
 	"mmc dev ${mmcdev}; if mmc rescan; then " \
 		"run spiprobe; " \
 		"env exists dofitboot || setenv dofitboot 0;" \
-		"env exists doraucboot || setenv doraucboot 0 && saveenv;" \
+		"env exists doraucboot || setenv doraucboot 0;" \
 		"if test ${doraucboot} = 1; then " \
 			"run raucboot; " \
 		"elif run loadimage; then " \
