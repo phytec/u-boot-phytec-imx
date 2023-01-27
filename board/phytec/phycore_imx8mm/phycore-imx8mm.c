@@ -57,12 +57,12 @@ int board_fix_fdt(void *blob)
 	u8 opt;
 
 	/* We have no access to global variables here */
-	ret = _phytec_eeprom_data_setup(&data, 0, EEPROM_ADDR, EEPROM_ADDR_FALLBACK);
+	ret = phytec_eeprom_data_setup(&data, 0, EEPROM_ADDR, EEPROM_ADDR_FALLBACK);
 	if (ret)
 		return 0;
 
 	/* Disable fspi node if SPI flash if not populated */
-	opt = _phytec_get_imx8m_spi(&data);
+	opt = phytec_get_imx8m_spi(&data);
 	if (!opt) {
 		ret = fdt_disable_node(blob, "nxp,imx8mm-fspi");
 		if (ret)
@@ -71,7 +71,7 @@ int board_fix_fdt(void *blob)
 	}
 
 	/* Disable fec node if eth phy is not populated */
-	opt = _phytec_get_imx8m_eth(&data);
+	opt = phytec_get_imx8m_eth(&data);
 	if (!opt) {
 		ret = fdt_disable_node(blob, "fsl,imx8mm-fec");
 		if (ret)
@@ -85,7 +85,7 @@ int board_fix_fdt(void *blob)
 
 int ft_board_setup(void *blob, struct bd_info *bd)
 {
-	u8 spi = phytec_get_imx8m_spi();
+	u8 spi = phytec_get_imx8m_spi(NULL);
 	/* Do nothing if no SPI is poulated or data invalid */
 	if (spi == 0)
 		return 0;
@@ -144,7 +144,7 @@ static int setup_fec(void)
 
 int board_init(void)
 {
-	phytec_eeprom_data_setup(0, EEPROM_ADDR, EEPROM_ADDR_FALLBACK);
+	phytec_eeprom_data_setup(NULL, 0, EEPROM_ADDR, EEPROM_ADDR_FALLBACK);
 
 	setup_fec();
 
@@ -160,7 +160,7 @@ int board_late_init(void)
 {
 	u8 spi;
 
-	spi = phytec_get_imx8m_spi();
+	spi = phytec_get_imx8m_spi(NULL);
 
 	if (spi != 0 && spi != PHYTEC_EEPROM_INVAL)
 		env_set("spiprobe", "sf probe");
@@ -215,7 +215,7 @@ int extension_board_scan(struct list_head *extension_list)
 	int ret = 0;
 	u8 option;
 
-	option = phytec_get_imx8m_eth();
+	option = phytec_get_imx8m_eth(NULL);
 	if (!option) {
 		extension = add_extension("phyCORE-i.MX8MM no eth phy",
 					  "imx8mm-phycore-no-eth.dtbo",
@@ -233,7 +233,7 @@ int extension_board_scan(struct list_head *extension_list)
 		ret++;
 	}
 
-	option = phytec_get_imx8m_spi();
+	option = phytec_get_imx8m_spi(NULL);
 	if (!option) {
 		extension = add_extension("phyCORE-i.MX8MM no SPI flash",
 					  "imx8mm-phycore-no-spiflash.dtbo",
