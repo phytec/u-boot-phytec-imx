@@ -112,6 +112,25 @@ int ft_board_setup(void *blob,struct bd_info *bd)
 	return 0;
 }
 
+static u32 phy_id = 0xffffffff;
+
+int board_phy_config(struct phy_device *phydev)
+{
+	switch (phydev->phy_id) {
+	case 0x2000a231:
+		printf("DP83867\n");
+		phy_id = phydev->phy_id;
+		break;
+	case 0x283bc30:
+		phy_id = phydev->phy_id;
+		break;
+	}
+
+	if (phydev->drv->config)
+		return phydev->drv->config(phydev);
+	return 0;
+}
+
 static int setup_fec(void)
 {
 	struct iomuxc_gpr_base_regs *gpr =
@@ -228,6 +247,15 @@ int extension_board_scan(struct list_head *extension_list)
 		extension = add_extension("phyCORE-i.MX8MP no eth phy",
 					  "imx8mp-phycore-no-eth.dtbo",
 					  "eth phy not populated on SoM");
+		list_add_tail(&extension->list, extension_list);
+		ret++;
+	}
+
+	/* ADIN1300 overlay */
+	if (phy_id == 0x283bc30) {
+		extension = add_extension("phyCORE-i.MX8MP eth PHY ADIN1300",
+					  "imx8mp-phycore-adin1300.dtbo",
+					  "ADIN1300 eth PHY populated");
 		list_add_tail(&extension->list, extension_list);
 		ret++;
 	}
