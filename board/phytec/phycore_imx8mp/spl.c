@@ -149,6 +149,9 @@ int power_init_board(void)
 	pmic_reg_write(p, PCA9450_BUCK1OUT_DVS0, 0x1C);
 	pmic_reg_write(p, PCA9450_BUCK2OUT_DVS0, 0x1C);
 
+	/* Set LDO4 to 0,9V. Needed for ADIN eth phy */
+	pmic_reg_write(p, PCA9450_LDO4CTRL, 0xC1);
+
 	/* Set BUCK1 DVS1 to suspend controlled through PMIC_STBY_REQ */
 	pmic_reg_write(p, PCA9450_BUCK1OUT_DVS1, 0x14);
 	pmic_reg_write(p, PCA9450_BUCK1CTRL, 0x59);
