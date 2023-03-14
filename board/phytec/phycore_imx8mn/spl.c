@@ -19,6 +19,7 @@
 #include <hang.h>
 #include <init.h>
 #include <i2c_eeprom.h>
+#include <i2c.h>
 #include <log.h>
 #include <spl.h>
 
@@ -172,6 +173,24 @@ int board_mmc_getcd(struct mmc *mmc)
 	return 0;
 }
 
+#define PMIC_PF8121A_I2C_BUS		0x0
+#define PMIC_PF8121A_I2C_ADDR		0x8
+#define PMIC_PF8121A_SW3_MODE_ADDR	0x60
+#define PMIC_PF8121A_SW3_OFF		0x0
+
+void power_init_board(void)
+{
+	int ret;
+	u8 sw3;
+
+	i2c_set_bus_num(PMIC_PF8121A_I2C_BUS);
+	sw3 = PMIC_PF8121A_SW3_OFF;
+	ret = i2c_write(PMIC_PF8121A_I2C_ADDR, PMIC_PF8121A_SW3_MODE_ADDR, 1,
+			&sw3, 1);
+	if (ret)
+		printf("error writing pmic: %i\n", ret);
+}
+
 void spl_board_init(void)
 {
 }
@@ -230,6 +249,8 @@ void board_init_f(ulong dummy)
 	enable_tzc380();
 
 	setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info1);
+
+	power_init_board();
 
 	/* DDR initialization */
 	spl_dram_init();
