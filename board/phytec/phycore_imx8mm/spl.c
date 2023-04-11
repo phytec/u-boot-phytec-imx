@@ -25,9 +25,6 @@
 
 #include "../common/imx8m_som_detection.h"
 
-extern struct dram_timing_info dram_timing_1gb;
-extern struct dram_timing_info dram_timing_4gb;
-
 DECLARE_GLOBAL_DATA_PTR;
 
 #define EEPROM_ADDR		0x51
