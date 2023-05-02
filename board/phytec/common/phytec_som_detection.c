@@ -17,7 +17,7 @@
 
 struct phytec_eeprom_data eeprom_data;
 
-#if CONFIG_IS_ENABLED(PHYTEC_SOM_DETECTION)
+#if IS_ENABLED(CONFIG_PHYTEC_SOM_DETECTION)
 
 int phytec_eeprom_data_setup(struct phytec_eeprom_data *data,
 			     int bus_num, int addr, int addr_fallback)
@@ -233,4 +233,4 @@ inline char *__maybe_unused phytec_get_opt(struct phytec_eeprom_data *data)
 	return NULL;
 }
 
-#endif /* CONFIG_IS_ENABLED(PHYTEC_SOM_DETECTION) */
+#endif /* IS_ENABLED(CONFIG_PHYTEC_SOM_DETECTION) */

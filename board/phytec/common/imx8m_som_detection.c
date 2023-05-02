@@ -25,7 +25,7 @@ extern struct phytec_eeprom_data eeprom_data;
  * Returns 0 in case it's a known SoM. Otherwise, returns -1.
  */
 
-#if CONFIG_IS_ENABLED(PHYTEC_IMX8M_SOM_DETECTION)
+#if IS_ENABLED(CONFIG_PHYTEC_IMX8M_SOM_DETECTION)
 
 u8 phytec_imx8m_detect(u8 som, char *opt)
 {
@@ -177,4 +177,4 @@ inline u8 __maybe_unused phytec_get_imx8m_eth(struct phytec_eeprom_data *data)
 	return PHYTEC_EEPROM_INVAL;
 }
 
-#endif /* CONFIG_IS_ENABLED(PHYTEC_IMX8M_SOM_DETECTION) */
+#endif /* IS_ENABLED(CONFIG_PHYTEC_IMX8M_SOM_DETECTION) */
