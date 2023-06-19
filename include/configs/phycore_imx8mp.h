@@ -12,6 +12,7 @@
 
 #include "phycore_rauc_env.h"
 #include "phycore_fitimage_env.h"
+#include "phycore_efi_env.h"
 
 #define CONFIG_SYS_BOOTM_LEN		SZ_64M
 
@@ -145,8 +146,11 @@
 			"echo WARN: Cannot load the DT; " \
 		"fi;\0" \
 	"raucdev=2\0" \
+	"imx_boot_offset=0x40\0" \
+	"efi_boot_targets=usb0 mmc1 mmc2\0" \
 	PHYCORE_RAUC_ENV_BOOTLOGIC \
-	PHYCORE_FITIMAGE_ENV_BOOTLOGIC
+	PHYCORE_FITIMAGE_ENV_BOOTLOGIC \
+	PHYCORE_EFI_ENV_BOOTLOGIC
 
 #ifdef CONFIG_IMX_HAB
 #define BOOTCOMMAND_APPEND "reset;"
