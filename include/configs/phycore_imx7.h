@@ -106,7 +106,10 @@
 	"bootenv=bootenv.txt\0" \
 	"mmc_load_bootenv=fatload mmc ${mmcdev}:${mmcpart} ${bootenv_addr} ${bootenv}\0" \
 	"boot_fdt=try\0" \
-	"ip_dyn=yes\0" \
+	"ipaddr=192.168.3.11\0" \
+	"serverip=192.168.3.10\0" \
+	"netmask=255.225.255.0\0" \
+	"ip_dyn=no\0" \
 	"mmcdev=" __stringify(CONFIG_SYS_MMC_ENV_DEV) "\0" \
 	"mmcpart=" __stringify(CONFIG_SYS_MMC_IMG_LOAD_PART) "\0" \
 	"mmcroot=" CONFIG_MMCROOT " rootwait rw\0" \
