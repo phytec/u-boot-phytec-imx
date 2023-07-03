@@ -17,6 +17,7 @@
 #include <asm/mach-imx/mxc_i2c.h>
 #include <power/pfuze3000_pmic.h>
 #include <power/pmic.h>
+#include <linux/delay.h>
 
 #define I2C_PAD_CTRL    (PAD_CTL_DSE_3P3V_32OHM | PAD_CTL_SRE_SLOW | \
 	PAD_CTL_HYS | PAD_CTL_PUE | PAD_CTL_PUS_PU100KOHM)
@@ -104,7 +105,7 @@ int board_mmc_getcd(struct mmc *mmc)
 	return ret;
 }
 
-int board_mmc_init(bd_t *bis)
+int board_mmc_init(struct bd_info *bis)
 {
 	int i, ret;
 	for (i = 0; i < CONFIG_SYS_FSL_USDHC_NUM; i++) {
