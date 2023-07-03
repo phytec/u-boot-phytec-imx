@@ -51,6 +51,7 @@
 		"rauc.slot=${raucslot} rootwait rw\0" \
 	"loadraucimage=fatload mmc ${raucdev}:${raucbootpart} ${loadaddr} ${image}\0" \
 	"loadraucfdt=fatload mmc ${raucdev}:${raucbootpart} ${fdt_addr} ${fdt_file}\0" \
+	"loadraucfdto=fatload mmc ${raucdev}:${raucbootpart} ${fdto_addr} ${overlay}\0" \
 	"loadrauc_bootenv=fatload mmc ${raucdev}:${raucbootpart} ${bootenv_addr} ${bootenv}\0" \
 	"rauc_apply_overlays=fdt address ${fdt_addr}; "	\
 		"if test ${no_extensions} = 0; then " \
@@ -62,7 +63,7 @@
 		"fi; " \
 		"if test ${no_overlays} = 0; then " \
 			"for overlay in $overlays; do " \
-				"if run mmc_load_overlay; then " \
+				"if run loadraucfdto; then " \
 					"fdt resize ${filesize}; " \
 					"fdt apply ${fdto_addr}; " \
 				"fi; " \
