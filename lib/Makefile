@@ -37,7 +37,6 @@ else
 obj-$(CONFIG_CIRCBUF) += circbuf.o
 endif
 
-obj-y += crc8.o
 obj-y += crc16.o
 obj-$(CONFIG_ERRNO_STR) += errno_str.o
 obj-$(CONFIG_FIT) += fdtdec_common.o
@@ -59,11 +58,12 @@ endif
 
 obj-$(CONFIG_$(SPL_TPL_)TPM) += tpm-common.o
 ifeq ($(CONFIG_$(SPL_TPL_)TPM),y)
-obj-y += crc8.o
 obj-$(CONFIG_TPM) += tpm_api.o
 obj-$(CONFIG_TPM_V1) += tpm-v1.o
 obj-$(CONFIG_TPM_V2) += tpm-v2.o
 endif
+
+obj-$(CONFIG_$(SPL_TPL_)CRC8) += crc8.o
 
 obj-$(CONFIG_$(SPL_TPL_)GENERATE_ACPI_TABLE) += acpi/
 obj-$(CONFIG_$(SPL_)MD5) += md5.o
