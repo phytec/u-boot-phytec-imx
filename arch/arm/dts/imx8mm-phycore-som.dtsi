@@ -21,6 +21,15 @@
 		reg = <0x0 0x40000000 0 0x80000000>;
 	};
 
+	reg_vdd_1p2: regulator-vdd-1p2 {
+		compatible = "regulator-fixed";
+		regulator-always-on;
+		regulator-boot-on;
+		regulator-max-microvolt = <1200000>;
+		regulator-min-microvolt = <1200000>;
+		regulator-name = "reg_vdd_1p2";
+	};
+
 	reg_vdd_3v3_s: regulator-vdd-3v3-s {
 		compatible = "regulator-fixed";
 		regulator-always-on;
@@ -45,26 +54,6 @@
 
 &A53_3 {
 	cpu-supply = <&reg_vdd_arm>;
-};
-
-&ddrc {
-	operating-points-v2 = <&ddrc_opp_table>;
-
-	ddrc_opp_table: opp-table {
-		compatible = "operating-points-v2";
-
-		opp-25000000 {
-			opp-hz = /bits/ 64 <25000000>;
-		};
-
-		opp-100000000 {
-			opp-hz = /bits/ 64 <100000000>;
-		};
-
-		opp-750000000 {
-			opp-hz = /bits/ 64 <750000000>;
-		};
-	};
 };
 
 /* Ethernet */
@@ -102,6 +91,8 @@
 	status = "okay";
 
 	som_flash: flash@0 {
+		#address-cells = <1>;
+		#size-cells = <1>;
 		compatible = "jedec,spi-nor";
 		reg = <0>;
 		spi-max-frequency = <80000000>;
@@ -111,7 +102,7 @@
 };
 
 &gpio1 {
-	gpio-line-names = "nINT_ETHPHY", "", "WDOG_INT", "X_RTC_INT",
+	gpio-line-names = "", "", "WDOG_INT", "X_RTC_INT",
 		"", "", "", "RESET_ETHPHY",
 		"", "", "nENABLE_FLATLINK";
 };
@@ -159,9 +150,9 @@
 			reg_vcc_enet: ldo3 {
 				regulator-always-on;
 				regulator-boot-on;
-				regulator-max-microvolt = <2500000>;
+				regulator-max-microvolt = <3300000>;
 				regulator-min-microvolt = <1500000>;
-				regulator-name = "VCC_ENET_2V5 (LDO3)";
+				regulator-name = "VCC_ENET (LDO3)";
 
 				regulator-state-mem {
 					regulator-off-in-suspend;
@@ -210,7 +201,7 @@
 				};
 			};
 
-			reg_vdd_gpu: buck3 {
+			reg_vdd_vpu: buck3 {
 				regulator-always-on;
 				regulator-boot-on;
 				regulator-max-microvolt = <1000000>;
@@ -278,6 +269,24 @@
 		};
 	};
 
+	tc358775: bridge@f {
+		compatible = "toshiba,tc358775";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_tc358775>;
+		reg = <0x0f>;
+		reset-gpios = <&gpio1 10 GPIO_ACTIVE_HIGH>;
+		stby-gpios = <&gpio1 11 GPIO_ACTIVE_HIGH>;
+		vdd-supply = <&reg_vdd_1p2>;
+		vddio-supply = <&reg_vdd_1v8>;
+		status = "disabled";
+
+		/*
+		 * Setup is carrier board dependent please checkout
+		 * overlays/imx8mm-phyboard-polis-peb-av-010-tc358775.dtbo
+		 * as an example.
+		 */
+	};
+
 	sn65dsi83: bridge@2d {
 		compatible = "ti,sn65dsi83";
 		enable-gpios = <&gpio1 10 GPIO_ACTIVE_LOW>;
@@ -287,6 +296,7 @@
 		status = "disabled";
 	};
 
+	/* EEPROM */
 	eeprom@51 {
 		compatible = "atmel,24c32";
 		pagesize = <32>;
@@ -294,17 +304,22 @@
 		vcc-supply = <&reg_vdd_3v3_s>;
 	};
 
+	/* RTC */
 	rv3028: rtc@52 {
 		compatible = "microcrystal,rv3028";
-		interrupts = <3 IRQ_TYPE_LEVEL_LOW>;
-		interrupt-parent = <&gpio1>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_rtc>;
 		reg = <0x52>;
+	};
+
+	/* EEPROM ID page */
+	eepromid@59 {
+		compatible = "atmel,24c32";
+		pagesize = <32>;
+		reg = <0x59>;
+		size = <32>;
 	};
 };
 
-/* EMMC */
+/* eMMC */
 &usdhc3 {
 	assigned-clocks = <&clk IMX8MM_CLK_USDHC3_ROOT>;
 	assigned-clock-rates = <400000000>;
@@ -329,20 +344,20 @@
 &iomuxc {
 	pinctrl_fec1: fec1grp {
 		fsl,pins = <
-			MX8MM_IOMUXC_ENET_MDC_ENET1_MDC			0x2
-			MX8MM_IOMUXC_ENET_MDIO_ENET1_MDIO		0x2
+			MX8MM_IOMUXC_ENET_MDC_ENET1_MDC			0x0
+			MX8MM_IOMUXC_ENET_MDIO_ENET1_MDIO		0x0
 			MX8MM_IOMUXC_ENET_RD0_ENET1_RGMII_RD0		0x90
 			MX8MM_IOMUXC_ENET_RD1_ENET1_RGMII_RD1		0x90
 			MX8MM_IOMUXC_ENET_RD2_ENET1_RGMII_RD2		0x90
 			MX8MM_IOMUXC_ENET_RD3_ENET1_RGMII_RD3		0x90
 			MX8MM_IOMUXC_ENET_RXC_ENET1_RGMII_RXC		0x90
 			MX8MM_IOMUXC_ENET_RX_CTL_ENET1_RGMII_RX_CTL	0x90
-			MX8MM_IOMUXC_ENET_TD0_ENET1_RGMII_TD0		0x16
-			MX8MM_IOMUXC_ENET_TD1_ENET1_RGMII_TD1		0x16
-			MX8MM_IOMUXC_ENET_TD2_ENET1_RGMII_TD2		0x16
-			MX8MM_IOMUXC_ENET_TD3_ENET1_RGMII_TD3		0x16
-			MX8MM_IOMUXC_ENET_TXC_ENET1_RGMII_TXC		0x16
-			MX8MM_IOMUXC_ENET_TX_CTL_ENET1_RGMII_TX_CTL	0x16
+			MX8MM_IOMUXC_ENET_TD0_ENET1_RGMII_TD0		0x12
+			MX8MM_IOMUXC_ENET_TD1_ENET1_RGMII_TD1		0x12
+			MX8MM_IOMUXC_ENET_TD2_ENET1_RGMII_TD2		0x12
+			MX8MM_IOMUXC_ENET_TD3_ENET1_RGMII_TD3		0x12
+			MX8MM_IOMUXC_ENET_TXC_ENET1_RGMII_TXC		0x12
+			MX8MM_IOMUXC_ENET_TX_CTL_ENET1_RGMII_TX_CTL	0x12
 			MX8MM_IOMUXC_GPIO1_IO07_GPIO1_IO7		0x10
 		>;
 	};
@@ -381,6 +396,13 @@
 	pinctrl_sn65dsi83: sn65dsi83grp {
 		fsl,pins = <
 			MX8MM_IOMUXC_GPIO1_IO10_GPIO1_IO10		0x0
+		>;
+	};
+
+	pinctrl_tc358775: tc358775grp {
+		fsl,pins = <
+			MX8MM_IOMUXC_GPIO1_IO10_GPIO1_IO10		0x0
+			MX8MM_IOMUXC_GPIO1_IO11_GPIO1_IO11		0x0
 		>;
 	};
 

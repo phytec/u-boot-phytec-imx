@@ -8,7 +8,6 @@
 
 #include <dt-bindings/interrupt-controller/irq.h>
 #include <dt-bindings/leds/common.h>
-#include <dt-bindings/phy/phy-imx8-pcie.h>
 #include "imx8mm-phycore-som.dtsi"
 
 / {
@@ -89,6 +88,13 @@
 		startup-delay-us = <20>;
 	};
 
+	reg_mipi_1p0: regulator-mipi-1p0 {
+		compatible = "regulator-fixed";
+		regulator-name = "mipi_1p0";
+		regulator-min-microvolt = <1000000>;
+		regulator-max-microvolt = <1000000>;
+	};
+
 	reg_usb_otg1_vbus: regulator-usb-otg1 {
 		compatible = "regulator-fixed";
 		gpio = <&gpio1 12 GPIO_ACTIVE_HIGH>;
@@ -120,6 +126,59 @@
 	};
 };
 
+&aips4 {
+	csi-upstream@32e20000 {
+		compatible = "fsl,imx8mm-csi", "fsl,imx7-csi";
+		reg = <0x32e20000 0x1000>;
+		interrupts = <GIC_SPI 16 IRQ_TYPE_LEVEL_HIGH>;
+		clocks = <&clk IMX8MM_CLK_CSI1_ROOT>;
+		clock-names = "mclk";
+		power-domains = <&mipi_pd>;
+		dma-coherent;
+		status = "okay";
+
+		port {
+			csi_up_ep: endpoint {
+				remote-endpoint = <&mipi_csi_out_ep>;
+			};
+		};
+	};
+
+	csi1_mipi_csi: mipi-csi-upstream@32e30000 {
+		compatible = "fsl,imx8mm-mipi-csi2";
+		reg = <0x32e30000 0x1000>;
+		interrupts = <GIC_SPI 17 IRQ_TYPE_LEVEL_HIGH>;
+		clock-frequency = <500000000>;
+		clocks = <&clk IMX8MM_CLK_DISP_APB_ROOT>,
+			 <&clk IMX8MM_CLK_CSI1_ROOT>,
+			 <&clk IMX8MM_CLK_CSI1_PHY_REF>,
+			 <&clk IMX8MM_CLK_DISP_AXI_ROOT>;
+		clock-names = "pclk", "wrap", "phy", "axi";
+		power-domains = <&mipi_pd>;
+		fsl,csis-hs-settle = <9>;
+		status = "disabled";
+
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@0 {
+			reg = <0>;
+		};
+
+		port@1 {
+			reg = <1>;
+
+			mipi_csi_out_ep: endpoint {
+				remote-endpoint = <&csi_up_ep>;
+			};
+		};
+	};
+};
+
+&csi1_bridge {
+	status = "disabled";
+};
+
 /* SPI - CAN MCP251XFD */
 &ecspi1 {
 	cs-gpios = <&gpio5 9 GPIO_ACTIVE_LOW>;
@@ -140,8 +199,29 @@
 	};
 };
 
+/* TPM */
+&ecspi2 {
+	cs-gpios = <&gpio5 13 GPIO_ACTIVE_LOW>;
+	num-cs = <1>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_ecspi2>;
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+
+	tpm: tpm-tis@0 {
+		compatible = "tcg,tpm_tis-spi";
+		interrupt-parent = <&gpio2>;
+		interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_tpm>;
+		reg = <0>;
+		spi-max-frequency = <38000000>;
+	};
+};
+
 &gpio1 {
-	gpio-line-names = "nINT_ETHPHY", "LED_RED", "WDOG_INT", "X_RTC_INT",
+	gpio-line-names = "", "LED_RED", "WDOG_INT", "X_RTC_INT",
 		"", "", "", "RESET_ETHPHY",
 		"CAN_nINT", "CAN_EN", "nENABLE_FLATLINK", "",
 		"USB_OTG_VBUS_EN", "", "LED_GREEN", "LED_BLUE";
@@ -168,36 +248,47 @@
 		"", "ECSPI1_SS0";
 };
 
-&i2c4 {
+csi1_i2c: &i2c4 {
 	clock-frequency = <400000>;
-	pinctrl-names = "default";
+	pinctrl-names = "default", "gpio";
 	pinctrl-0 = <&pinctrl_i2c4>;
+	pinctrl-1 = <&pinctrl_i2c4_gpio>;
+	sda-gpios = <&gpio5 21 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
+	scl-gpios = <&gpio5 20 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
+};
+
+&mipi_csi_1 {
+	status = "disabled";
 };
 
 /* PCIe */
 &pcie0 {
 	assigned-clocks = <&clk IMX8MM_CLK_PCIE1_AUX>,
+			  <&clk IMX8MM_CLK_PCIE1_PHY>,
 			  <&clk IMX8MM_CLK_PCIE1_CTRL>;
 	assigned-clock-parents = <&clk IMX8MM_SYS_PLL2_50M>,
+				 <&clk IMX8MM_SYS_PLL2_100M>,
 				 <&clk IMX8MM_SYS_PLL2_250M>;
-	assigned-clock-rates = <10000000>, <250000000>;
+	assigned-clock-rates = <10000000>, <100000000>, <250000000>;
+	clocks = <&clk IMX8MM_CLK_PCIE1_ROOT>,
+		 <&clk IMX8MM_CLK_PCIE1_AUX>,
+		 <&clk IMX8MM_CLK_PCIE1_PHY>,
+		 <&clk IMX8MM_CLK_DUMMY>;
+	clock-names = "pcie", "pcie_aux", "pcie_phy", "pcie_bus";
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pcie>;
 	reset-gpio = <&gpio4 9 GPIO_ACTIVE_LOW>;
 	status = "okay";
 };
 
-&pcie_phy {
-	clocks = <&clk IMX8MM_CLK_PCIE1_PHY>;
-	fsl,clkreq-unsupported;
-	fsl,refclk-pad-mode = <IMX8_PCIE_REFCLK_PAD_OUTPUT>;
-	fsl,tx-deemph-gen1 = <0x2d>;
-	fsl,tx-deemph-gen2 = <0xf>;
-	status = "okay";
-};
-
+/* RTC */
 &rv3028 {
+	interrupt-parent = <&gpio1>;
+	interrupts = <3 IRQ_TYPE_LEVEL_LOW>;
+	pinctrl-0 = <&pinctrl_rtc>;
+	pinctrl-names = "default";
 	trickle-resistor-ohms = <3000>;
+	wakeup-source;
 };
 
 &snvs_pwrkey {
@@ -333,6 +424,15 @@
 		>;
 	};
 
+	pinctrl_ecspi2: ecspi2grp {
+		fsl,pins = <
+			MX8MM_IOMUXC_ECSPI2_MISO_ECSPI2_MISO    0x80
+			MX8MM_IOMUXC_ECSPI2_MOSI_ECSPI2_MOSI    0x80
+			MX8MM_IOMUXC_ECSPI2_SCLK_ECSPI2_SCLK    0x80
+			MX8MM_IOMUXC_ECSPI2_SS0_GPIO5_IO13      0x00
+		>;
+	};
+
 	pinctrl_fan: fan0grp {
 		fsl,pins = <
 			MX8MM_IOMUXC_SAI1_RXD6_GPIO4_IO8	0x16
@@ -341,8 +441,15 @@
 
 	pinctrl_i2c4: i2c4grp {
 		fsl,pins = <
-			MX8MM_IOMUXC_I2C4_SCL_I2C4_SCL		0x400001c2
-			MX8MM_IOMUXC_I2C4_SDA_I2C4_SDA		0x400001c2
+			MX8MM_IOMUXC_I2C4_SCL_I2C4_SCL          0x400001c2
+			MX8MM_IOMUXC_I2C4_SDA_I2C4_SDA          0x400001c2
+		>;
+	};
+
+	pinctrl_i2c4_gpio: i2c4gpiogrp {
+		fsl,pins = <
+			MX8MM_IOMUXC_I2C4_SCL_GPIO5_IO20        0x1e2
+			MX8MM_IOMUXC_I2C4_SDA_GPIO5_IO21        0x1e2
 		>;
 	};
 
@@ -368,6 +475,12 @@
 		>;
 	};
 
+	pinctrl_tpm: tpmgrp {
+		fsl,pins = <
+			MX8MM_IOMUXC_SD1_STROBE_GPIO2_IO11      0x140
+		>;
+	};
+
 	pinctrl_uart1: uart1grp {
 		fsl,pins = <
 			MX8MM_IOMUXC_SAI2_RXC_UART1_DCE_RX	0x00
@@ -388,8 +501,8 @@
 
 	pinctrl_uart3: uart3grp {
 		fsl,pins = <
-			MX8MM_IOMUXC_UART3_RXD_UART3_DCE_RX	0x40
-			MX8MM_IOMUXC_UART3_TXD_UART3_DCE_TX	0x40
+			MX8MM_IOMUXC_UART3_RXD_UART3_DCE_RX	0x140
+			MX8MM_IOMUXC_UART3_TXD_UART3_DCE_TX	0x140
 		>;
 	};
 
