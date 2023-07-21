@@ -7,4 +7,4 @@ ifdef CONFIG_SPL_BUILD
 obj- := __dummy__.o
 endif
 
-obj-y += phytec_som_detection.o imx8m_som_detection.o
+obj-y += phytec_som_detection.o imx8m_som_detection.o mmc.o
