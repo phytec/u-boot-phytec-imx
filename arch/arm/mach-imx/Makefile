@@ -20,6 +20,7 @@ obj-$(CONFIG_DWC_ETH_QOS) += mac.o
 obj-$(CONFIG_SYS_I2C_MXC) += i2c-mxv7.o
 obj-$(CONFIG_IMX_HAB) += hab.o
 obj-y += cpu.o
+obj-y += mmdc_size.o
 endif
 
 ifeq ($(SOC),$(filter $(SOC),mx5 mx6))
