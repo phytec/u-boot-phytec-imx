@@ -746,6 +746,7 @@ static inline void reg32setbit(unsigned long addr, u32 bit)
 #define dwc_ddrphy_apb_rd(addr) \
 	reg32_read(IP2APB_DDRPHY_IPS_BASE_ADDR(0) + ddrphy_addr_remap(addr))
 
+extern bool imx8m_ddr_old_spreadsheet;
 extern struct dram_cfg_param ddrphy_trained_csr[];
 extern uint32_t ddrphy_trained_csr_num;
 
