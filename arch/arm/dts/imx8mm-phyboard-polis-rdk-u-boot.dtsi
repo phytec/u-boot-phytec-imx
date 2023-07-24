@@ -14,6 +14,10 @@
 	};
 };
 
+&pinctrl_i2c1 {
+	u-boot,dm-spl;
+};
+
 &pinctrl_uart3 {
 	u-boot,dm-spl;
 };
@@ -51,6 +55,10 @@
 };
 
 &gpio5 {
+	u-boot,dm-spl;
+};
+
+&i2c1 {
 	u-boot,dm-spl;
 };
 
