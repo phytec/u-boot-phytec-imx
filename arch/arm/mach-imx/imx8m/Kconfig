@@ -305,6 +305,13 @@ config TARGET_PHYCORE_IMX8MM
 	select SUPPORT_SPL
 	select IMX8M_LPDDR4
 
+config TARGET_PHYCORE_IMX8MN
+	bool "PHYTEC PHYCORE i.MX8MN"
+	select BINMAN
+	select IMX8MN
+	select SUPPORT_SPL
+	select IMX8M_LPDDR4
+
 config TARGET_PHYCORE_IMX8MP
 	bool "PHYTEC PHYCORE i.MX8MP"
 	select BINMAN
@@ -361,6 +368,7 @@ source "board/kontron/pitx_imx8m/Kconfig"
 source "board/kontron/sl-mx8mm/Kconfig"
 source "board/phytec/phycore_imx8mm/Kconfig"
 source "board/phytec/phycore_imx8mp/Kconfig"
+source "board/phytec/phycore_imx8mn/Kconfig"
 source "board/ronetix/imx8mq-cm/Kconfig"
 source "board/technexion/pico-imx8mq/Kconfig"
 source "board/variscite/imx8mn_var_som/Kconfig"
