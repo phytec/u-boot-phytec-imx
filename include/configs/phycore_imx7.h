@@ -108,7 +108,7 @@
 	"boot_fdt=try\0" \
 	"ipaddr=192.168.3.11\0" \
 	"serverip=192.168.3.10\0" \
-	"netmask=255.225.255.0\0" \
+	"netmask=255.255.255.0\0" \
 	"ip_dyn=no\0" \
 	"mmcdev=" __stringify(CONFIG_SYS_MMC_ENV_DEV) "\0" \
 	"mmcpart=" __stringify(CONFIG_SYS_MMC_IMG_LOAD_PART) "\0" \
@@ -178,29 +178,41 @@
 		"nand read ${loadaddr} 0x4000000 0x1000000;"\
 		"nand read ${fdt_addr} 0x5000000 0x100000;"\
 		"bootz ${loadaddr} - ${fdt_addr}\0" \
-	"netargs=setenv bootargs console=${console},${baudrate} " \
-		"root=/dev/nfs " \
-		"ip=dhcp nfsroot=${serverip}:${nfsroot},v3,tcp\0" \
+	"nfsroot=/nfsroot\0" \
+	"netargs=setenv bootargs console=${console},${baudrate} root=/dev/nfs ip=${nfsip} " \
+		"nfsroot=${serverip}:${nfsroot},v4,tcp\0" \
+	"net_load_bootenv=${get_cmd} ${bootenv_addr} ${bootenv}\0" \
+	"net_load_overlay=${get_cmd} ${fdto_addr} ${overlay}\0" \
+	"net_apply_overlays=fdt address ${fdt_addr}; " \
+		"if test ${no_overlays} = 0; then " \
+			"for overlay in $overlays; " \
+			"do; " \
+				"if run net_load_overlay; then " \
+					"fdt resize ${filesize}; " \
+					"fdt apply ${fdto_addr}; " \
+				"fi; " \
+			"done;" \
+		"fi;\0 " \
 	"netboot=echo Booting from net ...; " \
-		"run netargs; " \
 		"if test ${ip_dyn} = yes; then " \
+			"setenv nfsip dhcp; " \
 			"setenv get_cmd dhcp; " \
 		"else " \
+			"setenv nfsip ${ipaddr}:${serverip}::${netmask}::eth0:on; " \
 			"setenv get_cmd tftp; " \
 		"fi; " \
-		"${get_cmd} ${image}; " \
-		"if test ${boot_fdt} = yes || test ${boot_fdt} = try; then " \
-			"if ${get_cmd} ${fdt_addr} ${fdt_file}; then " \
-				"bootz ${loadaddr} - ${fdt_addr}; " \
-			"else " \
-				"if test ${boot_fdt} = try; then " \
-					"bootz; " \
-				"else " \
-					"echo WARN: Cannot load the DT; " \
-				"fi; " \
+		"if test ${no_bootenv} = 0; then " \
+			"if run net_load_bootenv; then " \
+				"env import -t ${bootenv_addr} ${filesize}; " \
 			"fi; " \
+		"fi; " \
+		"run netargs; " \
+		"${get_cmd} ${loadaddr} ${image}; " \
+		"if ${get_cmd} ${fdt_addr} ${fdt_file}; then " \
+			"run net_apply_overlays; " \
+			"bootz ${loadaddr} - ${fdt_addr}; " \
 		"else " \
-			"bootz; " \
+			"echo WARN: Cannot load the DT; " \
 		"fi;\0" \
 	"raucdev=0\0" \
 	PHYCORE_RAUC_ENV_BOOTLOGIC
