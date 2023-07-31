@@ -21,7 +21,12 @@
 #include <log.h>
 #include <spl.h>
 
+#include "../common/imx8m_som_detection.h"
+
 DECLARE_GLOBAL_DATA_PTR;
+
+#define EEPROM_ADDR		0x51
+#define EEPROM_ADDR_FALLBACK	0x59
 
 #define PMIC_PF8121A_I2C_BUS		0x0
 #define PMIC_PF8121A_I2C_ADDR		0x8
@@ -35,6 +40,21 @@ int spl_board_boot_device(enum boot_device boot_dev_spl)
 
 void spl_dram_init(void)
 {
+	int ret = phytec_eeprom_data_setup_fallback(NULL, 0, EEPROM_ADDR,
+						    EEPROM_ADDR_FALLBACK);
+	ddr_init(&dram_timing);
+	if (ret)
+		goto out;
+
+	ret = phytec_imx8m_detect(NULL);
+	if (ret)
+		goto out;
+
+	phytec_print_som_info(NULL);
+	ddr_init(&dram_timing);
+	return;
+out:
+	puts("Could not detect correct RAM size. Fall back to default.");
 	ddr_init(&dram_timing);
 }
 
