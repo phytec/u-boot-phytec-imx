@@ -129,7 +129,6 @@ int board_early_init_f(void)
 
 void board_init_f(ulong dummy)
 {
-	struct udevice *dev;
 	int ret;
 
 	arch_cpu_init();
