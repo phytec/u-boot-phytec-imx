@@ -54,12 +54,44 @@ static void spl_dram_init(void)
 		goto out;
 
 	ret = phytec_imx8m_detect(NULL);
-	if (ret)
-		goto out;
+	if (!ret)
+		phytec_print_som_info(NULL);
 
-	phytec_print_som_info(NULL);
-
+	u8 size = phytec_get_imx8m_ddr_size(NULL);
+	switch (size) {
+		case 1:
+			/* 1GB RAM */
+			dram_timing.ddrc_cfg[5].val = 0x2d0087;
+			dram_timing.ddrc_cfg[21].val = 0x8d;
+			dram_timing.ddrc_cfg[42].val = 0xf070707;
+			dram_timing.ddrc_cfg[58].val = 0x60012;
+			dram_timing.ddrc_cfg[73].val = 0x13;
+			dram_timing.ddrc_cfg[83].val = 0x30005;
+			dram_timing.ddrc_cfg[98].val = 0x5;
+			break;
+		case 3:
+			/* 2GB RAM */
+			break;
+		case 5:
+			/* 4GB RAM */
+			dram_timing.ddrc_cfg[2].val = 0xa3080020;
+			dram_timing.ddrc_cfg[37].val = 0x17;
+			dram_timing.fsp_msg[0].fsp_cfg[8].val = 0x310;
+			dram_timing.fsp_msg[0].fsp_cfg[20].val = 0x3;
+			dram_timing.fsp_msg[1].fsp_cfg[9].val = 0x310;
+			dram_timing.fsp_msg[1].fsp_cfg[21].val = 0x3;
+			dram_timing.fsp_msg[2].fsp_cfg[9].val = 0x310;
+			dram_timing.fsp_msg[2].fsp_cfg[21].val = 0x3;
+			dram_timing.fsp_msg[3].fsp_cfg[10].val = 0x310;
+			dram_timing.fsp_msg[3].fsp_cfg[22].val = 0x3;
+			break;
+		default:
+			goto out;
+	}
+	ddr_init(&dram_timing);
+	return;
 out:
+	puts("Could not detect correct RAM size. Fall back to default.");
 	ddr_init(&dram_timing);
 }
 
