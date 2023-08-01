@@ -48,7 +48,7 @@
 	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0" \
 	"ipaddr=192.168.3.11\0" \
 	"serverip=192.168.3.10\0" \
-	"netmask=255.225.255.0\0" \
+	"netmask=255.255.255.0\0" \
 	"ip_dyn=no\0" \
 	"bootenv=bootenv.txt\0" \
 	"mmc_load_bootenv=fatload mmc ${mmcdev}:${mmcpart} ${bootenv_addr} ${bootenv}\0" \
