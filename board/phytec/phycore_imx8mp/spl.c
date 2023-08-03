@@ -107,8 +107,24 @@ void spl_dram_init(void)
 		dram_timing.ddrphy_pie[481].val = 0xfa;
 		dram_timing.ddrphy_pie[482].val = 0x9c4;
 		dram_timing.fsp_table[0] = 4000;
-	}
 
+		int size = phytec_get_imx8m_ddr_size(NULL);
+		if (size == 5) {
+			/* 4GB timings, diff to 2GB 2GHz */
+			dram_timing.ddrc_cfg[2].val = 0xa3080020;
+			dram_timing.ddrc_cfg[39].val = 0x17;
+			dram_timing.fsp_msg[0].fsp_cfg[9].val = 0x310;
+			dram_timing.fsp_msg[0].fsp_cfg[21].val = 0x3;
+			dram_timing.fsp_msg[1].fsp_cfg[10].val = 0x310;
+			dram_timing.fsp_msg[1].fsp_cfg[22].val = 0x3;
+			dram_timing.fsp_msg[2].fsp_cfg[10].val = 0x310;
+			dram_timing.fsp_msg[2].fsp_cfg[22].val = 0x3;
+			dram_timing.fsp_msg[3].fsp_cfg[10].val = 0x310;
+			dram_timing.fsp_msg[3].fsp_cfg[22].val = 0x3;
+		}
+	}
+	ddr_init(&dram_timing);
+	return;
 out:
 	ddr_init(&dram_timing);
 }
