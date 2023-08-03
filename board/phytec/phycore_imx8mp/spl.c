@@ -50,7 +50,7 @@ void spl_dram_init(void)
 
 	ret = phytec_get_rev(NULL);
 	if (ret >= 3 && ret != PHYTEC_EEPROM_INVAL) {
-		dram_timing.ddrc_cfg[3].val = 0x1233;
+		dram_timing.ddrc_cfg[3].val = 0x1323;
 		dram_timing.ddrc_cfg[4].val = 0x1e84800;
 		dram_timing.ddrc_cfg[5].val = 0x7a0118;
 		dram_timing.ddrc_cfg[8].val = 0xc00307a3;
@@ -94,7 +94,7 @@ void spl_dram_init(void)
 		dram_timing.fsp_msg[0].fsp_cfg[28].val = 0xf400;
 		dram_timing.fsp_msg[0].fsp_cfg[29].val = 0xf33f;
 		dram_timing.fsp_msg[3].drate = 4000;
-		dram_timing.fsp_msg[3].fsp_cfg[1].val = 0xbb8;
+		dram_timing.fsp_msg[3].fsp_cfg[1].val = 0xfa0;
 		dram_timing.fsp_msg[3].fsp_cfg[11].val = 0x3ff4;
 		dram_timing.fsp_msg[3].fsp_cfg[12].val = 0xf3;
 		dram_timing.fsp_msg[3].fsp_cfg[16].val = 0x3ff4;
