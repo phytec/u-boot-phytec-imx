@@ -14,6 +14,7 @@
 #include <asm/arch/imx-regs.h>
 
 #include "imx_env.h"
+#include "phycore_fitimage_env.h"
 
 #ifdef CONFIG_SPL_BUILD
 #define CONFIG_SPL_MAX_SIZE				(192 * 1024)
@@ -53,12 +54,6 @@
 /* Flat Device Tree Definitions */
 #define CONFIG_OF_BOARD_SETUP
 
-#undef CONFIG_CMD_EXPORTENV
-#undef CONFIG_CMD_IMPORTENV
-#undef CONFIG_CMD_IMLS
-
-#undef CONFIG_CMD_CRC32
-
 #define CONFIG_SYS_FSL_ESDHC_ADDR       0
 #define USDHC1_BASE_ADDR                0x5B010000
 #define USDHC2_BASE_ADDR                0x5B020000
@@ -96,13 +91,19 @@
 	"splashimage=0x9e000000\0" \
 	"console=ttyLP0\0" \
 	"fdt_addr=0x83000000\0"			\
+	"fdto_addr=0x83100000\0" \
+	"bootenv_addr=0x83200000\0" \
 	"fdt_high=0xffffffffffffffff\0"		\
 	"cntr_addr=0x98000000\0"			\
 	"cntr_file=os_cntr_signed.bin\0" \
 	"boot_fdt=try\0" \
 	"fdt_file=imx8qxp-phytec-pcm-942.dtb\0" \
-	"overlay_files=imx8qxp-phytec-pcm-942-lcd-018.dtbo\0" \
-	"overlay_addr=0x83F00000\0" \
+	"bootenv=bootenv.txt\0" \
+	"mmc_load_bootenv=fatload mmc ${mmcdev}:${mmcpart} ${bootenv_addr} ${bootenv}\0" \
+	"ipaddr=192.168.3.11\0" \
+	"serverip=192.168.3.10\0" \
+	"netmask=255.255.255.0\0" \
+	"ip_dyn=no\0" \
 	"mmcdev=" __stringify(CONFIG_SYS_MMC_ENV_DEV) "\0" \
 	"mmcpart=" __stringify(CONFIG_SYS_MMC_IMG_LOAD_PART) "\0" \
 	"mmcroot=" CONFIG_MMCROOT " rootwait rw\0" \
@@ -113,69 +114,75 @@
 		"source\0" \
 	"loadimage=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${image}\0" \
 	"loadfdt=fatload mmc ${mmcdev}:${mmcpart} ${fdt_addr} ${fdt_file}\0" \
+	"mmc_load_overlay=fatload mmc ${mmcdev}:${mmcpart} ${fdto_addr} ${overlay}\0" \
+	"mmc_apply_overlays=fdt address ${fdt_addr}; "  \
+		"if test ${no_overlays} = 0; then " \
+			"for overlay in $overlays; " \
+			"do; " \
+				"if run mmc_load_overlay; then " \
+					"fdt resize ${filesize}; " \
+					"fdt apply ${fdto_addr}; " \
+				"fi; " \
+			"done;" \
+		"fi;\0 " \
 	"loadcntr=fatload mmc ${mmcdev}:${mmcpart} ${cntr_addr} ${cntr_file}\0" \
 	"auth_os=auth_cntr ${cntr_addr}\0" \
 	"boot_os=booti ${loadaddr} - ${fdt_addr};\0" \
-	"get_overlay_mmc=" \
-		"fdt addr ${fdt_addr};" \
-		"fdt resize 0x100000;" \
-		"for overlay in $overlay_files;" \
-		"do;" \
-			"fatload mmc ${mmcdev}:${mmcpart} ${overlay_addr} ${overlay};" \
-			"fdt apply ${overlay_addr};" \
-		"done;\0" \
 	"mmcboot=echo Booting from mmc ...; " \
+		"if test ${no_bootenv} = 0; then " \
+			"if run mmc_load_bootenv; then " \
+				"env import -t ${bootenv_addr} ${filesize}; " \
+			"fi; " \
+		"fi; " \
 		"run mmcargs; " \
-		"if test ${sec_boot} = yes; then " \
-			"if run auth_os; then " \
-				"run boot_os; " \
-			"else " \
-				"echo ERR: failed to authenticate; " \
-			"fi; " \
+		"run fit_test_and_run_boot; " \
+		"if run loadfdt; then " \
+			"run mmc_apply_overlays; " \
+			"booti ${loadaddr} - ${fdt_addr}; " \
 		"else " \
-		"if test ${boot_fdt} = yes || test ${boot_fdt} = try; then " \
-			"if run loadfdt; then " \
-				"run get_overlay_mmc; " \
-				"run boot_os; " \
-			"else " \
-				"echo WARN: Cannot load the DT; " \
-			"fi; " \
-		"else " \
-			"echo wait for boot; " \
-			"fi;" \
-		"fi;\0" \
-	"netargs=setenv bootargs console=${console},${baudrate} earlycon " \
-		"root=/dev/nfs " \
-		"ip=dhcp nfsroot=${serverip}:${nfsroot},v3,tcp\0" \
+			"echo WARN: Cannot load the DT; " \
+		"fi;\0 " \
+	"nfsroot=/nfsroot\0" \
+	"netargs=setenv bootargs console=${console},${baudrate} root=/dev/nfs ip=${nfsip} " \
+		"nfsroot=${serverip}:${nfsroot},v4,tcp\0" \
+	"net_load_bootenv=${get_cmd} ${bootenv_addr} ${bootenv}\0" \
+	"net_load_overlay=${get_cmd} ${fdto_addr} ${overlay}\0" \
+	"net_apply_overlays=fdt address ${fdt_addr}; " \
+		"if test ${no_overlays} = 0; then " \
+			"for overlay in $overlays; " \
+			"do; " \
+				"if run net_load_overlay; then " \
+					"fdt resize ${filesize}; " \
+					"fdt apply ${fdto_addr}; " \
+				"fi; " \
+			"done;" \
+		"fi;\0 " \
 	"netboot=echo Booting from net ...; " \
-		"run netargs;  " \
 		"if test ${ip_dyn} = yes; then " \
+			"setenv nfsip dhcp; " \
 			"setenv get_cmd dhcp; " \
 		"else " \
+			"setenv nfsip ${ipaddr}:${serverip}::${netmask}::eth0:on; " \
 			"setenv get_cmd tftp; " \
 		"fi; " \
-		"if test ${sec_boot} = yes; then " \
-			"${get_cmd} ${cntr_addr} ${cntr_file}; " \
-			"if run auth_os; then " \
-				"run boot_os; " \
-			"else " \
-				"echo ERR: failed to authenticate; " \
+		"if test ${no_bootenv} = 0; then " \
+			"if run net_load_bootenv; then " \
+				"env import -t ${bootenv_addr} ${filesize}; " \
 			"fi; " \
+		"fi; " \
+		"run netargs; " \
+		"${get_cmd} ${loadaddr} ${image}; " \
+		"if ${get_cmd} ${fdt_addr} ${fdt_file}; then " \
+			"run net_apply_overlays; " \
+			"booti ${loadaddr} - ${fdt_addr}; " \
 		"else " \
-			"${get_cmd} ${loadaddr} ${image}; " \
-			"if test ${boot_fdt} = yes || test ${boot_fdt} = try; then " \
-				"if ${get_cmd} ${fdt_addr} ${fdt_file}; then " \
-					"run boot_os; " \
-				"else " \
-					"echo WARN: Cannot load the DT; " \
-				"fi; " \
-			"else " \
-				"booti; " \
-			"fi;" \
-		"fi;\0"
+			"echo WARN: Cannot load the DT; " \
+		"fi;\0" \
+		PHYCORE_FITIMAGE_ENV_BOOTLOGIC \
 
 #define CONFIG_BOOTCOMMAND \
 	   "mmc dev ${mmcdev}; if mmc rescan; then " \
+		   "env exists dofitboot || setenv dofitboot 0;" \
 		   "if run loadbootscript; then " \
 			   "run bootscript; " \
 		   "else " \
