@@ -723,6 +723,9 @@ void ddrphy_init_read_msg_block(enum fw_type type);
 
 void update_umctl2_rank_space_setting(unsigned int pstat_num);
 void get_trained_CDD(unsigned int fsp);
+unsigned int lpddr4_mr_read(unsigned int mr_rank, unsigned int mr_addr);
+void lpddr4_mr_write(unsigned int mr_rank, unsigned int mr_addr,
+		     unsigned int mr_data);
 
 static inline void reg32_write(unsigned long addr, u32 val)
 {

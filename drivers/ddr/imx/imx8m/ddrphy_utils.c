@@ -156,50 +156,6 @@ void ddrphy_init_read_msg_block(enum fw_type type)
 {
 }
 
-void lpddr4_mr_write(unsigned int mr_rank, unsigned int mr_addr,
-		     unsigned int mr_data)
-{
-	unsigned int tmp;
-	/*
-	 * 1. Poll MRSTAT.mr_wr_busy until it is 0.
-	 * This checks that there is no outstanding MR transaction.
-	 * No writes should be performed to MRCTRL0 and MRCTRL1 if
-	 * MRSTAT.mr_wr_busy = 1.
-	 */
-	do {
-		tmp = reg32_read(DDRC_MRSTAT(0));
-	} while (tmp & 0x1);
-	/*
-	 * 2. Write the MRCTRL0.mr_type, MRCTRL0.mr_addr, MRCTRL0.mr_rank and
-	 * (for MRWs) MRCTRL1.mr_data to define the MR transaction.
-	 */
-	reg32_write(DDRC_MRCTRL0(0), (mr_rank << 4));
-	reg32_write(DDRC_MRCTRL1(0), (mr_addr << 8) | mr_data);
-	reg32setbit(DDRC_MRCTRL0(0), 31);
-}
-
-unsigned int lpddr4_mr_read(unsigned int mr_rank, unsigned int mr_addr)
-{
-	unsigned int tmp;
-
-	reg32_write(DRC_PERF_MON_MRR0_DAT(0), 0x1);
-	do {
-		tmp = reg32_read(DDRC_MRSTAT(0));
-	} while (tmp & 0x1);
-
-	reg32_write(DDRC_MRCTRL0(0), (mr_rank << 4) | 0x1);
-	reg32_write(DDRC_MRCTRL1(0), (mr_addr << 8));
-	reg32setbit(DDRC_MRCTRL0(0), 31);
-	do {
-		tmp = reg32_read(DRC_PERF_MON_MRR0_DAT(0));
-	} while ((tmp & 0x8) == 0);
-	tmp = reg32_read(DRC_PERF_MON_MRR1_DAT(0));
-	tmp = tmp & 0xff;
-	reg32_write(DRC_PERF_MON_MRR0_DAT(0), 0x4);
-
-	return tmp;
-}
-
 unsigned int look_for_max(unsigned int data[],
 			  unsigned int addr_start, unsigned int addr_end)
 {
