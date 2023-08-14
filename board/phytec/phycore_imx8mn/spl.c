@@ -42,7 +42,6 @@ void spl_dram_init(void)
 {
 	int ret = phytec_eeprom_data_setup_fallback(NULL, 0, EEPROM_ADDR,
 						    EEPROM_ADDR_FALLBACK);
-	ddr_init(&dram_timing);
 	if (ret)
 		goto out;
 
