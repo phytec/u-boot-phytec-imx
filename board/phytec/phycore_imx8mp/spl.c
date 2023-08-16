@@ -43,10 +43,8 @@ void spl_dram_init(void)
 		goto out;
 
 	ret = phytec_imx8m_detect(NULL);
-	if (ret)
-		goto out;
-
-	phytec_print_som_info(NULL);
+	if (!ret)
+		phytec_print_som_info(NULL);
 
 	ret = phytec_get_rev(NULL);
 	if (ret >= 3 && ret != PHYTEC_EEPROM_INVAL) {
@@ -122,10 +120,61 @@ void spl_dram_init(void)
 			dram_timing.fsp_msg[3].fsp_cfg[10].val = 0x310;
 			dram_timing.fsp_msg[3].fsp_cfg[22].val = 0x3;
 		}
+	} else {
+		u8 size = phytec_get_imx8m_ddr_size(NULL);
+
+		switch (size) {
+		case 2:
+			/* 1GB  */
+			dram_timing.ddrc_cfg[3].val = 0x1233;
+			dram_timing.ddrc_cfg[5].val = 0x5b0087;
+			dram_timing.ddrc_cfg[6].val = 0x61027f10;
+			dram_timing.ddrc_cfg[7].val = 0x7b0;
+			dram_timing.ddrc_cfg[11].val = 0xf30000;
+			dram_timing.ddrc_cfg[23].val = 0x8d;
+			dram_timing.ddrc_cfg[45].val = 0xf070707;
+			dram_timing.ddrc_cfg[59].val = 0x1031;
+			dram_timing.ddrc_cfg[62].val = 0xc0012;
+			dram_timing.ddrc_cfg[77].val = 0x13;
+			dram_timing.ddrc_cfg[84].val = 0x1031;
+			dram_timing.ddrc_cfg[87].val = 0x30005;
+			dram_timing.ddrc_cfg[102].val = 0x5;
+			dram_timing.ddrphy_cfg[75].val = 0x1e3;
+			dram_timing.ddrphy_cfg[77].val = 0x1e3;
+			dram_timing.ddrphy_cfg[79].val = 0x1e3;
+			dram_timing.fsp_msg[0].fsp_cfg[11].val = 0xf3;
+			dram_timing.fsp_msg[0].fsp_cfg[16].val = 0xf3;
+			dram_timing.fsp_msg[0].fsp_cfg[23].val = 0xf32d;
+			dram_timing.fsp_msg[0].fsp_cfg[29].val = 0xf32d;
+			dram_timing.fsp_msg[3].fsp_cfg[12].val = 0xf3;
+			dram_timing.fsp_msg[3].fsp_cfg[17].val = 0xf3;
+			dram_timing.fsp_msg[3].fsp_cfg[24].val = 0xf32d;
+			dram_timing.fsp_msg[3].fsp_cfg[30].val = 0xf32d;
+			break;
+		case 3:
+			/*2GB*/
+			break;
+		case 5:
+			/* 4GB */
+			dram_timing.ddrc_cfg[2].val = 0xa3080020;
+			dram_timing.ddrc_cfg[39].val = 0x17;
+			dram_timing.fsp_msg[0].fsp_cfg[9].val = 0x310;
+			dram_timing.fsp_msg[0].fsp_cfg[21].val = 0x3;
+			dram_timing.fsp_msg[1].fsp_cfg[10].val = 0x310;
+			dram_timing.fsp_msg[1].fsp_cfg[22].val = 0x3;
+			dram_timing.fsp_msg[2].fsp_cfg[10].val = 0x310;
+			dram_timing.fsp_msg[2].fsp_cfg[22].val = 0x3;
+			dram_timing.fsp_msg[3].fsp_cfg[10].val = 0x310;
+			dram_timing.fsp_msg[3].fsp_cfg[22].val = 0x3;
+			break;
+		default:
+			goto out;
+		}
 	}
 	ddr_init(&dram_timing);
 	return;
 out:
+	printf("Could not detect correct RAM size. Fallback to default.\n");
 	ddr_init(&dram_timing);
 }
 
