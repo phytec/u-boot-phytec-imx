@@ -120,6 +120,15 @@ void spl_dram_init(void)
 			dram_timing.fsp_msg[3].fsp_cfg[10].val = 0x310;
 			dram_timing.fsp_msg[3].fsp_cfg[22].val = 0x3;
 		}
+		if (size == 2) {
+			dram_timing.ddrc_cfg[5].val = 0x7a00b4;
+			dram_timing.ddrc_cfg[23].val = 0xbc;
+			dram_timing.ddrc_cfg[45].val = 0xf070707;
+			dram_timing.ddrc_cfg[62].val = 0xc0012;
+			dram_timing.ddrc_cfg[77].val = 0x13;
+			dram_timing.ddrc_cfg[87].val = 0x30005;
+			dram_timing.ddrc_cfg[102].val = 0x5;
+		}
 	} else {
 		u8 size = phytec_get_imx8m_ddr_size(NULL);
 
