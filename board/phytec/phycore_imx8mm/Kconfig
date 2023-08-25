@@ -12,5 +12,34 @@ config SYS_CONFIG_NAME
 config IMX_CONFIG
 	default "board/phytec/phycore_imx8mm/imximage-8mm-sd.cfg"
 
+config PHYCORE_IMX8MM_RAM_SIZE_FIX
+	bool "Set phyCORE-i.MX8MM RAM size fix instead of detecting"
+	default false
+	help
+	  RAM size is automatic being detected with the help of
+	  the EEPROM introspection data. Set RAM size to a fix value
+	  instead.
+
+choice
+	prompt "phyCORE-i.MX8MM RAM size"
+	depends on PHYCORE_IMX8MM_RAM_SIZE_FIX
+	default PHYCORE_IMX8MM_RAM_SIZE_2GB
+
+config PHYCORE_IMX8MM_RAM_SIZE_1GB
+	bool "1GB RAM"
+	help
+	  Set RAM size fix to 1GB for phyCORE-i.MX8MM.
+
+config PHYCORE_IMX8MM_RAM_SIZE_2GB
+	bool "2GB RAM"
+	help
+	  Set RAM size fix to 2GB for phyCORE-i.MX8MM.
+
+config PHYCORE_IMX8MM_RAM_SIZE_4GB
+	bool "4GB RAM"
+	help
+	  Set RAM size fix to 4GB for phyCORE-i.MX8MM.
+endchoice
+
 source "board/phytec/common/Kconfig"
 endif
