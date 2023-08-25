@@ -18,6 +18,10 @@
 	u-boot,dm-spl;
 };
 
+&pinctrl_i2c1_gpio {
+	u-boot,dm-spl;
+};
+
 &pinctrl_uart3 {
 	u-boot,dm-spl;
 };
