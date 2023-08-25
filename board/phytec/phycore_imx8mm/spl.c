@@ -26,6 +26,9 @@ DECLARE_GLOBAL_DATA_PTR;
 #define EEPROM_ADDR		0x51
 #define EEPROM_ADDR_FALLBACK	0x59
 
+void set_dram_timings_1gb(void);
+void set_dram_timings_4gb(void);
+
 int spl_board_boot_device(enum boot_device boot_dev_spl)
 {
 	switch (boot_dev_spl) {
@@ -44,6 +47,13 @@ int spl_board_boot_device(enum boot_device boot_dev_spl)
 	}
 }
 
+enum phytec_imx8mm_ddr_eeprom_code {
+	INVALID = PHYTEC_EEPROM_INVAL,
+	PHYTEC_IMX8MM_DDR_1GB = 1,
+	PHYTEC_IMX8MM_DDR_2GB = 3,
+	PHYTEC_IMX8MM_DDR_4GB = 5,
+};
+
 static void spl_dram_init(void)
 {
 	int ret;
@@ -57,41 +67,23 @@ static void spl_dram_init(void)
 	if (!ret)
 		phytec_print_som_info(NULL);
 
-	u8 size = phytec_get_imx8m_ddr_size(NULL);
+	enum phytec_imx8mm_ddr_eeprom_code size = phytec_get_imx8m_ddr_size(NULL);
 	switch (size) {
-		case 1:
-			/* 1GB RAM */
-			dram_timing.ddrc_cfg[5].val = 0x2d0087;
-			dram_timing.ddrc_cfg[21].val = 0x8d;
-			dram_timing.ddrc_cfg[42].val = 0xf070707;
-			dram_timing.ddrc_cfg[58].val = 0x60012;
-			dram_timing.ddrc_cfg[73].val = 0x13;
-			dram_timing.ddrc_cfg[83].val = 0x30005;
-			dram_timing.ddrc_cfg[98].val = 0x5;
-			break;
-		case 3:
-			/* 2GB RAM */
-			break;
-		case 5:
-			/* 4GB RAM */
-			dram_timing.ddrc_cfg[2].val = 0xa3080020;
-			dram_timing.ddrc_cfg[37].val = 0x17;
-			dram_timing.fsp_msg[0].fsp_cfg[8].val = 0x310;
-			dram_timing.fsp_msg[0].fsp_cfg[20].val = 0x3;
-			dram_timing.fsp_msg[1].fsp_cfg[9].val = 0x310;
-			dram_timing.fsp_msg[1].fsp_cfg[21].val = 0x3;
-			dram_timing.fsp_msg[2].fsp_cfg[9].val = 0x310;
-			dram_timing.fsp_msg[2].fsp_cfg[21].val = 0x3;
-			dram_timing.fsp_msg[3].fsp_cfg[10].val = 0x310;
-			dram_timing.fsp_msg[3].fsp_cfg[22].val = 0x3;
-			break;
-		default:
-			goto out;
+	case PHYTEC_IMX8MM_DDR_1GB:
+		set_dram_timings_1gb();
+		break;
+	case PHYTEC_IMX8MM_DDR_2GB:
+		break;
+	case PHYTEC_IMX8MM_DDR_4GB:
+		set_dram_timings_4gb();
+		break;
+	default:
+		goto out;
 	}
 	ddr_init(&dram_timing);
 	return;
 out:
-	puts("Could not detect correct RAM size. Fall back to default.");
+	puts("Could not detect correct RAM size. Fall back to default.\n");
 	ddr_init(&dram_timing);
 }
 
