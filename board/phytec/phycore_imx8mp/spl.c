@@ -25,17 +25,32 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-#define EEPROM_ADDR             0x51
-#define EEPROM_ADDR_FALLBACK    0x59
+#define EEPROM_ADDR		0x51
+#define EEPROM_ADDR_FALLBACK	0x59
+
+void set_dram_timings_2ghz_2gb(void);
+void set_dram_timings_2ghz_1gb(void);
+void set_dram_timings_2ghz_4gb(void);
+void set_dram_timings_1_5ghz_1gb(void);
+void set_dram_timings_1_5ghz_4gb(void);
 
 int spl_board_boot_device(enum boot_device boot_dev_spl)
 {
 	return BOOT_DEVICE_BOOTROM;
 }
 
+enum phytec_imx8mp_ddr_eeprom_code {
+	INVALID = PHYTEC_EEPROM_INVAL,
+	PHYTEC_IMX8MP_DDR_1GB = 2,
+	PHYTEC_IMX8MP_DDR_2GB = 3,
+	PHYTEC_IMX8MP_DDR_4GB = 5,
+	PHYTEC_IMX8MP_DDR_4GB_2GHZ = 8,
+};
+
 void spl_dram_init(void)
 {
 	int ret;
+	bool use_2ghz_timings = false;
 
 	ret = phytec_eeprom_data_setup_fallback(NULL, 0, EEPROM_ADDR,
 						EEPROM_ADDR_FALLBACK);
@@ -47,138 +62,30 @@ void spl_dram_init(void)
 		phytec_print_som_info(NULL);
 
 	ret = phytec_get_rev(NULL);
-	if (ret >= 3 && ret != PHYTEC_EEPROM_INVAL) {
-		dram_timing.ddrc_cfg[3].val = 0x1323;
-		dram_timing.ddrc_cfg[4].val = 0x1e84800;
-		dram_timing.ddrc_cfg[5].val = 0x7a0118;
-		dram_timing.ddrc_cfg[8].val = 0xc00307a3;
-		dram_timing.ddrc_cfg[9].val = 0xc50000;
-		dram_timing.ddrc_cfg[10].val = 0xf4003f;
-		dram_timing.ddrc_cfg[11].val = 0xf30000;
-		dram_timing.ddrc_cfg[14].val = 0x2028222a;
-		dram_timing.ddrc_cfg[15].val = 0x8083f;
-		dram_timing.ddrc_cfg[16].val = 0xe0e000;
-		dram_timing.ddrc_cfg[17].val = 0x12040a12;
-		dram_timing.ddrc_cfg[18].val = 0x2050f0f;
-		dram_timing.ddrc_cfg[19].val = 0x1010009;
-		dram_timing.ddrc_cfg[20].val = 0x502;
-		dram_timing.ddrc_cfg[21].val = 0x20800;
-		dram_timing.ddrc_cfg[22].val = 0xe100002;
-		dram_timing.ddrc_cfg[23].val = 0x120;
-		dram_timing.ddrc_cfg[24].val = 0xc80064;
-		dram_timing.ddrc_cfg[25].val = 0x3e8001e;
-		dram_timing.ddrc_cfg[26].val = 0x3207a12;
-		dram_timing.ddrc_cfg[28].val = 0x4a3820e;
-		dram_timing.ddrc_cfg[30].val = 0x230e;
-		dram_timing.ddrc_cfg[37].val = 0x799;
-		dram_timing.ddrc_cfg[38].val = 0x9141d1c;
-		dram_timing.ddrc_cfg[74].val = 0x302;
-		dram_timing.ddrc_cfg[83].val = 0x599;
-		dram_timing.ddrc_cfg[99].val = 0x302;
-		dram_timing.ddrc_cfg[108].val = 0x599;
-		dram_timing.ddrphy_cfg[66].val = 0x18;
-		dram_timing.ddrphy_cfg[75].val = 0x1e3;
-		dram_timing.ddrphy_cfg[77].val = 0x1e3;
-		dram_timing.ddrphy_cfg[79].val = 0x1e3;
-		dram_timing.ddrphy_cfg[145].val = 0x3e8;
-		dram_timing.fsp_msg[0].drate = 4000;
-		dram_timing.fsp_msg[0].fsp_cfg[1].val = 0xfa0;
-		dram_timing.fsp_msg[0].fsp_cfg[10].val = 0x3ff4;
-		dram_timing.fsp_msg[0].fsp_cfg[11].val = 0xf3;
-		dram_timing.fsp_msg[0].fsp_cfg[15].val = 0x3ff4;
-		dram_timing.fsp_msg[0].fsp_cfg[16].val = 0xf3;
-		dram_timing.fsp_msg[0].fsp_cfg[22].val = 0xf400;
-		dram_timing.fsp_msg[0].fsp_cfg[23].val = 0xf33f;
-		dram_timing.fsp_msg[0].fsp_cfg[28].val = 0xf400;
-		dram_timing.fsp_msg[0].fsp_cfg[29].val = 0xf33f;
-		dram_timing.fsp_msg[3].drate = 4000;
-		dram_timing.fsp_msg[3].fsp_cfg[1].val = 0xfa0;
-		dram_timing.fsp_msg[3].fsp_cfg[11].val = 0x3ff4;
-		dram_timing.fsp_msg[3].fsp_cfg[12].val = 0xf3;
-		dram_timing.fsp_msg[3].fsp_cfg[16].val = 0x3ff4;
-		dram_timing.fsp_msg[3].fsp_cfg[17].val = 0xf3;
-		dram_timing.fsp_msg[3].fsp_cfg[23].val = 0xf400;
-		dram_timing.fsp_msg[3].fsp_cfg[24].val = 0xf33f;
-		dram_timing.fsp_msg[3].fsp_cfg[29].val = 0xf400;
-		dram_timing.fsp_msg[3].fsp_cfg[30].val = 0xf33f;
-		dram_timing.ddrphy_pie[480].val = 0x465;
-		dram_timing.ddrphy_pie[481].val = 0xfa;
-		dram_timing.ddrphy_pie[482].val = 0x9c4;
-		dram_timing.fsp_table[0] = 4000;
+	if (ret >= 3 && ret != PHYTEC_EEPROM_INVAL)
+		use_2ghz_timings = true;
 
-		int size = phytec_get_imx8m_ddr_size(NULL);
-		if (size == 5) {
-			/* 4GB timings, diff to 2GB 2GHz */
-			dram_timing.ddrc_cfg[2].val = 0xa3080020;
-			dram_timing.ddrc_cfg[39].val = 0x17;
-			dram_timing.fsp_msg[0].fsp_cfg[9].val = 0x310;
-			dram_timing.fsp_msg[0].fsp_cfg[21].val = 0x3;
-			dram_timing.fsp_msg[1].fsp_cfg[10].val = 0x310;
-			dram_timing.fsp_msg[1].fsp_cfg[22].val = 0x3;
-			dram_timing.fsp_msg[2].fsp_cfg[10].val = 0x310;
-			dram_timing.fsp_msg[2].fsp_cfg[22].val = 0x3;
-			dram_timing.fsp_msg[3].fsp_cfg[10].val = 0x310;
-			dram_timing.fsp_msg[3].fsp_cfg[22].val = 0x3;
-		}
-		if (size == 2) {
-			dram_timing.ddrc_cfg[5].val = 0x7a00b4;
-			dram_timing.ddrc_cfg[23].val = 0xbc;
-			dram_timing.ddrc_cfg[45].val = 0xf070707;
-			dram_timing.ddrc_cfg[62].val = 0xc0012;
-			dram_timing.ddrc_cfg[77].val = 0x13;
-			dram_timing.ddrc_cfg[87].val = 0x30005;
-			dram_timing.ddrc_cfg[102].val = 0x5;
-		}
-	} else {
-		u8 size = phytec_get_imx8m_ddr_size(NULL);
+	enum phytec_imx8mp_ddr_eeprom_code size = phytec_get_imx8m_ddr_size(NULL);
 
-		switch (size) {
-		case 2:
-			/* 1GB  */
-			dram_timing.ddrc_cfg[3].val = 0x1233;
-			dram_timing.ddrc_cfg[5].val = 0x5b0087;
-			dram_timing.ddrc_cfg[6].val = 0x61027f10;
-			dram_timing.ddrc_cfg[7].val = 0x7b0;
-			dram_timing.ddrc_cfg[11].val = 0xf30000;
-			dram_timing.ddrc_cfg[23].val = 0x8d;
-			dram_timing.ddrc_cfg[45].val = 0xf070707;
-			dram_timing.ddrc_cfg[59].val = 0x1031;
-			dram_timing.ddrc_cfg[62].val = 0xc0012;
-			dram_timing.ddrc_cfg[77].val = 0x13;
-			dram_timing.ddrc_cfg[84].val = 0x1031;
-			dram_timing.ddrc_cfg[87].val = 0x30005;
-			dram_timing.ddrc_cfg[102].val = 0x5;
-			dram_timing.ddrphy_cfg[75].val = 0x1e3;
-			dram_timing.ddrphy_cfg[77].val = 0x1e3;
-			dram_timing.ddrphy_cfg[79].val = 0x1e3;
-			dram_timing.fsp_msg[0].fsp_cfg[11].val = 0xf3;
-			dram_timing.fsp_msg[0].fsp_cfg[16].val = 0xf3;
-			dram_timing.fsp_msg[0].fsp_cfg[23].val = 0xf32d;
-			dram_timing.fsp_msg[0].fsp_cfg[29].val = 0xf32d;
-			dram_timing.fsp_msg[3].fsp_cfg[12].val = 0xf3;
-			dram_timing.fsp_msg[3].fsp_cfg[17].val = 0xf3;
-			dram_timing.fsp_msg[3].fsp_cfg[24].val = 0xf32d;
-			dram_timing.fsp_msg[3].fsp_cfg[30].val = 0xf32d;
-			break;
-		case 3:
-			/*2GB*/
-			break;
-		case 5:
-			/* 4GB */
-			dram_timing.ddrc_cfg[2].val = 0xa3080020;
-			dram_timing.ddrc_cfg[39].val = 0x17;
-			dram_timing.fsp_msg[0].fsp_cfg[9].val = 0x310;
-			dram_timing.fsp_msg[0].fsp_cfg[21].val = 0x3;
-			dram_timing.fsp_msg[1].fsp_cfg[10].val = 0x310;
-			dram_timing.fsp_msg[1].fsp_cfg[22].val = 0x3;
-			dram_timing.fsp_msg[2].fsp_cfg[10].val = 0x310;
-			dram_timing.fsp_msg[2].fsp_cfg[22].val = 0x3;
-			dram_timing.fsp_msg[3].fsp_cfg[10].val = 0x310;
-			dram_timing.fsp_msg[3].fsp_cfg[22].val = 0x3;
-			break;
-		default:
-			goto out;
-		}
+	switch (size) {
+	case PHYTEC_IMX8MP_DDR_1GB:
+		if (use_2ghz_timings)
+			set_dram_timings_2ghz_1gb();
+		else
+			set_dram_timings_1_5ghz_1gb();
+		break;
+	case PHYTEC_IMX8MP_DDR_2GB:
+		if (use_2ghz_timings)
+			set_dram_timings_2ghz_2gb();
+		break;
+	case PHYTEC_IMX8MP_DDR_4GB:
+		set_dram_timings_1_5ghz_4gb();
+		break;
+	case PHYTEC_IMX8MP_DDR_4GB_2GHZ:
+		set_dram_timings_2ghz_4gb();
+		break;
+	default:
+		goto out;
 	}
 	ddr_init(&dram_timing);
 	return;
