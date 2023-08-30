@@ -954,7 +954,8 @@ dtb-$(CONFIG_ARCH_IMX8) += \
 	fsl-imx8dxl-evk-lcdif.dtb \
 	fsl-imx8dxl-ddr3l-evk.dtb \
 	imx8-deneb.dtb \
-	imx8-giedi.dtb
+	imx8-giedi.dtb \
+	imx8qxp-phycore-kit.dtb
 
 dtb-$(CONFIG_ARCH_IMX8ULP) += \
 	imx8ulp-evk.dtb \
