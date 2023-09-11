@@ -1,0 +1,12 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * Copyright (C) 2015-2021 PHYTEC America, LLC
+ *
+ * DTS for PHYTEC kit KPB-01910-004
+ */
+
+/dts-v1/;
+
+#include "imx7-phycore-som.dtsi"	/* SOM */
+#include "imx7-pba-c-09.dtsi"		/* Carrier board */
+#include "imx7-peb-d-rpi.dtsi"		/* PEB-D-RPI module */
