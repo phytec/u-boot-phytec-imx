@@ -67,8 +67,6 @@
 #define UPDATE_M4_ENV ""
 #endif
 
-#define CONFIG_SYS_MMC_IMG_LOAD_PART	1
-
 #ifdef CONFIG_NAND_BOOT
 #define MFG_NAND_PARTITION "mtdparts=gpmi-nand:64m(boot),16m(kernel),16m(dtb),-(rootfs)"
 #else
@@ -110,7 +108,7 @@
 	"netmask=255.255.255.0\0" \
 	"ip_dyn=no\0" \
 	"mmcdev=" __stringify(CONFIG_SYS_MMC_ENV_DEV) "\0" \
-	"mmcpart=" __stringify(CONFIG_SYS_MMC_IMG_LOAD_PART) "\0" \
+	"mmcpart=1\0" \
 	"mmcroot=" CONFIG_MMCROOT " rootwait rw\0" \
 	"mmcautodetect=yes\0" \
 	"mmcargs=setenv bootargs console=${console},${baudrate} " \
