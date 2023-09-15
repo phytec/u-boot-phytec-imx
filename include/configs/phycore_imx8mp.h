@@ -39,6 +39,9 @@
 	"serverip=192.168.3.10\0" \
 	"netmask=255.255.255.0\0" \
 	"ip_dyn=no\0" \
+	"mtdparts=30bb0000.spi:3840k(u-boot),128k(env),128k(env_redund),-(none)\0" \
+	"mtdids=nor0=30bb0000.spi\0" \
+	"spiprobe=true\0" \
 	"mmcdev=" __stringify(CONFIG_SYS_MMC_ENV_DEV) "\0" \
 	"mmcpart=1\0" \
 	"mmcroot=2\0" \
@@ -48,6 +51,7 @@
 	"loadimage=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${image}\0" \
 	"loadfdt=fatload mmc ${mmcdev}:${mmcpart} ${fdt_addr} ${fdt_file}\0" \
 	"mmcboot=echo Booting from mmc ...; " \
+		"run spiprobe; " \
 		"run mmcargs; " \
 		"if run loadfdt; then " \
 			"booti ${loadaddr} - ${fdt_addr}; " \
@@ -58,6 +62,7 @@
 	"netargs=setenv bootargs console=${console} root=/dev/nfs ip=${nfsip} " \
 		"nfsroot=${serverip}:${nfsroot},v3,tcp\0" \
 	"netboot=echo Booting from net ...; " \
+		"run spiprobe; " \
 		"if test ${ip_dyn} = yes; then " \
 			"setenv nfsip dhcp; " \
 			"setenv get_cmd dhcp; " \
