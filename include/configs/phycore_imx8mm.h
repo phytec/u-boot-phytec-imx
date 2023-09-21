@@ -51,6 +51,7 @@
 	"loadimage=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${image}\0" \
 	"loadfdt=fatload mmc ${mmcdev}:${mmcpart} ${fdt_addr} ${fdt_file}\0" \
 	"mmcboot=echo Booting from mmc ...; " \
+		"run spiprobe; " \
 		"run mmcargs; " \
 		"if run loadfdt; then " \
 			"booti ${loadaddr} - ${fdt_addr}; " \
@@ -61,6 +62,7 @@
 	"netargs=setenv bootargs console=${console} root=/dev/nfs ip=${nfsip} " \
 		"nfsroot=${serverip}:${nfsroot},v3,tcp\0" \
 	"netboot=echo Booting from net ...; " \
+		"run spiprobe; " \
 		"if test ${ip_dyn} = yes; then " \
 			"setenv nfsip dhcp; " \
 			"setenv get_cmd dhcp; " \
