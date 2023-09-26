@@ -23,8 +23,8 @@
 #include <asm/arch/snvs_security_sc.h>
 #include <asm/arch/iomux.h>
 #include <asm/arch/sys_proto.h>
+#include <asm/mach-imx/boot_mode.h>
 #include <usb.h>
-//#include "../common/tcpc.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -242,9 +242,16 @@ int board_late_init(void)
 	env_set("sec_boot", "yes");
 #endif
 
-#ifdef CONFIG_ENV_IS_IN_MMC
-	board_late_mmc_env_init();
-#endif
+	switch (get_boot_device()) {
+	case MMC1_BOOT:
+		env_set_ulong("mmcdev", 0);
+		break;
+	case SD2_BOOT:
+		env_set_ulong("mmcdev", 1);
+		break;
+	default:
+		break;
+	}
 
 	return 0;
 }
