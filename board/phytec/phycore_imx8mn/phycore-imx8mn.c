@@ -87,3 +87,8 @@ int extension_board_scan(struct list_head *extension_list)
 	return cnt;
 }
 #endif /* CONFIG_CMD_EXTENSION */
+
+int mmc_map_to_kernel_blk(int dev_no)
+{
+	return dev_no;
+}
