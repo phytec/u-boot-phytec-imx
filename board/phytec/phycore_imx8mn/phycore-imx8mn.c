@@ -26,6 +26,11 @@ static int setup_fec(void)
 
 int board_init(void)
 {
+	int ret = phytec_eeprom_data_setup_fallback(NULL, 0,
+			EEPROM_ADDR, EEPROM_ADDR_FALLBACK);
+	if (ret)
+		printf("%s: EEPROM data init failed\n", __func__);
+
 	setup_fec();
 
 	return 0;
