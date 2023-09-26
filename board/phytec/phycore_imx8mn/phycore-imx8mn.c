@@ -9,9 +9,15 @@
 #include <asm/io.h>
 #include <asm/mach-imx/boot_mode.h>
 #include <env.h>
+#include <extension_board.h>
 #include <miiphy.h>
 
+#include "../common/imx8m_som_detection.h"
+
 DECLARE_GLOBAL_DATA_PTR;
+
+#define EEPROM_ADDR		0x51
+#define EEPROM_ADDR_FALLBACK	0x59
 
 static int setup_fec(void)
 {
@@ -56,3 +62,28 @@ int board_late_init(void)
 
 	return 0;
 }
+
+#if (IS_ENABLED(CONFIG_CMD_EXTENSION))
+int extension_board_scan(struct list_head *extension_list)
+{
+	int cnt = 0;
+
+	if (!phytec_get_imx8m_eth(NULL)) {
+		list_add_tail(&phytec_add_extension(
+					"phyCORE-i.MX8MN no eth phy",
+					"imx8mn-phycore-no-eth.dtbo",
+					"eth phy not populated on SoM"
+					)->list, extension_list);
+		cnt += 1;
+	}
+	if (!phytec_get_imx8m_spi(NULL)) {
+		list_add_tail(&phytec_add_extension(
+					"phyCORE-i.MX8MN no SPI flash",
+					"imx8mn-phycore-no-spiflash.dtbo",
+					"SPI flash not populated on SoM"
+					)->list, extension_list);
+		cnt += 1;
+	}
+	return cnt;
+}
+#endif /* CONFIG_CMD_EXTENSION */
