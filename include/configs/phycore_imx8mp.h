@@ -42,6 +42,8 @@
 	"mtdparts=30bb0000.spi:3840k(u-boot),128k(env),128k(env_redund),-(none)\0" \
 	"mtdids=nor0=30bb0000.spi\0" \
 	"spiprobe=true\0" \
+	"emmc_dev=2\0" \
+	"sd_dev=1\0" \
 	"mmcdev=" __stringify(CONFIG_SYS_MMC_ENV_DEV) "\0" \
 	"mmcpart=1\0" \
 	"mmcroot=2\0" \
@@ -104,5 +106,9 @@
 /* USDHC */
 #define CONFIG_SYS_FSL_USDHC_NUM	2
 #define CONFIG_SYS_FSL_ESDHC_ADDR       0
+
+/* USB configs */
+#define CONFIG_USB_MAX_CONTROLLER_COUNT         2
+#define CONFIG_SERIAL_TAG
 
 #endif /* __PHYCORE_IMX8MP_H */
