@@ -31,6 +31,8 @@
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"image=Image\0" \
+	"bootenv=bootenv.txt\0" \
+	"bootenv_addr=0x49100000\0" \
 	"console=ttymxc2,115200\0" \
 	"fdt_addr=0x48000000\0" \
 	"fdto_addr=0x49000000\0" \
@@ -47,6 +49,7 @@
 	"mmcautodetect=yes\0" \
 	"mmcargs=setenv bootargs console=${console} " \
 		"root=/dev/mmcblk${mmcdev}p${mmcroot} rootwait rw\0" \
+	"mmc_load_bootenv=fatload mmc ${mmcdev}:${mmcpart} ${bootenv_addr} ${bootenv}\0" \
 	"mmc_load_overlay=fatload mmc ${mmcdev}:${mmcpart} ${fdto_addr} ${overlay}\0" \
 	"mmc_apply_overlays=fdt address ${fdt_addr}; " \
 		"if test ${no_extensions} = 0; then " \
@@ -66,6 +69,11 @@
 			"done; " \
 		"fi;\0 " \
 	"mmcboot=echo Booting from mmc ...; " \
+		"if test ${no_bootenv} = 0; then " \
+			"if run mmc_load_bootenv; then " \
+				"env import -t ${bootenv_addr} ${filesize}; " \
+			"fi; " \
+		"fi; " \
 		"run mmcargs; " \
 		"if run loadfdt; then " \
 			"run mmc_apply_overlays; " \
@@ -74,6 +82,7 @@
 			"echo WARN: Cannot load the DT; " \
 		"fi;\0 " \
 	"nfsroot=/nfs\0" \
+	"net_load_bootenv=${get_cmd} ${bootenv_addr} ${bootenv}\0" \
 	"net_load_overlay=${get_cmd} ${fdto_addr} ${overlay}\0" \
 	"net_apply_overlays=fdt address ${fdt_addr}; " \
 		"if test ${no_extensions} = 0; then " \
@@ -101,6 +110,11 @@
 		"else " \
 			"setenv nfsip ${ipaddr}:${serverip}::${netmask}::eth0:on; " \
 			"setenv get_cmd tftp; " \
+		"fi; " \
+		"if test ${no_bootenv} = 0; then " \
+			"if run net_load_bootenv; then " \
+				"env import -t ${bootenv_addr} ${filesize}; " \
+			"fi; " \
 		"fi; " \
 		"run netargs; " \
 		"${get_cmd} ${loadaddr} ${image}; " \
