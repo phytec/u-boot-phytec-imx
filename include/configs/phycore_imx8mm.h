@@ -34,6 +34,7 @@
 	"image=Image\0" \
 	"console=ttymxc2\0" \
 	"fdt_addr=0x48000000\0" \
+	"fdto_addr=0x49000000\0" \
 	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0" \
 	"bootcmd_mfg=fastboot 0\0" \
 	"ipaddr=192.168.3.11\0" \
@@ -53,10 +54,20 @@
 		"root=/dev/mmcblk${mmcdev}p${mmcroot} fsck.repair=yes rootwait rw \0" \
 	"loadimage=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${image}\0" \
 	"loadfdt=fatload mmc ${mmcdev}:${mmcpart} ${fdt_addr} ${fdt_file}\0" \
+	"mmc_load_overlay=fatload mmc ${mmcdev}:${mmcpart} ${fdto_addr} ${overlay}\0" \
+	"mmc_apply_overlays=fdt address ${fdt_addr}; "	\
+		"for overlay in ${overlays}; " \
+		"do; " \
+			"if run mmc_load_overlay; then " \
+				"fdt resize ${filesize}; " \
+				"fdt apply ${fdto_addr}; " \
+			"fi; " \
+		"done;\0" \
 	"mmcboot=echo Booting from mmc ...; " \
 		"run spiprobe; " \
 		"run mmcargs; " \
 		"if run loadfdt; then " \
+			"run mmc_apply_overlays; " \
 			"booti ${loadaddr} - ${fdt_addr}; " \
 		"else " \
 			"echo WARN: Cannot load the DT; " \
@@ -64,6 +75,15 @@
 	"nfsroot=/nfs\0" \
 	"netargs=setenv bootargs console=${console},${baudrate} root=/dev/nfs ip=${nfsip} " \
 		"nfsroot=${serverip}:${nfsroot},v3,tcp\0" \
+	"net_load_overlay=${get_cmd} ${fdto_addr} ${overlay}\0" \
+	"net_apply_overlays=fdt address ${fdt_addr}; " \
+		"for overlay in ${overlays}; " \
+		"do; " \
+			"if run net_load_overlay; then " \
+				"fdt resize ${filesize}; " \
+				"fdt apply ${fdto_addr}; " \
+			"fi; " \
+		"done;\0" \
 	"netboot=echo Booting from net ...; " \
 		"run spiprobe; " \
 		"if test ${ip_dyn} = yes; then " \
@@ -76,6 +96,7 @@
 		"run netargs; " \
 		"${get_cmd} ${loadaddr} ${image}; " \
 		"if ${get_cmd} ${fdt_addr} ${fdt_file}; then " \
+			"run net_apply_overlays; " \
 			"booti ${loadaddr} - ${fdt_addr}; " \
 		"else " \
 			"echo WARN: Cannot load the DT; " \
