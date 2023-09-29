@@ -12,6 +12,7 @@
 #include <asm/mach-imx/boot_mode.h>
 #include <dwc3-uboot.h>
 #include <env.h>
+#include <extension_board.h>
 #include <fdt_support.h>
 #include <jffs2/load_kernel.h>
 #include <miiphy.h>
@@ -144,3 +145,41 @@ int board_phys_sdram_size(phys_size_t *size)
 
 	return 0;
 }
+
+#if (IS_ENABLED(CONFIG_CMD_EXTENSION))
+int extension_board_scan(struct list_head *extension_list)
+{
+	struct extension *extension = NULL;
+	int ret = 0;
+	u8 option;
+
+	option = phytec_get_imx8m_eth(NULL);
+	if (!option) {
+		extension = phytec_add_extension("phyCORE-i.MX8MP no eth phy",
+						 "imx8mp-phycore-no-eth.dtbo",
+						 "eth phy not populated on SoM");
+		list_add_tail(&extension->list, extension_list);
+		ret++;
+	}
+
+	option = phytec_get_imx8m_spi(NULL);
+	if (!option) {
+		extension = phytec_add_extension("phyCORE-i.MX8MP no SPI flash",
+						 "imx8mp-phycore-no-spiflash.dtbo",
+						 "SPI flash not populated on SoM");
+		list_add_tail(&extension->list, extension_list);
+		ret++;
+	}
+
+	option = phytec_get_imx8mp_rtc(NULL);
+	if (!option) {
+		extension = phytec_add_extension("phyCORE-i.MX8MP no RTC",
+						 "imx8mp-phycore-no-rtc.dtbo",
+						 "RTC not populated on SoM");
+		list_add_tail(&extension->list, extension_list);
+		ret++;
+	}
+
+	return ret;
+}
+#endif
