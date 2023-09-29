@@ -1,0 +1,20 @@
+
+if TARGET_PHYCORE_IMX93
+
+config SYS_BOARD
+	default "phycore_imx93"
+
+config SYS_VENDOR
+	default "phytec"
+
+config SYS_CONFIG_NAME
+	default "phycore_imx93"
+
+config IMX93_PHYCORE_LPDDR4X_1GB
+	bool "Using LPDDR4X Timing and size of 1GB"
+	default y
+	select IMX9_LPDDR4X
+	help
+	  Select the LPDDR4X timing and size of 1GB
+
+endif

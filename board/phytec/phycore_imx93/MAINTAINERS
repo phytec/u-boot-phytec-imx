@@ -1,0 +1,10 @@
+phyCORE-i.MX93
+M:     Christoph Stoidner <c.stoidner@phytec.de>
+W:     https://www.phytec.de/produkte/system-on-modules/phycore-imx-91-93/
+S:     Maintained
+F:     arch/arm/dts/phycore-imx93.dts
+F:     arch/arm/dts/phycore-imx93-som.dtsi
+F:     arch/arm/dts/phycore-imx93-u-boot.dtsi
+F:     board/phytec/phycore_imx93/
+F:     configs/phycore-imx93_defconfig
+F:     include/configs/phycore_imx93.h
