@@ -11,6 +11,8 @@
 #include <linux/stringify.h>
 #include <asm/arch/imx-regs.h>
 
+#include "phycore_rauc_env.h"
+
 #define CONFIG_SYS_BOOTM_LEN		SZ_64M
 #define CONFIG_SPL_MAX_SIZE		(148 * SZ_1K)
 #define CONFIG_SYS_MONITOR_LEN		SZ_512K
@@ -126,6 +128,19 @@
 		"else " \
 			"echo WARN: Cannot load the DT; " \
 		"fi;\0" \
+	"raucdev=2\0" \
+	PHYCORE_RAUC_ENV_BOOTLOGIC
+
+#define CONFIG_BOOTCOMMAND \
+	"mmc dev ${mmcdev}; if mmc rescan; then " \
+		"env exists doraucboot || setenv doraucboot 0;" \
+		"if test ${doraucboot} = 1; then " \
+			"run raucboot; " \
+		"elif run loadimage; then " \
+			"run mmcboot; " \
+		"else run netboot; " \
+		"fi; " \
+	"fi;"
 
 /* Link Definitions */
 #define CONFIG_SYS_INIT_RAM_ADDR	0x40000000
