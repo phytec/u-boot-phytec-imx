@@ -142,6 +142,11 @@
 		"fi; " \
 	"fi;"
 
+#ifdef CONFIG_ENV_WRITEABLE_LIST
+/* Set environment flag validation to RAUC's list of env vars that must writable */
+#define CONFIG_ENV_FLAGS_LIST_STATIC RAUC_REQUIRED_WRITABLE_ENV_FLAGS
+#endif
+
 /* Link Definitions */
 #define CONFIG_SYS_INIT_RAM_ADDR	0x40000000
 #define CONFIG_SYS_INIT_RAM_SIZE	SZ_512K
