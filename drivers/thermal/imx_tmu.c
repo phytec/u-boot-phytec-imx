@@ -454,7 +454,7 @@ static int imx_tmu_bind(struct udevice *dev)
 	pdata->zone_node = 1;
 	/* default alert/crit temps based on temp grade */
 	get_cpu_temp_grade(&minc, &maxc);
-	pdata->critical = maxc * 1000;
+	pdata->critical = (maxc - 5) * 1000;
 	pdata->alert = (maxc - 10) * 1000;
 
 	node = ofnode_path("/thermal-zones");
