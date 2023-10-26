@@ -137,17 +137,6 @@
 	"raucdev=2\0" \
 	PHYCORE_RAUC_ENV_BOOTLOGIC
 
-#define CONFIG_BOOTCOMMAND \
-	"mmc dev ${mmcdev}; if mmc rescan; then " \
-		"env exists doraucboot || setenv doraucboot 0;" \
-		"if test ${doraucboot} = 1; then " \
-			"run raucboot; " \
-		"elif run loadimage; then " \
-			"run mmcboot; " \
-		"else run netboot; " \
-		"fi; " \
-	"fi;"
-
 #ifdef CONFIG_ENV_WRITEABLE_LIST
 /* Set environment flag validation to RAUC's list of env vars that must writable */
 #define CONFIG_ENV_FLAGS_LIST_STATIC RAUC_REQUIRED_WRITABLE_ENV_FLAGS
