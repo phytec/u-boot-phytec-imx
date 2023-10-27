@@ -68,6 +68,7 @@
 		"fi; " \
 		"if run loadraucimage; then " \
 			"run raucargs; " \
+			"run fit_test_and_run_boot; " \
 			"if run loadraucfdt; then " \
 				"run rauc_apply_overlays; " \
 				"booti ${loadaddr} - ${fdt_addr}; " \
