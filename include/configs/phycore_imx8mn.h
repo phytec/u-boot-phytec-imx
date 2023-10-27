@@ -12,6 +12,7 @@
 #include <asm/arch/imx-regs.h>
 
 #include "phycore_rauc_env.h"
+#include "phycore_fitimage_env.h"
 
 #define CONFIG_SYS_BOOTM_LEN		SZ_64M
 #define CONFIG_SPL_MAX_SIZE		(148 * SZ_1K)
@@ -79,6 +80,7 @@
 			"fi; " \
 		"fi; " \
 		"run mmcargs; " \
+		"run fit_test_and_run_boot; " \
 		"if run loadfdt; then " \
 			"run mmc_apply_overlays; " \
 			"booti ${loadaddr} - ${fdt_addr}; " \
@@ -129,7 +131,8 @@
 			"echo WARN: Cannot load the DT; " \
 		"fi;\0" \
 	"raucdev=2\0" \
-	PHYCORE_RAUC_ENV_BOOTLOGIC
+	PHYCORE_RAUC_ENV_BOOTLOGIC \
+	PHYCORE_FITIMAGE_ENV_BOOTLOGIC
 
 #ifdef CONFIG_ENV_WRITEABLE_LIST
 /* Set environment flag validation to RAUC's list of env vars that must writable */
