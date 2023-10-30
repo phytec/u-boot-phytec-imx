@@ -102,3 +102,6 @@ __pycache__
 # pylint files
 /pylint.cur
 /pylint.out/
+
+# Clang's compilation database file
+/compile_commands.json
