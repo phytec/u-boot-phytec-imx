@@ -3,6 +3,14 @@
 Develop U-Boot
 ==============
 
+General
+-------
+
+.. toctree::
+   :maxdepth: 1
+
+   ide_integration
+
 Implementation
 --------------
 
