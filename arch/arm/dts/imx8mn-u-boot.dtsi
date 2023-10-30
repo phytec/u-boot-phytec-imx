@@ -60,7 +60,6 @@
 
 		blob_2d_dmem: blob-ext@4 {
 			filename = "lpddr4_pmu_train_2d_dmem.bin";
-			size = <0x4000>;
 			type = "blob-ext";
 		};
 	};
