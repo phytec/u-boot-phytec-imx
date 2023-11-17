@@ -39,6 +39,7 @@
 	"bootenv=bootenv.txt\0" \
 	"bootenv_addr=0x49100000\0" \
 	"fdt_addr=0x48000000\0" \
+	"fdt_high=0xffffffffffffffff\0" \
 	"fdto_addr=0x49000000\0" \
 	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0" \
 	"ipaddr=192.168.3.11\0" \

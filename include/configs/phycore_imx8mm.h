@@ -37,6 +37,7 @@
 	"image=Image\0" \
 	"console=ttymxc2\0" \
 	"fdt_addr=0x48000000\0" \
+	"fdt_high=0xffffffffffffffff\0" \
 	"fdto_addr=0x49000000\0" \
 	"bootenv_addr=0x49100000\0" \
 	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0" \
