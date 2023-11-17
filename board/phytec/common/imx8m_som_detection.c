@@ -35,7 +35,7 @@ u8 __maybe_unused phytec_imx8m_detect(struct phytec_eeprom_data *data)
 		data = &eeprom_data;
 
 	/* We can not do the check for early API revsions */
-	if (data->data.api_rev < PHYTEC_API_REV2)
+	if (!data->valid || data->data.api_rev < PHYTEC_API_REV2)
 		return 1;
 
 	som = data->data.data.data_api2.som_no;
@@ -75,6 +75,8 @@ u8 __maybe_unused phytec_get_imx8m_ddr_size(struct phytec_eeprom_data *data)
 
 	if (!data)
 		data = &eeprom_data;
+	if (!data->valid)
+		return  PHYTEC_EEPROM_INVAL;
 
 	opt = phytec_get_opt(data);
 	if (opt)
@@ -99,8 +101,7 @@ u8 __maybe_unused phytec_get_imx8m_spi(struct phytec_eeprom_data *data)
 
 	if (!data)
 		data = &eeprom_data;
-
-	if (data->data.api_rev < PHYTEC_API_REV2)
+	if (!data->valid || data->data.api_rev < PHYTEC_API_REV2)
 		return PHYTEC_EEPROM_INVAL;
 
 	opt = phytec_get_opt(data);
@@ -127,7 +128,7 @@ u8 __maybe_unused phytec_get_imx8m_eth(struct phytec_eeprom_data *data)
 	if (!data)
 		data = &eeprom_data;
 
-	if (data->data.api_rev < PHYTEC_API_REV2)
+	if (!data->valid || data->data.api_rev < PHYTEC_API_REV2)
 		return PHYTEC_EEPROM_INVAL;
 
 	opt = phytec_get_opt(data);
@@ -154,8 +155,7 @@ u8 __maybe_unused phytec_get_imx8mp_rtc(struct phytec_eeprom_data *data)
 
 	if (!data)
 		data = &eeprom_data;
-
-	if (data->data.api_rev < PHYTEC_API_REV2)
+	if (!data->valid || data->data.api_rev < PHYTEC_API_REV2)
 		return PHYTEC_EEPROM_INVAL;
 
 	opt = phytec_get_opt(data);
