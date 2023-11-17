@@ -45,6 +45,7 @@
 	"serverip=192.168.3.10\0" \
 	"netmask=255.255.255.0\0" \
 	"ip_dyn=no\0" \
+	"prepare_mcore=setenv mcore_clk clk-imx8mn.mcore_booted;\0" \
 	"loadimage=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${image}\0" \
 	"loadfdt=fatload mmc ${mmcdev}:${mmcpart} ${fdt_addr} ${fdt_file}\0" \
 	"emmc_dev=2\0" \
@@ -53,7 +54,7 @@
 	"mmcpart=1\0" \
 	"mmcroot=2\0" \
 	"mmcautodetect=yes\0" \
-	"mmcargs=setenv bootargs console=${console} " \
+	"mmcargs=setenv bootargs ${mcore_clk} console=${console} " \
 		"root=/dev/mmcblk${mmcdev}p${mmcroot} rootwait rw\0" \
 	"mmc_load_bootenv=fatload mmc ${mmcdev}:${mmcpart} ${bootenv_addr} ${bootenv}\0" \
 	"mmc_load_overlay=fatload mmc ${mmcdev}:${mmcpart} ${fdto_addr} ${overlay}\0" \
@@ -108,7 +109,7 @@
 				"fi; " \
 			"done; " \
 		"fi;\0 " \
-	"netargs=setenv bootargs console=${console} root=/dev/nfs ip=${nfsip} " \
+	"netargs=setenv bootargs ${mcore_clk} console=${console} root=/dev/nfs ip=${nfsip} " \
 		"nfsroot=${serverip}:${nfsroot},v3,tcp\0" \
 	"netboot=echo Booting from net ...; " \
 		"if test ${ip_dyn} = yes; then " \

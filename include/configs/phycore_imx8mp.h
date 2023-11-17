@@ -46,6 +46,7 @@
 	"serverip=192.168.3.10\0" \
 	"netmask=255.255.255.0\0" \
 	"ip_dyn=no\0" \
+	"prepare_mcore=setenv mcore_clk clk-imx8mp.mcore_booted;\0" \
 	"mtdparts=30bb0000.spi:3840k(u-boot),128k(env),128k(env_redund),-(none)\0" \
 	"mtdids=nor0=30bb0000.spi\0" \
 	"spiprobe=true\0" \
@@ -55,7 +56,7 @@
 	"mmcpart=1\0" \
 	"mmcroot=2\0" \
 	"mmcautodetect=yes\0" \
-	"mmcargs=setenv bootargs console=${console},${baudrate} " \
+	"mmcargs=setenv bootargs ${mcore_clk} console=${console},${baudrate} " \
 		"root=/dev/mmcblk${mmcdev}p${mmcroot} fsck.repair=yes rootwait rw\0" \
 	"loadimage=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${image}\0" \
 	"loadfdt=fatload mmc ${mmcdev}:${mmcpart} ${fdt_addr} ${fdt_file}\0" \
@@ -94,7 +95,7 @@
 			"echo WARN: Cannot load the DT; " \
 		"fi;\0 " \
 	"nfsroot=/nfs\0" \
-	"netargs=setenv bootargs console=${console},${baudrate} root=/dev/nfs ip=${nfsip} " \
+	"netargs=setenv bootargs ${mcore_clk} console=${console},${baudrate} root=/dev/nfs ip=${nfsip} " \
 		"nfsroot=${serverip}:${nfsroot},v3,tcp\0" \
 	"net_load_bootenv=${get_cmd} ${bootenv_addr} ${bootenv}\0" \
 	"net_load_overlay=${get_cmd} ${fdto_addr} ${overlay}\0" \
