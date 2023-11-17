@@ -36,14 +36,14 @@ u8 __maybe_unused phytec_imx8m_detect(struct phytec_eeprom_data *data)
 
 	/* We can not do the check for early API revsions */
 	if (data->api_rev < PHYTEC_API_REV2)
-		return -1;
+		return 1;
 
 	som = data->data.data_api2.som_no;
 	debug("%s: som id: %u\n", __func__, som);
 
 	opt = phytec_get_opt(data);
 	if (!opt)
-		return -1;
+		return 1;
 
 	if (som == PHYTEC_IMX8MP_SOM && is_imx8mp())
 		return 0;
@@ -61,7 +61,7 @@ u8 __maybe_unused phytec_imx8m_detect(struct phytec_eeprom_data *data)
 		return 0;
 
 	pr_err("%s: SoM ID does not match. Wrong EEPROM data?\n", __func__);
-	return -1;
+	return 1;
 }
 
 /*
@@ -174,7 +174,7 @@ u8 __maybe_unused phytec_get_imx8mp_rtc(struct phytec_eeprom_data *data)
 
 inline u8 __maybe_unused phytec_imx8m_detect(struct phytec_eeprom_data *data)
 {
-	return -1;
+	return 1;
 }
 
 inline u8 __maybe_unused
