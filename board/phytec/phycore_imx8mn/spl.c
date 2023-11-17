@@ -53,7 +53,7 @@ void spl_dram_init(void)
 	ddr_init(&dram_timing);
 	return;
 out:
-	puts("Could not detect correct RAM size. Fall back to default.");
+	puts("Could not detect correct RAM size. Fall back to default.\n");
 	ddr_init(&dram_timing);
 }
 
