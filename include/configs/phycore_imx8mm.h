@@ -41,7 +41,6 @@
 	"fdto_addr=0x49000000\0" \
 	"bootenv_addr=0x49100000\0" \
 	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0" \
-	"bootcmd_mfg=fastboot 0\0" \
 	"ipaddr=192.168.3.11\0" \
 	"serverip=192.168.3.10\0" \
 	"netmask=255.255.255.0\0" \
