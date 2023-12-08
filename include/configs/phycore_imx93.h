@@ -20,11 +20,14 @@
 	"console=ttyLP0\0" \
 	"fdt_addr=0x83000000\0" \
 	"fdto_addr=0x830c0000\0" \
+	"bootenv_addr=0x83500000\0" \
 	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0" \
 	"ipaddr=192.168.3.11\0" \
 	"serverip=192.168.3.10\0" \
 	"netmask=255.255.255.0\0" \
 	"ip_dyn=no\0" \
+	"bootenv=bootenv.txt\0" \
+	"mmc_load_bootenv=fatload mmc ${mmcdev}:${mmcpart} ${bootenv_addr} ${bootenv}\0" \
 	"mmcdev=" __stringify(CONFIG_SYS_MMC_ENV_DEV)"\0" \
 	"mmcpart=1\0" \
 	"mmcroot=2\0" \
@@ -43,6 +46,9 @@
 			"fi; " \
 		"done;\0" \
 	"mmcboot=echo Booting from mmc ...; " \
+		"if run mmc_load_bootenv; then " \
+			"env import -t ${bootenv_addr} ${filesize}; " \
+		"fi; " \
 		"run mmcargs; " \
 		"if run loadfdt; then " \
 			"run mmc_apply_overlays; " \
@@ -54,6 +60,7 @@
 	"netargs=setenv bootargs console=${console},${baudrate} earlycon " \
 		"root=/dev/nfs ip=${nfsip} " \
 		"nfsroot=${serverip}:${nfsroot},v3,tcp\0" \
+	"net_load_bootenv=${get_cmd} ${bootenv_addr} ${bootenv}\0" \
 	"net_load_overlay=${get_cmd} ${fdto_addr} ${overlay}\0" \
 	"net_apply_overlays=fdt address ${fdt_addr}; " \
 		"for overlay in ${overlays}; " \
@@ -70,6 +77,9 @@
 		"else " \
 			"setenv nfsip ${ipaddr}:${serverip}::${netmask}::eth0:on; " \
 			"setenv get_cmd tftp; " \
+		"fi; " \
+		"if run net_load_bootenv; then " \
+			"env import -t ${bootenv_addr} ${filesize}; " \
 		"fi; " \
 		"run netargs; " \
 		"${get_cmd} ${loadaddr} ${image}; " \
