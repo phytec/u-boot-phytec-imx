@@ -161,3 +161,7 @@
 	u-boot,dm-spl;
 	fsl,signal-voltage-switch-extra-delay-ms = <8>;
 };
+
+&wdog3 {
+	u-boot,dm-spl;
+};
