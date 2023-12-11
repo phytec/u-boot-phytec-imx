@@ -1711,10 +1711,9 @@ enum env_location env_get_location(enum env_operation op, int prio)
 
 	if (prio > 1)
 		return ENVL_UNKNOWN;
-#if defined(CONFIG_ENV_IS_NOWHERE) && defined(CONFIG_ENV_APPEND)
-	if (prio == 1)
+	if (prio == 1 && IS_ENABLED(CONFIG_ENV_IS_NOWHERE) && IS_ENABLED(CONFIG_ENV_APPEND))
 		return ENVL_NOWHERE;
-#endif
+
 	switch (dev) {
 	case QSPI_BOOT:
 		if (IS_ENABLED(CONFIG_ENV_IS_IN_SPI_FLASH))
