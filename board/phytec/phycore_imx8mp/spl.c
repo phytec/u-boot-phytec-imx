@@ -33,6 +33,7 @@ void set_dram_timings_2ghz_1gb(void);
 void set_dram_timings_2ghz_4gb(void);
 void set_dram_timings_1_5ghz_1gb(void);
 void set_dram_timings_1_5ghz_4gb(void);
+void set_dram_timings_2ghz_8gb(void);
 
 int spl_board_boot_device(enum boot_device boot_dev_spl)
 {
@@ -44,6 +45,7 @@ enum phytec_imx8mp_ddr_eeprom_code {
 	PHYTEC_IMX8MP_DDR_1GB = 2,
 	PHYTEC_IMX8MP_DDR_2GB = 3,
 	PHYTEC_IMX8MP_DDR_4GB = 5,
+	PHYTEC_IMX8MP_DDR_8GB = 7,
 	PHYTEC_IMX8MP_DDR_4GB_2GHZ = 8,
 };
 
@@ -69,6 +71,8 @@ void spl_dram_init(void)
 			size = PHYTEC_IMX8MP_DDR_2GB;
 		else if (IS_ENABLED(CONFIG_PHYCORE_IMX8MP_RAM_SIZE_4GB))
 			size = PHYTEC_IMX8MP_DDR_4GB;
+		else if (IS_ENABLED(CONFIG_PHYCORE_IMX8MP_RAM_SIZE_8GB))
+			size = PHYTEC_IMX8MP_DDR_8GB;
 		if (IS_ENABLED(CONFIG_PHYCORE_IMX8MP_USE_2GHZ_RAM_TIMINGS)) {
 			if (size == PHYTEC_IMX8MP_DDR_4GB)
 				size = PHYTEC_IMX8MP_DDR_4GB_2GHZ;
@@ -99,6 +103,9 @@ void spl_dram_init(void)
 		break;
 	case PHYTEC_IMX8MP_DDR_4GB_2GHZ:
 		set_dram_timings_2ghz_4gb();
+		break;
+	case PHYTEC_IMX8MP_DDR_8GB:
+		set_dram_timings_2ghz_8gb();
 		break;
 	default:
 		goto out;

@@ -1969,3 +1969,26 @@ void set_dram_timings_1_5ghz_4gb(void)
 	dram_timing.fsp_msg[3].fsp_cfg[10].val = 0x310;
 	dram_timing.fsp_msg[3].fsp_cfg[22].val = 0x3;
 }
+
+void set_dram_timings_2ghz_8gb(void)
+{
+	set_dram_timings_2ghz_2gb();
+	dram_timing.ddrc_cfg[2].val = 0xa3080020;
+	dram_timing.ddrc_cfg[5].val = 0x7a017c;
+	dram_timing.ddrc_cfg[23].val = 0x184;
+	dram_timing.ddrc_cfg[39].val = 0x18;
+	dram_timing.ddrc_cfg[46].val = 0xf07;
+	dram_timing.ddrc_cfg[62].val = 0xc0026;
+	dram_timing.ddrc_cfg[77].val = 0x27;
+	dram_timing.ddrc_cfg[87].val = 0x3000a;
+	dram_timing.ddrc_cfg[102].val = 0xa;
+
+	dram_timing.fsp_msg[0].fsp_cfg[9].val = 0x310;
+	dram_timing.fsp_msg[0].fsp_cfg[21].val = 0x3;
+	dram_timing.fsp_msg[1].fsp_cfg[10].val = 0x310;
+	dram_timing.fsp_msg[1].fsp_cfg[22].val = 0x3;
+	dram_timing.fsp_msg[2].fsp_cfg[10].val = 0x310;
+	dram_timing.fsp_msg[2].fsp_cfg[22].val = 0x3;
+	dram_timing.fsp_msg[3].fsp_cfg[10].val = 0x310;
+	dram_timing.fsp_msg[3].fsp_cfg[22].val = 0x3;
+}
