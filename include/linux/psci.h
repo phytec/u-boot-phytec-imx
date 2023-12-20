@@ -143,4 +143,6 @@ static inline unsigned long invoke_psci_fn(unsigned long a0, unsigned long a1,
 }
 #endif
 
+void do_smc_shutdown(void);
+
 #endif /* _UAPI_LINUX_PSCI_H */

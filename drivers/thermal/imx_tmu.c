@@ -19,6 +19,7 @@
 #include <linux/delay.h>
 #include <malloc.h>
 #include <thermal.h>
+#include <linux/psci.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -245,6 +246,14 @@ int imx_tmu_get_temp(struct udevice *dev, int *temp)
 		ret = read_temperature(dev, &cpu_tmp);
 		if (ret)
 			return ret;
+		if (is_imx8mm() || is_imx8mn() || is_imx8mp() || is_imx93()) {
+			if (cpu_tmp >= pdata->critical) {
+				dev_crit(dev, "CPU Temperature (%dC) reaches critical temperature.\n",
+						cpu_tmp / 1000);
+				dev_crit(dev, "Shutting down ...\n");
+				do_smc_shutdown();
+			}
+		}
 	}
 
 	*temp = cpu_tmp / 1000;
