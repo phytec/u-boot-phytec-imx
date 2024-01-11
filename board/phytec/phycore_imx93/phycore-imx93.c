@@ -31,8 +31,8 @@ int board_late_init(void)
 	case SD2_BOOT:
 		env_set_ulong("mmcdev", 1);
 		break;
-	case MMC3_BOOT:
-		env_set_ulong("mmcdev", 2);
+	case MMC1_BOOT:
+		env_set_ulong("mmcdev", 0);
 		break;
 	default:
 		break;
