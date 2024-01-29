@@ -24,6 +24,8 @@ DECLARE_GLOBAL_DATA_PTR;
 
 #define EEPROM_ADDR            0x50
 
+void set_dram_timings_2gb_lpddr4x(void);
+
 int spl_board_boot_device(enum boot_device boot_dev_spl)
 {
 	return BOOT_DEVICE_BOOTROM;
@@ -40,9 +42,20 @@ void spl_board_init(void)
 		printf("Fail to start RNG: %d\n", ret);
 }
 
+enum phytec_imx93_ddr_eeprom_code {
+	INVALID = PHYTEC_EEPROM_INVAL,
+	PHYTEC_IMX93_LPDDR4X_512MB = 0,
+	PHYTEC_IMX93_LPDDR4X_1GB = 1,
+	PHYTEC_IMX93_LPDDR4X_2GB = 2,
+	PHYTEC_IMX93_LPDDR4_512MB = 3,
+	PHYTEC_IMX93_LPDDR4_1GB = 4,
+	PHYTEC_IMX93_LPDDR4_2GB = 5,
+};
+
 void spl_dram_init(void)
 {
 	int ret;
+	enum phytec_imx93_ddr_eeprom_code ddr_opt = INVALID;
 
 	/* NOTE: In SPL lpi2c3 is mapped to bus 1 */
 	ret = phytec_eeprom_data_setup(NULL, 1, EEPROM_ADDR);
@@ -50,11 +63,24 @@ void spl_dram_init(void)
 		goto out;
 
 	ret = phytec_imx93_detect(NULL);
-	if (ret)
-		goto out;
+	if (!ret)
+		phytec_print_som_info(NULL);
 
-	phytec_print_som_info(NULL);
+	ddr_opt = phytec_imx93_get_opt(NULL, PHYTEC_IMX93_OPT_DDR);
+
+	switch(ddr_opt) {
+	case PHYTEC_IMX93_LPDDR4X_1GB:
+		break;
+	case PHYTEC_IMX93_LPDDR4X_2GB:
+		set_dram_timings_2gb_lpddr4x();
+		break;
+	default:
+		goto out;
+	}
+	ddr_init(&dram_timing);
+	return;
 out:
+	puts("Could not detect correct RAM type and size. Fall back to default.\n");
 	ddr_init(&dram_timing);
 }
 
