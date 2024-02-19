@@ -11,6 +11,7 @@
 #include <dm/uclass.h>
 #include <i2c.h>
 #include <u-boot/crc.h>
+#include <malloc.h>
 
 #include "phytec_som_detection.h"
 
@@ -200,4 +201,24 @@ u8 __maybe_unused phytec_get_rev(struct phytec_eeprom_data *data)
 	api2 = &data->data.data_api2;
 
 	return api2->pcb_rev;
+}
+
+struct extension *phytec_add_extension(const char *name, const char *overlay,
+				       const char *other)
+{
+	struct extension *extension;
+
+	if (strlen(overlay) > sizeof(extension->overlay)) {
+		pr_err("Overlay name %s is longer than %i.\n", overlay,
+		       (int)sizeof(extension->overlay));
+		return NULL;
+	}
+
+	extension = calloc(1, sizeof(struct extension));
+	snprintf(extension->name, sizeof(extension->name), name);
+	snprintf(extension->overlay, sizeof(extension->overlay), overlay);
+	snprintf(extension->other, sizeof(extension->other), other);
+	snprintf(extension->owner, sizeof(extension->owner), "PHYTEC");
+
+	return extension;
 }
