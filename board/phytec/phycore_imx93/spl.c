@@ -59,14 +59,21 @@ void spl_dram_init(void)
 
 	/* NOTE: In SPL lpi2c3 is mapped to bus 1 */
 	ret = phytec_eeprom_data_setup(NULL, 1, EEPROM_ADDR);
-	if (ret)
+	if (ret && !IS_ENABLED(CONFIG_PHYCORE_IMX93_RAM_TYPE_FIX))
 		goto out;
 
 	ret = phytec_imx93_detect(NULL);
 	if (!ret)
 		phytec_print_som_info(NULL);
 
-	ddr_opt = phytec_imx93_get_opt(NULL, PHYTEC_IMX93_OPT_DDR);
+	if (IS_ENABLED(CONFIG_PHYCORE_IMX93_RAM_TYPE_FIX)) {
+		if (IS_ENABLED(CONFIG_PHYCORE_IMX93_RAM_TYPE_LPDDR4X_1GB))
+			ddr_opt = PHYTEC_IMX93_LPDDR4X_1GB;
+		else if (IS_ENABLED(CONFIG_PHYCORE_IMX93_RAM_TYPE_LPDDR4X_2GB))
+			ddr_opt = PHYTEC_IMX93_LPDDR4X_2GB;
+	} else {
+		ddr_opt = phytec_imx93_get_opt(NULL, PHYTEC_IMX93_OPT_DDR);
+	}
 
 	switch(ddr_opt) {
 	case PHYTEC_IMX93_LPDDR4X_1GB:
