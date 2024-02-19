@@ -1000,6 +1000,48 @@ set_status:
 #endif
 #endif
 
+static int fixup_thermal_trips(void *blob, const char *name)
+{
+	int minc, maxc;
+	int node, trip;
+
+	node = fdt_path_offset(blob, "/thermal-zones");
+	if (node < 0)
+		return node;
+
+	node = fdt_subnode_offset(blob, node, name);
+	if (node < 0)
+		return node;
+
+	node = fdt_subnode_offset(blob, node, "trips");
+	if (node < 0)
+		return node;
+
+	get_cpu_temp_grade(&minc, &maxc);
+
+	fdt_for_each_subnode(trip, blob, node) {
+		const char *type;
+		int temp, ret;
+
+		type = fdt_getprop(blob, trip, "type", NULL);
+		if (!type)
+			continue;
+
+		temp = 0;
+		if (!strcmp(type, "critical"))
+			temp = 1000 * maxc;
+		else if (!strcmp(type, "passive"))
+			temp = 1000 * (maxc - 10);
+		if (temp) {
+			ret = fdt_setprop_u32(blob, trip, "temperature", temp);
+			if (ret)
+				return ret;
+		}
+	}
+
+	return 0;
+}
+
 int ft_system_setup(void *blob, struct bd_info *bd)
 {
 	if (is_imx9351() || is_imx9331() || is_imx9321() || is_imx9311() || is_imx9301())
@@ -1019,6 +1061,9 @@ int ft_system_setup(void *blob, struct bd_info *bd)
 		low_drive_freq_update(blob);
 		disable_lpm(blob);
 	}
+
+	if (fixup_thermal_trips(blob, "cpu-thermal"))
+		printf("Failed to update cpu-thermal trip(s)");
 
 	return ft_add_optee_node(blob, bd);
 }
