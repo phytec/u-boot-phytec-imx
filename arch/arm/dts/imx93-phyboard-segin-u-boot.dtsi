@@ -153,6 +153,19 @@
 	status = "okay";
 };
 
+&usbmisc1 {
+	u-boot,dm-spl;
+};
+
+&usbphynop1 {
+	u-boot,dm-spl;
+};
+
+&usbotg1 {
+	dr_mode = "peripheral";
+	u-boot,dm-spl;
+};
+
 &usdhc1 {
 	u-boot,dm-spl;
 };
