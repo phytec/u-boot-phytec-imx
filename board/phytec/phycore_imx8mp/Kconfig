@@ -64,14 +64,12 @@ choice
 config PHYCORE_IMX8MP_USE_2GHZ_RAM_TIMINGS
 	bool "Use 2GHz RAM timings"
 	depends on PHYCORE_IMX8MP_RAM_FREQ_FIX
-	default false
 	help
 	  Use 2GHz RAM timings instead of 1.5GHz timings.
 
 config PHYCORE_IMX8MP_USE_1_5GHZ_RAM_TIMINGS
         bool "Use 1.5GHz RAM timings"
         depends on PHYCORE_IMX8MP_RAM_FREQ_FIX
-        default false
         help
           Use 1.5GHz RAM timings instead of 2GHz timings.
 endchoice
