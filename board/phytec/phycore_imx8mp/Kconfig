@@ -49,17 +49,17 @@ config PHYCORE_IMX8MP_RAM_SIZE_8GB
 endchoice
 
 config PHYCORE_IMX8MP_RAM_FREQ_FIX
-        bool "Set phyCORE-i.MX8MP RAM frequency fix instead of detecting"
-        default false
-        help
-          RAM frequency is automatic being detected with the help of
-          the EEPROM introspection data. Set RAM frequency to a fix value
-          instead.
+	bool "Set phyCORE-i.MX8MP RAM frequency fix instead of detecting"
+	default false
+	help
+	  RAM frequency is automatic being detected with the help of
+	  the EEPROM introspection data. Set RAM frequency to a fix value
+	  instead.
 
 choice
-        prompt "phyCORE-i.MX8MP RAM frequency"
-        depends on PHYCORE_IMX8MP_RAM_FREQ_FIX
-        default PHYCORE_IMX8MP_USE_1_5GHZ_RAM_TIMINGS
+	prompt "phyCORE-i.MX8MP RAM frequency"
+	depends on PHYCORE_IMX8MP_RAM_FREQ_FIX
+	default PHYCORE_IMX8MP_USE_1_5GHZ_RAM_TIMINGS
 
 config PHYCORE_IMX8MP_USE_2GHZ_RAM_TIMINGS
 	bool "Use 2GHz RAM timings"
@@ -68,10 +68,10 @@ config PHYCORE_IMX8MP_USE_2GHZ_RAM_TIMINGS
 	  Use 2GHz RAM timings instead of 1.5GHz timings.
 
 config PHYCORE_IMX8MP_USE_1_5GHZ_RAM_TIMINGS
-        bool "Use 1.5GHz RAM timings"
-        depends on PHYCORE_IMX8MP_RAM_FREQ_FIX
-        help
-          Use 1.5GHz RAM timings instead of 2GHz timings.
+	bool "Use 1.5GHz RAM timings"
+	depends on PHYCORE_IMX8MP_RAM_FREQ_FIX
+	help
+	  Use 1.5GHz RAM timings instead of 2GHz timings.
 endchoice
 
 source "board/phytec/common/Kconfig"
