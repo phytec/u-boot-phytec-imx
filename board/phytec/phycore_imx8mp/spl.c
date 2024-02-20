@@ -90,8 +90,10 @@ void spl_dram_init(void)
 				use_2ghz_timings = false;
 		}
 	} else {
-		ret = phytec_get_rev(NULL);
-		if (ret >= 3 && ret != PHYTEC_EEPROM_INVAL)
+		u8 rev = phytec_get_rev(NULL);
+		u8 somtyp = phytec_get_som_type(NULL);
+
+		if (rev != PHYTEC_EEPROM_INVAL && (rev >= 3 || (somtyp == PCL && rev >= 1)))
 			use_2ghz_timings = true;
 	}
 
