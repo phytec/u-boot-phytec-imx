@@ -21,6 +21,13 @@ enum {
 	PHYTEC_API_REV2,
 };
 
+enum phytec_som_type_str {
+	PCM = 0,
+	PCL,
+	KSM,
+	KSP,
+};
+
 static const char * const phytec_som_type_str[] = {
 	"PCM",
 	"PCL",
@@ -74,6 +81,7 @@ void __maybe_unused phytec_print_som_info(struct phytec_eeprom_data *data);
 
 char * __maybe_unused phytec_get_opt(struct phytec_eeprom_data *data);
 u8 __maybe_unused phytec_get_rev(struct phytec_eeprom_data *data);
+u8 __maybe_unused phytec_get_som_type(struct phytec_eeprom_data *data);
 
 struct extension *phytec_add_extension(const char *name, const char *overlay,
 				       const char *other);
