@@ -9,5 +9,6 @@ F:     arch/arm/dts/imx93-phyboard-segin.dts
 F:     arch/arm/dts/imx93-phyboard-segin-u-boot.dtsi
 F:     board/phytec/phycore_imx93/
 F:     configs/imx93-phyboard-nash_defconfig
+F:     configs/imx93-phyboard-segin_defconfig
 F:     configs/phycore-imx93_defconfig
 F:     include/configs/phycore_imx93.h
