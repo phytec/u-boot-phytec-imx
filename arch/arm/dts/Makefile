@@ -1092,6 +1092,7 @@ dtb-$(CONFIG_ARCH_IMX9) += \
 	imx91p-11x11-evk.dtb \
 	imx91p-9x9-qsb-ontat-wvga-panel.dtb \
 	imx91p-9x9-qsb-spinand.dtb \
+	imx93-phyboard-nash.dtb \
 	imx93-phyboard-segin.dtb
 
 dtb-$(CONFIG_ARCH_IMXRT) += imxrt1050-evk.dtb \

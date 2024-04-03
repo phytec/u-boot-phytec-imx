@@ -1,0 +1,180 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright (C) 2024 PHYTEC Messtechnik GmbH
+ * Author: Christoph Stoidner <c.stoidner@phytec.de>
+ */
+
+/ {
+	aliases {
+		usbgadget0 = &usbg1;
+	};
+
+	firmware {
+		optee {
+			compatible = "linaro,optee-tz";
+			method = "smc";
+		};
+	};
+
+	usbg1: usbg1 {
+		compatible = "fsl,imx27-usb-gadget";
+		dr_mode = "peripheral";
+		chipidea,usb = <&usbotg1>;
+		status = "okay";
+	};
+
+	wdt-reboot {
+		compatible = "wdt-reboot";
+		wdt = <&wdog3>;
+		u-boot,dm-spl;
+	};
+};
+
+&{/soc@0} {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&{/soc@0/bus@42000000/i2c@42530000/pmic@25} {
+	u-boot,dm-spl;
+};
+
+&{/soc@0/bus@42000000/i2c@42530000/pmic@25/regulators} {
+	u-boot,dm-spl;
+};
+
+&aips1 {
+	u-boot,dm-spl;
+	u-boot,dm-pre-reloc;
+};
+
+&aips2 {
+	u-boot,dm-spl;
+};
+
+&aips3 {
+	u-boot,dm-spl;
+};
+
+&clk {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+	/delete-property/ assigned-clocks;
+	/delete-property/ assigned-clock-rates;
+	/delete-property/ assigned-clock-parents;
+};
+
+&clk_ext1 {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&eqos {
+	status = "disabled";
+};
+
+&gpio1 {
+	u-boot,dm-spl;
+};
+
+&gpio2 {
+	u-boot,dm-spl;
+};
+
+&gpio3 {
+	u-boot,dm-spl;
+};
+
+&gpio4 {
+	u-boot,dm-spl;
+};
+
+&iomuxc {
+	u-boot,dm-spl;
+};
+
+&lpi2c1 {
+	u-boot,dm-spl;
+};
+
+&lpi2c2 {
+	u-boot,dm-spl;
+};
+
+&lpi2c3 {
+	u-boot,dm-spl;
+};
+
+&lpuart1 {
+	u-boot,dm-spl;
+};
+
+&osc_24m {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&osc_32k {
+	u-boot,dm-pre-reloc;
+	u-boot,dm-spl;
+};
+
+&pinctrl_reg_usdhc2_vmmc {
+	u-boot,dm-spl;
+};
+
+&pinctrl_lpi2c3 {
+	u-boot,dm-spl;
+};
+
+&pinctrl_uart1 {
+	u-boot,dm-spl;
+};
+
+&pinctrl_usdhc1 {
+	u-boot,dm-spl;
+};
+
+&pinctrl_usdhc2_cd {
+	u-boot,dm-spl;
+};
+
+&pinctrl_usdhc2_default {
+	u-boot,dm-spl;
+};
+
+&reg_usdhc2_vmmc {
+	u-boot,off-on-delay-us = <20000>;
+	u-boot,dm-spl;
+};
+
+&s4muap {
+	u-boot,dm-spl;
+	status = "okay";
+};
+
+&usbmisc1 {
+	u-boot,dm-spl;
+};
+
+&usbphynop1 {
+	u-boot,dm-spl;
+};
+
+&usbotg1 {
+	dr_mode = "peripheral";
+	u-boot,dm-spl;
+};
+
+&usdhc1 {
+	u-boot,dm-spl;
+};
+
+&usdhc2 {
+	u-boot,dm-spl;
+	fsl,signal-voltage-switch-extra-delay-ms = <8>;
+};
+
+&wdog3 {
+	u-boot,dm-spl;
+};

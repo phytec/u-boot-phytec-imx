@@ -3,8 +3,11 @@ M:     Christoph Stoidner <c.stoidner@phytec.de>
 W:     https://www.phytec.eu/en/produkte/system-on-modules/phycore-imx-91-93/
 S:     Maintained
 F:     arch/arm/dts/imx93-phycore-som.dtsi
+F:     arch/arm/dts/imx93-phyboard-nash.dts
+F:     arch/arm/dts/imx93-phyboard-nash-u-boot.dtsi
 F:     arch/arm/dts/imx93-phyboard-segin.dts
 F:     arch/arm/dts/imx93-phyboard-segin-u-boot.dtsi
 F:     board/phytec/phycore_imx93/
+F:     configs/imx93-phyboard-nash_defconfig
 F:     configs/phycore-imx93_defconfig
 F:     include/configs/phycore_imx93.h
