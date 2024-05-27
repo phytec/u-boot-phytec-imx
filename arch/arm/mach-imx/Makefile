@@ -272,8 +272,19 @@ append = cat $(filter-out $< $(PHONY), $^) >> $@
 quiet_cmd_pad_cat = CAT     $@
 cmd_pad_cat = $(cmd_objcopy) && $(append) || rm -f $@
 
-u-boot-with-spl.imx: SPL $(if $(CONFIG_OF_SEPARATE),u-boot.img,u-boot.uim) FORCE
+u-boot-with-spl.imx: SPL $(if $(CONFIG_OF_SEPARATE),u-boot.img,u-boot.uim) $(if $(CONFIG_QSPI_BOOT),$(QSPI_HEADER),) FORCE
 	$(call if_changed,pad_cat)
+ifeq ($(CONFIG_QSPI_BOOT),y)
+	@awk '{s="0000000"$$1;l=length(s);if(!((NR-1)%4))printf "%08x ",(NR-1)*4; \
+		for(i=1;i<8;i+=2)printf " %s",substr(s,l-i,2);if(!(NR%4))printf "\n";}' \
+		$(QSPI_HEADER) > qspi.tmp
+	@xxd -r qspi.tmp qspi.bin
+	@dd if=$@ of=u-boot.tmp bs=1k seek=$(QSPI_UBOOT_OFF)
+	@dd if=qspi.bin of=u-boot.tmp bs=1k seek=$(QSPI_HEADER_OFF) conv=notrunc
+	@mv u-boot.tmp $@
+	@rm qspi.tmp qspi.bin
+	@echo "Packed QSPI header with $@"
+endif
 
 u-boot-with-nand-spl.imx: spl/u-boot-nand-spl.imx $(if $(CONFIG_OF_SEPARATE),u-boot.img,u-boot.uim) FORCE
 	$(call if_changed,pad_cat)
