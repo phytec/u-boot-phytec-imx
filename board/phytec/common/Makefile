@@ -9,3 +9,4 @@ endif
 
 obj-y += phytec_som_detection.o
 obj-$(CONFIG_ARCH_IMX8M) += imx8m_som_detection.o
+obj-$(CONFIG_PHYTEC_IMX8M_SOM_DETECTION) += imx8m_som_detection.o
