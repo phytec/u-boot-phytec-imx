@@ -1,0 +1,17 @@
+if TARGET_PHYCORE_IMX8X
+
+config SYS_BOARD
+	default "phycore_imx8x"
+
+config SYS_VENDOR
+	default "phytec"
+
+config SYS_CONFIG_NAME
+	default "phycore_imx8x"
+
+config IMX_CONFIG
+	default "board/phytec/phycore_imx8x/imximage.cfg"
+
+source "board/phytec/common/Kconfig"
+
+endif
