@@ -71,7 +71,11 @@
 };
 
 &usb_dwc3_0 {
-	dr_mode = "peripheral";
+	compatible = "fsl,imx8mq-dwc3", "snps,dwc3";
+};
+
+&usb_dwc3_1 {
+	compatible = "fsl,imx8mq-dwc3", "snps,dwc3";
 };
 
 &usdhc2 {
