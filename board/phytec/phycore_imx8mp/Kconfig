@@ -36,6 +36,13 @@ config PHYCORE_IMX8MP_RAM_SIZE_4GB
 	bool "4GB RAM"
 	help
 	  Set RAM size fix to 4GB for phyCORE-i.MX8MP.
+
+config PHYCORE_IMX8MP_RAM_SIZE_4GB_2GHZ
+	bool "4GB RAM with 2GHz timings"
+	help
+	  Set RAM size fix to 4GB for phyCORE-i.MX8MP. Use 2GHz timings. Only
+	  use this if you have PCM-070-0F8433I.A0 or 4GiB RAM with 1549.3 SoM
+	  revision.
 endchoice
 
 source "board/phytec/common/Kconfig"
