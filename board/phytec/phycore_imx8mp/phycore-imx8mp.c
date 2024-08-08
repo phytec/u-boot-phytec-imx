@@ -5,6 +5,7 @@
  */
 
 #include <common.h>
+#include <efi_loader.h>
 #include <asm/arch/clock.h>
 #include <asm/arch/sys_proto.h>
 #include <asm/global_data.h>
@@ -24,6 +25,28 @@ DECLARE_GLOBAL_DATA_PTR;
 
 #define EEPROM_ADDR	     0x51
 #define EEPROM_ADDR_FALLBACK    0x59
+
+#if CONFIG_IS_ENABLED(EFI_HAVE_CAPSULE_SUPPORT)
+
+#define IMX_BOOT_IMAGE_GUID \
+	EFI_GUID(0x928b33bc, 0xe58b, 0x4247, 0x9f, 0x1d, \
+		 0x3b, 0xf1, 0xee, 0x1c, 0xda, 0xff)
+
+struct efi_fw_image fw_images[] = {
+	{
+		.image_type_id = IMX_BOOT_IMAGE_GUID,
+		.fw_name = u"IMX8MP-PHYBOARD-POLLUX-3-RAW",
+		.image_index = 1,
+	},
+};
+
+struct efi_capsule_update_info update_info = {
+	.dfu_string = "mmc 2=u-boot raw 0x40 0x2000",
+	.num_images = ARRAY_SIZE(fw_images),
+	.images = fw_images,
+};
+
+#endif /* EFI_HAVE_CAPSULE_SUPPORT */
 
 static struct dwc3_device dwc3_device_data = {
 #ifdef CONFIG_SPL_BUILD
