@@ -16,6 +16,7 @@
 #include <miiphy.h>
 #include <usb.h>
 #include <stdlib.h>
+#include <extension_board.h>
 
 #include "../common/imx8m_som_detection.h"
 
@@ -111,6 +112,40 @@ void phytec_set_fit_extensions(void)
 
 	env_set("fit_extensions", fit_extensions);
 }
+
+#if (IS_ENABLED(CONFIG_CMD_EXTENSION))
+int extension_board_scan(struct list_head *extension_list)
+{
+	struct extension *extension = NULL;
+	int cnt = 0;
+
+	if (!phytec_get_imx8m_eth(NULL)) {
+		extension = phytec_add_extension("phyCORE-i.MX8MP no eth phy",
+						 "imx8mp-phycore-no-eth.dtbo",
+						 "eth phy not populated on SoM");
+		list_add_tail(&extension->list, extension_list);
+		cnt++;
+	}
+
+	if (!phytec_get_imx8m_spi(NULL)) {
+		extension = phytec_add_extension("phyCORE-i.MX8MP no SPI flash",
+						 "imx8mp-phycore-no-spiflash.dtbo",
+						 "SPI flash not populated on SoM");
+		list_add_tail(&extension->list, extension_list);
+		cnt++;
+	}
+
+	if (!phytec_get_imx8mp_rtc(NULL)) {
+		extension = phytec_add_extension("phyCORE-i.MX8MP no RTC",
+						 "imx8mp-phycore-no-rtc.dtbo",
+						 "RTC not populated on SoM");
+		list_add_tail(&extension->list, extension_list);
+		cnt++;
+	}
+
+	return cnt;
+}
+#endif
 
 int board_late_init(void)
 {
