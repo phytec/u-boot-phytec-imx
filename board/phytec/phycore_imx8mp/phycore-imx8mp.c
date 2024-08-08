@@ -15,8 +15,14 @@
 #include <init.h>
 #include <miiphy.h>
 #include <usb.h>
+#include <stdlib.h>
+
+#include "../common/imx8m_som_detection.h"
 
 DECLARE_GLOBAL_DATA_PTR;
+
+#define EEPROM_ADDR	     0x51
+#define EEPROM_ADDR_FALLBACK    0x59
 
 static struct dwc3_device dwc3_device_data = {
 #ifdef CONFIG_SPL_BUILD
@@ -68,6 +74,11 @@ static int setup_fec(void)
 
 int board_init(void)
 {
+	int ret = phytec_eeprom_data_setup_fallback(NULL, 0,
+			EEPROM_ADDR, EEPROM_ADDR_FALLBACK);
+	if (ret)
+		printf("%s: EEPROM data init failed\n", __func__);
+
 	setup_fec();
 
 	init_usb_clk();
@@ -83,6 +94,22 @@ int board_mmc_get_env_dev(int devno)
 int mmc_map_to_kernel_blk(int dev_no)
 {
 	return dev_no;
+}
+
+void phytec_set_fit_extensions(void)
+{
+	char fit_extensions[128] = {};
+
+	if (!phytec_get_imx8m_eth(NULL))
+		sprintf(fit_extensions, "%s%s", fit_extensions, "#conf-imx8mp-phycore-no-eth.dtbo");
+
+	if (!phytec_get_imx8m_spi(NULL))
+		sprintf(fit_extensions, "%s%s", fit_extensions, "#conf-imx8mp-phycore-no-spiflash.dtbo");
+
+	if (!phytec_get_imx8mp_rtc(NULL))
+		sprintf(fit_extensions, "%s%s", fit_extensions, "#conf-imx8mp-phycore-no-rtc.dtbo");
+
+	env_set("fit_extensions", fit_extensions);
 }
 
 int board_late_init(void)
@@ -101,6 +128,7 @@ int board_late_init(void)
 	default:
 		break;
 	}
+	phytec_set_fit_extensions();
 
 	return 0;
 }
