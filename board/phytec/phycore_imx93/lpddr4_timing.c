@@ -1996,3 +1996,70 @@ struct dram_timing_info dram_timing = {
 	.fsp_cfg = ddr_dram_fsp_cfg,
 	.fsp_cfg_num = ARRAY_SIZE(ddr_dram_fsp_cfg),
 };
+
+void set_dram_timings_2gb_lpddr4x(void)
+{
+	/* Initialize DDRC registers */
+	dram_timing.ddrc_cfg[1].val = 0x8000ff;
+	dram_timing.ddrc_cfg[3].val = 0x80000512;
+
+	/* dram fsp cfg */
+	dram_timing.fsp_cfg[0].ddrc_cfg[0].val = 0x24AB321B;
+	dram_timing.fsp_cfg[0].ddrc_cfg[2].val = 0x2F2EE233;
+	dram_timing.fsp_cfg[0].ddrc_cfg[9].val = 0x015B015B;
+	dram_timing.fsp_cfg[0].ddrc_cfg[13].val = 0x015B2213;
+	dram_timing.fsp_cfg[0].mr_cfg[4].val = 0x20;
+	dram_timing.fsp_cfg[0].mr_cfg[5].val = 0x13;
+
+	dram_timing.fsp_cfg[1].ddrc_cfg[0].val = 0x12552100;
+	dram_timing.fsp_cfg[1].ddrc_cfg[2].val = 0x1816B4AA;
+	dram_timing.fsp_cfg[1].ddrc_cfg[9].val = 0x00AA00AA;
+	dram_timing.fsp_cfg[1].mr_cfg[4].val = 0x20;
+	dram_timing.fsp_cfg[1].mr_cfg[5].val = 0x13;
+
+	dram_timing.fsp_cfg[2].ddrc_cfg[0].val = 0x00061000;
+	dram_timing.fsp_cfg[2].ddrc_cfg[2].val = 0x6E62FA48;
+	dram_timing.fsp_cfg[2].ddrc_cfg[9].val = 0x00340034;
+	dram_timing.fsp_cfg[2].mr_cfg[4].val = 0x20;
+	dram_timing.fsp_cfg[2].mr_cfg[5].val = 0x13;
+
+	/* P0 message block parameter for training firmware */
+	dram_timing.fsp_msg[0].fsp_cfg[12].val = 0x2044;
+	dram_timing.fsp_msg[0].fsp_cfg[13].val = 0x1308;
+	dram_timing.fsp_msg[0].fsp_cfg[17].val = 0x2044;
+	dram_timing.fsp_msg[0].fsp_cfg[18].val = 0x1308;
+	dram_timing.fsp_msg[0].fsp_cfg[23].val = 0x820;
+	dram_timing.fsp_msg[0].fsp_cfg[24].val = 0x13;
+	dram_timing.fsp_msg[0].fsp_cfg[29].val = 0x820;
+	dram_timing.fsp_msg[0].fsp_cfg[30].val = 0x13;
+
+	/* P1 message block parameter for training firmware */
+	dram_timing.fsp_msg[1].fsp_cfg[13].val = 0x2044;
+	dram_timing.fsp_msg[1].fsp_cfg[14].val = 0x1308;
+	dram_timing.fsp_msg[1].fsp_cfg[18].val = 0x2044;
+	dram_timing.fsp_msg[1].fsp_cfg[19].val = 0x1308;
+	dram_timing.fsp_msg[1].fsp_cfg[24].val = 0x820;
+	dram_timing.fsp_msg[1].fsp_cfg[25].val = 0x13;
+	dram_timing.fsp_msg[1].fsp_cfg[30].val = 0x820;
+	dram_timing.fsp_msg[1].fsp_cfg[31].val = 0x13;
+
+	/* P2 message block parameter for training firmware */
+	dram_timing.fsp_msg[2].fsp_cfg[13].val = 0x2044;
+	dram_timing.fsp_msg[2].fsp_cfg[14].val = 0x1300;
+	dram_timing.fsp_msg[2].fsp_cfg[18].val = 0x2044;
+	dram_timing.fsp_msg[2].fsp_cfg[19].val = 0x1300;
+	dram_timing.fsp_msg[2].fsp_cfg[24].val = 0x20;
+	dram_timing.fsp_msg[2].fsp_cfg[25].val = 0x13;
+	dram_timing.fsp_msg[2].fsp_cfg[30].val = 0x20;
+	dram_timing.fsp_msg[2].fsp_cfg[31].val = 0x13;
+
+	/* P0 2D message block parameter for training firmware */
+	dram_timing.fsp_msg[3].fsp_cfg[13].val = 0x2044;
+	dram_timing.fsp_msg[3].fsp_cfg[14].val = 0x1308;
+	dram_timing.fsp_msg[3].fsp_cfg[18].val = 0x2044;
+	dram_timing.fsp_msg[3].fsp_cfg[19].val = 0x1308;
+	dram_timing.fsp_msg[3].fsp_cfg[24].val = 0x820;
+	dram_timing.fsp_msg[3].fsp_cfg[25].val = 0x13;
+	dram_timing.fsp_msg[3].fsp_cfg[30].val = 0x820;
+	dram_timing.fsp_msg[3].fsp_cfg[31].val = 0x13;
+}
