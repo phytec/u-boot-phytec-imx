@@ -20,7 +20,11 @@
 #include <power/pca9450.h>
 #include <spl.h>
 
+#include "../common/imx93_som_detection.h"
+
 DECLARE_GLOBAL_DATA_PTR;
+
+#define EEPROM_ADDR            0x50
 
 int spl_board_boot_device(enum boot_device boot_dev_spl)
 {
@@ -40,6 +44,19 @@ void spl_board_init(void)
 
 void spl_dram_init(void)
 {
+	int ret;
+
+	/* NOTE: In SPL lpi2c3 is mapped to bus 1 */
+	ret = phytec_eeprom_data_setup(NULL, 1, EEPROM_ADDR);
+	if (ret)
+		goto out;
+
+	ret = phytec_imx93_detect(NULL);
+	if (ret)
+		goto out;
+
+	phytec_print_som_info(NULL);
+out:
 	ddr_init(&dram_timing);
 }
 

@@ -10,4 +10,5 @@ config SYS_VENDOR
 config SYS_CONFIG_NAME
 	default "phycore_imx93"
 
+source "board/phytec/common/Kconfig"
 endif
