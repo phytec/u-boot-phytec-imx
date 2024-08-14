@@ -1198,6 +1198,7 @@ dtb-$(CONFIG_ARCH_IMX9) += \
 	imx93-9x9-qsb.dtb \
 	imx93-9x9-qsb-tianma-wvga-panel.dtb \
 	imx93-var-som-symphony.dtb \
+	imx93-phyboard-nash.dtb \
 	imx93-phyboard-segin.dtb
 
 dtb-$(CONFIG_ARCH_IMXRT) += imxrt1050-evk.dtb \
