@@ -609,7 +609,7 @@ static int fixup_thermal_trips(void *blob, const char *name)
 
 		temp = 0;
 		if (!strcmp(type, "critical"))
-			temp = 1000 * maxc;
+			temp = 1000 * (maxc - 5);
 		else if (!strcmp(type, "passive"))
 			temp = 1000 * (maxc - 10);
 		if (temp) {
