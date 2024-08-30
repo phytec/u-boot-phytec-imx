@@ -76,6 +76,17 @@ err:
 	printf("Could not detect eMMC VDD-IO. Fall back to default.\n");
 }
 
+static void usdhc_clk_fixup(void *blob, u32 reg, unsigned long freq)
+{
+	int offset = fdt_node_offset_by_compat_reg(blob, "fsl,imx93-usdhc", reg);
+
+	if (offset) {
+		offset = fdt_setprop_cell(blob, offset, "assigned-clock-rates", freq);
+		if (offset > 0)
+			printf("%s error for 0x%08x: %s\n", __func__, reg, fdt_strerror(offset));
+	}
+}
+
 int board_fix_fdt(void *blob)
 {
 	struct phytec_eeprom_data data;
@@ -84,12 +95,23 @@ int board_fix_fdt(void *blob)
 
 	emmc_fixup(blob, &data);
 
+	if (is_voltage_mode(VOLT_LOW_DRIVE)) {
+		usdhc_clk_fixup(blob, 0x42850000, 266666667);
+		usdhc_clk_fixup(blob, 0x42860000, 266666667);
+		usdhc_clk_fixup(blob, 0x428b0000, 266666667);
+	}
+
 	return 0;
 }
 
 int ft_board_setup(void *blob, struct bd_info *bd)
 {
 	emmc_fixup(blob, NULL);
+
+	/**
+	 * NOTE: VOLT_LOW_DRIVE fixup is already done by the ft_system_setup()
+	 * in arch/arm/mach-imx/imx9/native/soc.c (see low_drive_freq_update())
+	 */
 
 	return 0;
 }
