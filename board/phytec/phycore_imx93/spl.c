@@ -27,6 +27,7 @@ DECLARE_GLOBAL_DATA_PTR;
 #define EEPROM_ADDR            0x50
 
 void set_dram_timings_2gb_lpddr4x(void);
+void set_dram_timings_1gb_lpddr4x_900mhz(void);
 
 int spl_board_boot_device(enum boot_device boot_dev_spl)
 {
@@ -79,6 +80,8 @@ void spl_dram_init(void)
 
 	switch(ddr_opt) {
 	case PHYTEC_IMX93_LPDDR4X_1GB:
+		if (is_voltage_mode(VOLT_LOW_DRIVE))
+			set_dram_timings_1gb_lpddr4x_900mhz();
 		break;
 	case PHYTEC_IMX93_LPDDR4X_2GB:
 		set_dram_timings_2gb_lpddr4x();
@@ -90,6 +93,8 @@ void spl_dram_init(void)
 	return;
 out:
 	puts("Could not detect correct RAM type and size. Fall back to default.\n");
+	if (is_voltage_mode(VOLT_LOW_DRIVE))
+		set_dram_timings_1gb_lpddr4x_900mhz();
 	ddr_init(&dram_timing);
 }
 
