@@ -65,6 +65,8 @@ config TARGET_PHYCORE_IMX93
 	select IMX93
 	select IMX9_LPDDR4X
 	select SUPPORT_EXTENSION_SCAN
+	select OF_BOARD_FIXUP
+	select OF_BOARD_SETUP
 
 config TARGET_IMX93_9X9_QSB
 	bool "imx93_9x9_qsb"
