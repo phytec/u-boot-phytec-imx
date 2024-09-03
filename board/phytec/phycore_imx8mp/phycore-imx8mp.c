@@ -14,7 +14,10 @@
 #include <dwc3-uboot.h>
 #include <env.h>
 #include <init.h>
+#include <fdt_support.h>
+#include <jffs2/load_kernel.h>
 #include <miiphy.h>
+#include <mtd_node.h>
 #include <usb.h>
 #include <stdlib.h>
 #include <extension_board.h>
@@ -23,8 +26,8 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
-#define EEPROM_ADDR	     0x51
-#define EEPROM_ADDR_FALLBACK    0x59
+#define EEPROM_ADDR		0x51
+#define EEPROM_ADDR_FALLBACK	0x59
 
 #if CONFIG_IS_ENABLED(EFI_HAVE_CAPSULE_SUPPORT)
 
@@ -82,6 +85,22 @@ int board_usb_cleanup(int index, enum usb_init_type init)
 int dm_usb_gadget_handle_interrupts(struct udevice *dev)
 {
 	dwc3_uboot_handle_interrupt(dev);
+	return 0;
+}
+
+int ft_board_setup(void *blob, struct bd_info *bd)
+{
+	u8 spi = phytec_get_imx8m_spi(NULL);
+	/* Do nothing if no SPI is populated */
+	if (!spi)
+		return 0;
+
+	static const struct node_info nodes[] = {
+		{ "jedec,spi-nor", MTD_DEV_TYPE_NOR, },
+	};
+
+	fdt_fixup_mtdparts(blob, nodes, ARRAY_SIZE(nodes));
+
 	return 0;
 }
 
@@ -172,6 +191,11 @@ int extension_board_scan(struct list_head *extension_list)
 
 int board_late_init(void)
 {
+	u8 spi = phytec_get_imx8m_spi(NULL);
+
+	if (spi != 0 && spi != PHYTEC_EEPROM_INVAL)
+		env_set("spiprobe", "sf probe");
+
 	switch (get_boot_device()) {
 	case SD2_BOOT:
 		env_set_ulong("mmcdev", 1);
