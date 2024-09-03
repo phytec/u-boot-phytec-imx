@@ -13,6 +13,7 @@
 #include <asm/mach-imx/boot_mode.h>
 #include <env.h>
 #include <extension_board.h>
+#include <fdt_support.h>
 #include <phy.h>
 
 #include "../common/imx93_som_detection.h"
@@ -48,6 +49,47 @@ int board_late_init(void)
 	default:
 		break;
 	}
+
+	return 0;
+}
+
+static void emmc_fixup(void *blob, struct phytec_eeprom_data *data)
+{
+	u8 option = phytec_imx93_get_opt(data, PHYTEC_IMX93_OPT_FEAT);
+	int offset;
+
+	if (option == PHYTEC_EEPROM_INVAL)
+		goto err;
+
+	/* Check "IO Voltage 1v8" flag is set */
+	if (option & 0x01) {
+		offset = fdt_node_offset_by_compat_reg(blob, "fsl,imx93-usdhc",
+						       0x42850000);
+		if (offset)
+			fdt_delprop(blob, offset, "no-1-8-v");
+		else
+			goto err;
+	}
+
+	return;
+err:
+	printf("Could not detect eMMC VDD-IO. Fall back to default.\n");
+}
+
+int board_fix_fdt(void *blob)
+{
+	struct phytec_eeprom_data data;
+
+	phytec_eeprom_data_setup(&data, 2, EEPROM_ADDR);
+
+	emmc_fixup(blob, &data);
+
+	return 0;
+}
+
+int ft_board_setup(void *blob, struct bd_info *bd)
+{
+	emmc_fixup(blob, NULL);
 
 	return 0;
 }
