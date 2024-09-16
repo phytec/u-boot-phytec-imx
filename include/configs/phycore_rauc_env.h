@@ -40,7 +40,7 @@
 	"raucrootpart0=5\0" \
 	"raucbootpart1=2\0" \
 	"raucrootpart1=6\0" \
-	"raucargs=setenv bootargs console=${console} " \
+	"raucargs=setenv bootargs ${mcore_clk} console=${console} " \
 		"root=/dev/mmcblk${raucdev}p${raucrootpart} " \
 		"rauc.slot=${raucslot} rootwait rw\0" \
 	"loadraucimage=fatload mmc ${raucdev}:${raucbootpart} ${loadaddr} ${image}\0" \
