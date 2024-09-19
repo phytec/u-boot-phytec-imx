@@ -15,7 +15,7 @@
 
 #ifdef CONFIG_ENV_WRITEABLE_LIST
 /* Set environment flag validation to a list of env vars that must be writable */
-#define CFG_ENV_FLAGS_LIST_STATIC "BOOT_ORDER:sw,BOOT_system0_LEFT:dw,BOOT_system1_LEFT:dw"
+#define CFG_ENV_FLAGS_LIST_STATIC "BOOT_ORDER:sw,BOOT_system0_LEFT:dw,BOOT_system1_LEFT:dw,optargs:sw"
 #endif
 /* Link Definitions */
 
