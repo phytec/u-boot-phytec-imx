@@ -34,14 +34,6 @@ int spl_board_boot_device(enum boot_device boot_dev_spl)
 	return BOOT_DEVICE_BOOTROM;
 }
 
-enum phytec_imx8mp_ddr_eeprom_code {
-	PHYTEC_IMX8MP_DDR_1GB = 2,
-	PHYTEC_IMX8MP_DDR_2GB = 3,
-	PHYTEC_IMX8MP_DDR_4GB = 5,
-	PHYTEC_IMX8MP_DDR_8GB = 7,
-	PHYTEC_IMX8MP_DDR_4GB_2GHZ = 8,
-};
-
 void spl_dram_init(void)
 {
 	int ret;
