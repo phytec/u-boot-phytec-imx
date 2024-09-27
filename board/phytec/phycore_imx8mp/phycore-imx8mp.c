@@ -90,16 +90,51 @@ int dm_usb_gadget_handle_interrupts(struct udevice *dev)
 
 int ft_board_setup(void *blob, struct bd_info *bd)
 {
-	u8 spi = phytec_get_imx8m_spi(NULL);
-	/* Do nothing if no SPI is populated */
-	if (!spi)
-		return 0;
+	enum phytec_imx8mp_ddr_eeprom_code size;
 
-	static const struct node_info nodes[] = {
-		{ "jedec,spi-nor", MTD_DEV_TYPE_NOR, },
+	u8 spi = phytec_get_imx8m_spi(NULL);
+	/* Add partitions when SPI flash is available */
+	if (spi) {
+		static const struct node_info nodes[] = {
+			{ "jedec,spi-nor", MTD_DEV_TYPE_NOR, },
+		};
+
+		fdt_fixup_mtdparts(blob, nodes, ARRAY_SIZE(nodes));
 	};
 
-	fdt_fixup_mtdparts(blob, nodes, ARRAY_SIZE(nodes));
+	size = phytec_get_imx8m_ddr_size(NULL);
+	if (size == PHYTEC_IMX8MP_DDR_1GB) {
+		u32 *prop;
+		u32 phandle;
+		int prop_offset;
+		int node_offset;
+
+		prop_offset = fdt_node_offset_by_compatible(blob, -1, "fsl,imx8mp-gpu");
+		if (prop_offset < 0) {
+			printf("%s: Could not find \"fsl,imx8mp-gpu\" node in oftree\n", __func__);
+			return 0;
+		}
+
+		prop = (uint32_t *)fdt_getprop(blob, prop_offset, "memory-region", NULL);
+		if (prop < 0) {
+			printf("%s: Could not find \"memory-region\" property in GPU node\n",
+			       __func__);
+			return 0;
+		}
+
+		/* Look up in memory-region referenced reserved gpu mem node */
+		phandle = fdt32_to_cpu(*prop);
+		node_offset = fdt_node_offset_by_phandle(blob, phandle);
+		if (node_offset < 0) {
+			printf("%s: Could not find referenced node in \"memory-region\" property",
+			       __func__);
+			return 0;
+		}
+
+		/* Delete memory-region property and reserved gpu mem node */
+		fdt_del_node(blob, node_offset);
+		fdt_delprop(blob, prop_offset, "memory-region");
+	}
 
 	return 0;
 }
