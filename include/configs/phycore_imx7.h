@@ -6,6 +6,7 @@
 
 #include "mx7_common.h"
 #include "imx7_spl.h"
+#include "phycore_rauc_env.h"
 
 #define CONFIG_MXC_UART_BASE		UART1_IPS_BASE_ADDR
 
@@ -45,6 +46,10 @@
 /* Set to TCML address */
 #define CONFIG_SYS_AUXCORE_BOOTDATA	0x7F8000
 #endif
+
+/* Set Redundant ENV for RAUC */
+#define CONFIG_ENV_OFFSET_REDUND 0x100000
+#define CONFIG_SYS_REDUNDAND_ENVIRONMENT
 
 #ifdef CONFIG_IMX_BOOTAUX
 #define UPDATE_M4_ENV \
@@ -207,14 +212,32 @@
 			"bootz ${loadaddr} - ${fdt_addr}; " \
 		"else " \
 			"echo WARN: Cannot load the DT; " \
-		"fi;\0"
+		"fi;\0" \
+	"raucdev=2\0" \
+	PHYCORE_RAUC_ENV_BOOTLOGIC \
+	"raucemmcboot=echo Booting A/B system from eMMC...; " \
+		"if run loadrauc_bootenv; then " \
+			"env import -t ${bootenv_addr} ${filesize}; " \
+		"fi; " \
+		"if run loadraucimage; then " \
+			"run raucargs; " \
+			"run fit_test_and_run_boot; " \
+			"if run loadraucfdt; then " \
+				"run rauc_apply_overlays; " \
+				"bootz ${loadaddr} - ${fdt_addr};" \
+			"else " \
+				"echo WARN: Cannot load device tree; " \
+			"fi; " \
+		"else " \
+			"echo WARN: Cannot load kernel image; " \
+		"fi;\0" \
 
 #ifdef CONFIG_NAND_BOOT
 #define CONFIG_BOOTCOMMAND \
 	"run nandboot"
 #else
 #define CONFIG_BOOTCOMMAND \
-	"run mmcboot"
+	"mmc dev ${mmcdev}; if mmc rescan; then env exists doraucboot || setenv doraucboot 0; if test ${doraucboot} = 1; then run raucboot; else run mmcboot;fi;fi;"
 #endif
 
 #define CONFIG_SYS_HZ			1000
