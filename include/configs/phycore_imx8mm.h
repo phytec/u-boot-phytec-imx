@@ -31,4 +31,9 @@
 #define PHYS_SDRAM			0x40000000
 #define PHYS_SDRAM_SIZE                 SZ_2G /* 2GB DDR */
 
+/* USB configs */
+#define CONFIG_MXC_USB_PORTSC		(PORT_PTS_UTMI | PORT_PTS_PTW)
+#define CONFIG_USB_MAX_CONTROLLER_COUNT	2
+#define CONFIG_SERIAL_TAG
+
 #endif /* __PHYCORE_IMX8MM_H */
