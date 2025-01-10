@@ -13,6 +13,10 @@
 	};
 };
 
+&pinctrl_i2c1 {
+	bootph-pre-ram;
+};
+
 &pinctrl_uart3 {
 	bootph-pre-ram;
 };
@@ -58,6 +62,10 @@
 };
 
 &usdhc2 {
+	bootph-pre-ram;
+};
+
+&i2c1 {
 	bootph-pre-ram;
 };
 
