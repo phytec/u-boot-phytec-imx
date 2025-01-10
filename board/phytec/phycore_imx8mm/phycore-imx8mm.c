@@ -86,6 +86,21 @@ int mmc_map_to_kernel_blk(int dev_no)
 	return dev_no;
 }
 
+void phytec_set_fit_extensions(void)
+{
+	char fit_extensions[128] = {};
+
+	if (!phytec_get_imx8m_eth(NULL))
+		sprintf(fit_extensions, "%s%s", fit_extensions,
+			"#conf-imx8mm-phycore-no-eth.dtbo");
+
+	if (!phytec_get_imx8m_spi(NULL))
+		sprintf(fit_extensions, "%s%s", fit_extensions,
+			"#conf-imx8mm-phycore-no-spiflash.dtbo");
+
+	env_set("fit_extensions", fit_extensions);
+}
+
 int board_late_init(void)
 {
 	u8 spi = phytec_get_imx8m_spi(NULL);
@@ -105,6 +120,7 @@ int board_late_init(void)
 	default:
 		break;
 	}
+	phytec_set_fit_extensions();
 
 	return 0;
 }
