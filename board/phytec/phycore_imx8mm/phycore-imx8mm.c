@@ -11,6 +11,7 @@
 #include <asm/mach-imx/boot_mode.h>
 #include <env.h>
 #include <env_internal.h>
+#include <extension_board.h>
 #include <fdt_support.h>
 #include <jffs2/load_kernel.h>
 #include <miiphy.h>
@@ -107,6 +108,35 @@ int board_late_init(void)
 
 	return 0;
 }
+
+#ifdef CONFIG_CMD_EXTENSION
+int extension_board_scan(struct list_head *extension_list)
+{
+	struct extension *extension = NULL;
+	int ret = 0;
+	u8 option;
+
+	option = phytec_get_imx8m_eth(NULL);
+	if (!option) {
+		extension = phytec_add_extension("phyCORE-i.MX8MM no eth phy",
+						 "imx8mm-phycore-no-eth.dtbo",
+						 "eth phy not populated on SoM");
+		list_add_tail(&extension->list, extension_list);
+		ret++;
+	}
+
+	option = phytec_get_imx8m_spi(NULL);
+	if (!option) {
+		extension = phytec_add_extension("phyCORE-i.MX8MM no SPI flash",
+						 "imx8mm-phycore-no-spiflash.dtbo",
+						 "SPI flash not populated on SoM");
+		list_add_tail(&extension->list, extension_list);
+		ret++;
+	}
+
+	return ret;
+}
+#endif
 
 enum env_location env_get_location(enum env_operation op, int prio)
 {
