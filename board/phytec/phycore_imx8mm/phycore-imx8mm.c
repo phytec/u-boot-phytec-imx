@@ -80,6 +80,11 @@ int board_mmc_get_env_dev(int devno)
 	return devno;
 }
 
+int mmc_map_to_kernel_blk(int dev_no)
+{
+	return dev_no;
+}
+
 int board_late_init(void)
 {
 	u8 spi = phytec_get_imx8m_spi(NULL);
