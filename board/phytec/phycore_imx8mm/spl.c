@@ -67,6 +67,7 @@ int board_fit_config_name_match(const char *name)
 
 void spl_board_init(void)
 {
+	arch_misc_init();
 	puts("Normal Boot\n");
 }
 
