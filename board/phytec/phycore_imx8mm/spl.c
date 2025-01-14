@@ -65,6 +65,11 @@ int board_fit_config_name_match(const char *name)
 	return 0;
 }
 
+void spl_board_init(void)
+{
+	puts("Normal Boot\n");
+}
+
 void board_init_f(ulong dummy)
 {
 	int ret;

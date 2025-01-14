@@ -7,11 +7,26 @@
 #include "imx8mm-u-boot.dtsi"
 
 / {
+	aliases {
+		usbgadget0 = &usbg1;
+	};
+
+	usbg1: usbg1 {
+		compatible = "fsl,imx27-usb-gadget";
+		dr_mode = "peripheral";
+		chipidea,usb = <&usbotg1>;
+		status = "okay";
+	};
+
 	wdt-reboot {
 		compatible = "wdt-reboot";
 		wdt = <&wdog1>;
 		bootph-pre-ram;
 	};
+};
+
+&aips4 {
+	bootph-pre-ram;
 };
 
 &pinctrl_i2c1 {
@@ -62,7 +77,23 @@
 	bootph-pre-ram;
 };
 
+&reg_usb_otg1_vbus {
+	bootph-pre-ram;
+};
+
 &uart3 {
+	bootph-pre-ram;
+};
+
+&usbmisc1 {
+	bootph-pre-ram;
+};
+
+&usbotg1 {
+	bootph-pre-ram;
+};
+
+&usbphynop1 {
 	bootph-pre-ram;
 };
 
