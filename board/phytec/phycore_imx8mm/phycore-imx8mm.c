@@ -159,15 +159,8 @@ enum env_location env_get_location(enum env_operation op, int prio)
 	enum boot_device dev = get_boot_device();
 	enum env_location env_loc = ENVL_UNKNOWN;
 
-	if (prio > 1)
+	if (prio > 0)
 		return env_loc;
-
-	if (prio == 1) {
-		if (IS_ENABLED(CONFIG_ENV_APPEND))
-			return ENVL_NOWHERE;
-		else
-			return env_loc;
-	}
 
 	switch (dev) {
 	case QSPI_BOOT:
