@@ -411,6 +411,14 @@ config TARGET_PHYCORE_IMX8MP
 	select IMX8M_LPDDR4
 	select SUPPORT_EXTENSION_SCAN
 
+config TARGET_IMX8MP_LIBRA_FPSC
+	bool "PHYTEC Libra FPSC i.MX 8M Plus"
+	select IMX8MP
+	select SUPPORT_SPL
+	select IMX8M_LPDDR4
+	help
+	  i.MX8M Plus Libra is an FPSC SOM based on NXP i.MX8MP.
+
 config TARGET_IMX8MM_CL_IOT_GATE
 	bool "CompuLab iot-gate-imx8"
 	select IMX8MM
@@ -477,6 +485,7 @@ source "board/msc/sm2s_imx8mp/Kconfig"
 source "board/mntre/imx8mq_reform2/Kconfig"
 source "board/phytec/phycore_imx8mm/Kconfig"
 source "board/phytec/phycore_imx8mp/Kconfig"
+source "board/phytec/imx8mp-libra-fpsc/Kconfig"
 source "board/polyhex/imx8mp_debix_model_a/Kconfig"
 source "board/purism/librem5/Kconfig"
 source "board/ronetix/imx8mq-cm/Kconfig"
