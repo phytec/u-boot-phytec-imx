@@ -18,6 +18,7 @@
 #include <log.h>
 #include <spl.h>
 
+#include "lpddr4_timing.h"
 #include "../common/imx8m_som_detection.h"
 
 DECLARE_GLOBAL_DATA_PTR;
@@ -56,7 +57,23 @@ static void spl_dram_init(void)
 	if (!ret)
 		phytec_print_som_info(NULL);
 
+	enum phytec_imx8mm_ddr_eeprom_code size = phytec_get_imx8m_ddr_size(NULL);
+	switch (size) {
+	case PHYTEC_IMX8MM_DDR_1GB:
+		set_dram_timings_1gb();
+		break;
+	case PHYTEC_IMX8MM_DDR_2GB:
+		break;
+	case PHYTEC_IMX8MM_DDR_4GB:
+		set_dram_timings_4gb();
+		break;
+	default:
+		goto out;
+	}
+	ddr_init(&dram_timing);
+	return;
 out:
+	puts("Could not detect correct RAM size. Fall back to default.\n");
 	ddr_init(&dram_timing);
 }
 
