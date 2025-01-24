@@ -47,17 +47,28 @@ int spl_board_boot_device(enum boot_device boot_dev_spl)
 static void spl_dram_init(void)
 {
 	int ret;
+	enum phytec_imx8mm_ddr_eeprom_code size = PHYTEC_EEPROM_INVAL;
 
 	ret = phytec_eeprom_data_setup_fallback(NULL, 0, EEPROM_ADDR,
 			EEPROM_ADDR_FALLBACK);
-	if (ret)
+	if (ret && !IS_ENABLED(CONFIG_PHYCORE_IMX8MM_RAM_SIZE_FIX))
 		goto out;
 
 	ret = phytec_imx8m_detect(NULL);
 	if (!ret)
 		phytec_print_som_info(NULL);
 
-	enum phytec_imx8mm_ddr_eeprom_code size = phytec_get_imx8m_ddr_size(NULL);
+	if (IS_ENABLED(CONFIG_PHYCORE_IMX8MM_RAM_SIZE_FIX)) {
+		if (IS_ENABLED(CONFIG_PHYCORE_IMX8MM_RAM_SIZE_1GB))
+			size = PHYTEC_IMX8MM_DDR_1GB;
+		else if (IS_ENABLED(CONFIG_PHYCORE_IMX8MM_RAM_SIZE_2GB))
+			size = PHYTEC_IMX8MM_DDR_2GB;
+		else if (IS_ENABLED(CONFIG_PHYCORE_IMX8MM_RAM_SIZE_4GB))
+			size = PHYTEC_IMX8MM_DDR_4GB;
+	} else {
+		size = phytec_get_imx8m_ddr_size(NULL);
+	}
+
 	switch (size) {
 	case PHYTEC_IMX8MM_DDR_1GB:
 		set_dram_timings_1gb();
