@@ -21,6 +21,13 @@ enum phytec_imx8mp_ddr_eeprom_code {
 	PHYTEC_IMX8MP_DDR_4GB_2GHZ = 8,
 };
 
+enum phytec_imx8mm_ddr_eeprom_code {
+	INVALID = PHYTEC_EEPROM_INVAL,
+	PHYTEC_IMX8MM_DDR_1GB = 1,
+	PHYTEC_IMX8MM_DDR_2GB = 3,
+	PHYTEC_IMX8MM_DDR_4GB = 5,
+};
+
 int __maybe_unused phytec_imx8m_detect(struct phytec_eeprom_data *data);
 u8 __maybe_unused phytec_get_imx8m_ddr_size(struct phytec_eeprom_data *data);
 u8 __maybe_unused phytec_get_imx8mp_rtc(struct phytec_eeprom_data *data);

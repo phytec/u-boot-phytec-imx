@@ -12,6 +12,7 @@
 #include <env.h>
 #include <env_internal.h>
 #include <extension_board.h>
+#include <init.h>
 #include <fdt_support.h>
 #include <jffs2/load_kernel.h>
 #include <miiphy.h>
@@ -180,4 +181,14 @@ enum env_location env_get_location(enum env_operation op, int prio)
 	}
 
 	return env_loc;
+}
+
+int board_phys_sdram_size(phys_size_t *size)
+{
+	if (!size)
+		return -EINVAL;
+
+	*size = get_ram_size((void *)PHYS_SDRAM, PHYS_SDRAM_SIZE);
+
+	return 0;
 }

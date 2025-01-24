@@ -1842,3 +1842,28 @@ struct dram_timing_info dram_timing = {
 	.ddrphy_pie_num = ARRAY_SIZE(ddr_phy_pie),
 	.fsp_table = { 3000, 400, 100,},
 };
+
+void set_dram_timings_1gb(void)
+{
+	dram_timing.ddrc_cfg[5].val = 0x2d0087;
+	dram_timing.ddrc_cfg[21].val = 0x8d;
+	dram_timing.ddrc_cfg[42].val = 0xf070707;
+	dram_timing.ddrc_cfg[58].val = 0x60012;
+	dram_timing.ddrc_cfg[73].val = 0x13;
+	dram_timing.ddrc_cfg[83].val = 0x30005;
+	dram_timing.ddrc_cfg[98].val = 0x5;
+}
+
+void set_dram_timings_4gb(void)
+{
+	dram_timing.ddrc_cfg[2].val = 0xa3080020;
+	dram_timing.ddrc_cfg[37].val = 0x17;
+	dram_timing.fsp_msg[0].fsp_cfg[8].val = 0x310;
+	dram_timing.fsp_msg[0].fsp_cfg[20].val = 0x3;
+	dram_timing.fsp_msg[1].fsp_cfg[9].val = 0x310;
+	dram_timing.fsp_msg[1].fsp_cfg[21].val = 0x3;
+	dram_timing.fsp_msg[2].fsp_cfg[9].val = 0x310;
+	dram_timing.fsp_msg[2].fsp_cfg[21].val = 0x3;
+	dram_timing.fsp_msg[3].fsp_cfg[10].val = 0x310;
+	dram_timing.fsp_msg[3].fsp_cfg[22].val = 0x3;
+}
