@@ -35,7 +35,8 @@ u8 __maybe_unused phytec_imx93_detect(struct phytec_eeprom_data *data)
 	som = data->payload.data.data_api2.som_no;
 	debug("%s: som id: %u\n", __func__, som);
 
-	if (som == PHYTEC_IMX93_SOM && is_imx93())
+	/* PHYTEC_IMX93_SOM can have an imx91 SoC or imx93 SoC */
+	if (som == PHYTEC_IMX93_SOM && (is_imx91() || is_imx93()))
 		return 0;
 
 	pr_err("%s: SoM ID does not match. Wrong EEPROM data?\n", __func__);

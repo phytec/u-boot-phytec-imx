@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
+ * Copyright (C) 2025 PHYTEC Messtechnik GmbH
  * Copyright (C) 2023 PHYTEC Messtechnik GmbH
  * Author: Christoph Stoidner <c.stoidner@phytec.de>
  * Copyright (C) 2024 Mathieu Othacehe <m.othacehe@gmail.com>
@@ -47,12 +48,12 @@ void spl_board_init(void)
 
 enum phytec_imx93_ddr_eeprom_code {
 	INVALID = PHYTEC_EEPROM_INVAL,
-	PHYTEC_IMX93_LPDDR4X_512MB = 0,
-	PHYTEC_IMX93_LPDDR4X_1GB = 1,
-	PHYTEC_IMX93_LPDDR4X_2GB = 2,
-	PHYTEC_IMX93_LPDDR4_512MB = 3,
-	PHYTEC_IMX93_LPDDR4_1GB = 4,
-	PHYTEC_IMX93_LPDDR4_2GB = 5,
+	PHYTEC_IMX91_IMX93_LPDDR4X_512MB = 0,
+	PHYTEC_IMX91_IMX93_LPDDR4X_1GB = 1,
+	PHYTEC_IMX91_IMX93_LPDDR4X_2GB = 2,
+	PHYTEC_IMX91_IMX93_LPDDR4_512MB = 3,
+	PHYTEC_IMX91_IMX93_LPDDR4_1GB = 4,
+	PHYTEC_IMX91_IMX93_LPDDR4_2GB = 5,
 };
 
 void spl_dram_init(void)
@@ -62,30 +63,37 @@ void spl_dram_init(void)
 
 	/* NOTE: In SPL lpi2c3 is mapped to bus 1 */
 	ret = phytec_eeprom_data_setup(NULL, 1, EEPROM_ADDR);
-	if (ret && !IS_ENABLED(CONFIG_PHYCORE_IMX93_RAM_TYPE_FIX))
+	if (ret && !IS_ENABLED(CONFIG_PHYCORE_IMX91_IMX93_RAM_TYPE_FIX))
 		goto out;
 
 	ret = phytec_imx93_detect(NULL);
 	if (!ret)
 		phytec_print_som_info(NULL);
 
-	if (IS_ENABLED(CONFIG_PHYCORE_IMX93_RAM_TYPE_FIX)) {
-		if (IS_ENABLED(CONFIG_PHYCORE_IMX93_RAM_TYPE_LPDDR4X_1GB))
-			ddr_opt = PHYTEC_IMX93_LPDDR4X_1GB;
-		else if (IS_ENABLED(CONFIG_PHYCORE_IMX93_RAM_TYPE_LPDDR4X_2GB))
-			ddr_opt = PHYTEC_IMX93_LPDDR4X_2GB;
+	if (IS_ENABLED(CONFIG_PHYCORE_IMX91_IMX93_RAM_TYPE_FIX)) {
+		if (IS_ENABLED(CONFIG_PHYCORE_IMX91_IMX93_RAM_TYPE_LPDDR4X_1GB))
+			ddr_opt = PHYTEC_IMX91_IMX93_LPDDR4X_1GB;
+		else if (IS_ENABLED(CONFIG_PHYCORE_IMX91_IMX93_RAM_TYPE_LPDDR4X_2GB))
+			ddr_opt = PHYTEC_IMX91_IMX93_LPDDR4X_2GB;
 	} else {
 		ddr_opt = phytec_imx93_get_opt(NULL, PHYTEC_IMX93_OPT_DDR);
 	}
 
 	switch(ddr_opt) {
-	case PHYTEC_IMX93_LPDDR4X_1GB:
+#if defined(CONFIG_IMX91)
+	case PHYTEC_IMX91_IMX93_LPDDR4_1GB:
+		/* nothing to do, right dram timings are statically set for 1GB */
+		break;
+#endif
+#if defined(CONFIG_IMX93)
+	case PHYTEC_IMX91_IMX93_LPDDR4X_1GB:
 		if (is_voltage_mode(VOLT_LOW_DRIVE))
 			set_dram_timings_1gb_lpddr4x_900mhz();
 		break;
-	case PHYTEC_IMX93_LPDDR4X_2GB:
+	case PHYTEC_IMX91_IMX93_LPDDR4X_2GB:
 		set_dram_timings_2gb_lpddr4x();
 		break;
+#endif
 	default:
 		goto out;
 	}
@@ -93,8 +101,10 @@ void spl_dram_init(void)
 	return;
 out:
 	puts("Could not detect correct RAM type and size. Fall back to default.\n");
+#if defined(CONFIG_IMX93)
 	if (is_voltage_mode(VOLT_LOW_DRIVE))
 		set_dram_timings_1gb_lpddr4x_900mhz();
+#endif
 	ddr_init(&dram_timing);
 }
 
@@ -200,10 +210,12 @@ void board_init_f(ulong dummy)
 	printf("MAC-Address: %02x:%02x:%02x:%02x:%02x:%02x\n",
 	       mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
 
+#if defined(CONFIG_IMX93)
 	/* Put M33 into CPUWAIT for following kick */
 	ret = m33_prepare();
 	if (!ret)
 		printf("M33 prepare ok\n");
+#endif
 
 	board_init_r(NULL, 0);
 }

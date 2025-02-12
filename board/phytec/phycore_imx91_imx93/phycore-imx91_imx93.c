@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
+ * Copyright (C) 2025 PHYTEC Messtechnik GmbH
  * Copyright (C) 2023 PHYTEC Messtechnik GmbH
  * Author: Christoph Stoidner <c.stoidner@phytec.de>
  * Copyright (C) 2024 Mathieu Othacehe <m.othacehe@gmail.com>
@@ -7,7 +8,13 @@
 
 #include <asm/arch-imx9/ccm_regs.h>
 #include <asm/arch/sys_proto.h>
+#if defined(CONFIG_IMX91)
+#include <asm/arch-imx9/imx91_pins.h>
+#elif defined(CONFIG_IMX93)
 #include <asm/arch-imx9/imx93_pins.h>
+#else
+#error Unknown Platform
+#endif
 #include <asm/arch/clock.h>
 #include <asm/global_data.h>
 #include <asm/mach-imx/boot_mode.h>
@@ -63,6 +70,7 @@ static void emmc_fixup(void *blob, struct phytec_eeprom_data *data)
 
 	/* Check "IO Voltage 1v8" flag is set */
 	if (option & 0x01) {
+		/* imx93-usdhc driver is also used by imx91 */
 		offset = fdt_node_offset_by_compat_reg(blob, "fsl,imx93-usdhc",
 						       0x42850000);
 		if (offset)
@@ -78,6 +86,7 @@ err:
 
 static void usdhc_clk_fixup(void *blob, u32 reg, unsigned long freq)
 {
+	/* imx93-usdhc driver is also used by imx91 */
 	int offset = fdt_node_offset_by_compat_reg(blob, "fsl,imx93-usdhc", reg);
 
 	if (offset) {
@@ -178,8 +187,8 @@ int extension_board_scan(struct list_head *extension_list)
 
 	option = phytec_imx93_get_opt(NULL, PHYTEC_IMX93_OPT_EMMC);
 	if (!option) {
-		extension = phytec_add_extension("phyCORE-i.MX93 no eMMC",
-						 "imx93-phycore-no-emmc.dtbo",
+		extension = phytec_add_extension("phyCORE-i.MX91/i.MX93 no eMMC",
+						 "imx91-imx93-phycore-no-emmc.dtbo",
 						 "eMMC not populated on the SoM");
 		list_add_tail(&extension->list, extension_list);
 		ret++;
@@ -187,8 +196,8 @@ int extension_board_scan(struct list_head *extension_list)
 
 	option = phytec_imx93_get_opt(NULL, PHYTEC_IMX93_OPT_ETH);
 	if (!option) {
-		extension = phytec_add_extension("phyCORE-i.MX93 no eth phy",
-						 "imx93-phycore-no-eth.dtbo",
+		extension = phytec_add_extension("phyCORE-i.MX91/i.MX93 no eth phy",
+						 "imx91-imx93-phycore-no-eth.dtbo",
 						 "eth phy not populated on the SoM");
 		list_add_tail(&extension->list, extension_list);
 		ret++;
