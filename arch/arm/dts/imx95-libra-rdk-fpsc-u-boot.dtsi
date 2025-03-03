@@ -1,0 +1,182 @@
+// SPDX-License-Identifier: GPL-2.0+
+/*
+ * Copyright 2025 PHYTEC Messtechnik GmbH
+ */
+
+&{/soc@0} {
+	bootph-all;
+};
+
+&aips1 {
+	bootph-all;
+};
+
+&aips2 {
+	bootph-all;
+};
+
+&aips3 {
+	bootph-all;
+};
+
+&gpio1 {
+	reg = <0 0x47400000 0 0x1000>, <0 0x47400040 0 0x40>;
+};
+
+&gpio2 {
+	reg = <0 0x43810000 0 0x1000>, <0 0x43810040 0 0x40>;
+	bootph-all;
+};
+
+&gpio3 {
+	reg = <0 0x43820000 0 0x1000>, <0 0x43820040 0 0x40>;
+	bootph-all;
+};
+
+&gpio4 {
+	reg = <0 0x43840000 0 0x1000>, <0 0x43840040 0 0x40>;
+	bootph-all;
+};
+
+&gpio5 {
+	reg = <0 0x43850000 0 0x1000>, <0 0x43850040 0 0x40>;
+	bootph-all;
+};
+
+&mu2 {
+	bootph-all;
+};
+
+&dummy {
+	bootph-all;
+};
+
+&osc_24m {
+	bootph-all;
+};
+
+&clk_ext1 {
+	bootph-all;
+};
+
+&sram0 {
+	bootph-all;
+	bootph-pre-ram;
+};
+
+&scmi_buf0 {
+	bootph-all;
+};
+
+&scmi_buf1 {
+	bootph-all;
+};
+
+&scmi_devpd {
+	bootph-all;
+};
+
+&scmi_perf {
+	bootph-all;
+};
+
+&scmi_clk {
+	bootph-all;
+};
+
+&scmi_sensor {
+	bootph-all;
+};
+
+&scmi_iomuxc {
+	bootph-all;
+};
+
+&{/firmware} {
+	bootph-all;
+};
+
+&{/firmware/scmi} {
+	bootph-all;
+};
+
+&{/firmware/scmi/protocol@11} {
+	bootph-all;
+	bootph-pre-ram;
+};
+
+&{/firmware/scmi/protocol@13} {
+	bootph-all;
+	bootph-pre-ram;
+};
+
+&{/firmware/scmi/protocol@14} {
+	bootph-all;
+	bootph-pre-ram;
+};
+
+&{/firmware/scmi/protocol@15} {
+	bootph-all;
+};
+
+&{/firmware/scmi/protocol@19} {
+	bootph-all;
+};
+
+&lpuart7 {
+	clocks = <&scmi_clk IMX95_CLK_LPUART7>, <&scmi_clk IMX95_CLK_LPUART7>;
+	clock-names = "ipg", "per";
+	bootph-all;
+};
+
+&reg_usdhc2_vmmc {
+	bootph-pre-ram;
+};
+
+&usdhc1 {
+	bootph-pre-ram;
+};
+
+&usdhc2 {
+	bootph-pre-ram;
+};
+
+&wdog3 {
+	status = "disabled";
+};
+
+&pinctrl_lpuart7 {
+	bootph-all;
+};
+
+&elemu1 {
+	status = "okay";
+	bootph-all;
+};
+
+&elemu3 {
+	status = "okay";
+	bootph-all;
+};
+
+&pinctrl_usdhc2 {
+	bootph-all;
+};
+
+&pinctrl_usdhc2_100mhz {
+	bootph-all;
+};
+
+&pinctrl_usdhc2_200mhz {
+	bootph-all;
+};
+
+&pinctrl_reg_usdhc2_vmmc {
+	bootph-all;
+};
+
+&dispmix_csr {
+	/delete-property/ assigned-clocks;
+	/delete-property/ assigned-clock-rates;
+	/delete-property/ assigned-clock-parents;
+};

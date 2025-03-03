@@ -1,0 +1,12 @@
+if TARGET_IMX95_LIBRA_FPSC
+
+config SYS_BOARD
+	default "imx95-libra-fpsc"
+
+config SYS_VENDOR
+	default "phytec"
+
+config SYS_CONFIG_NAME
+	default "imx95-libra-fpsc"
+
+endif
