@@ -90,6 +90,9 @@ void init_uart_clk(u32 index)
 	case 2:
 		clock_id = IMX95_CLK_LPUART3;
 		break;
+	case 6:
+		clock_id = IMX95_CLK_LPUART7;
+		break;
 	default:
 		return;
 	}
