@@ -78,7 +78,8 @@
 &lpi2c1 { /* I2C5 */
 	clock-frequency = <400000>;
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_lpi2c2>;
+	pinctrl-0 = <&pinctrl_lpi2c1>;
+	status = "okay";
 
 	/* User EEPROM */
 	eeprom@50 {
