@@ -111,6 +111,10 @@
 	wakeup-source;
 };
 
+&ethphy1 {
+	ti,leds-polarity = <0>;
+};
+
 /* Ethernet */
 &eqos {
 	pinctrl-names = "default";
@@ -184,6 +188,8 @@
 &lpuart1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart1>;
+	/delete-property/ dmas;
+	/delete-property/ dma-names;
 	status = "okay";
 };
 
@@ -276,7 +282,7 @@
 	/* need to config the SION for data and cmd pad, refer to ERR052021 */
 	pinctrl_usdhc2_default: usdhc2grp {
 		fsl,pins = <
-			MX93_PAD_SD2_CLK__USDHC2_CLK		0x179e
+			MX93_PAD_SD2_CLK__USDHC2_CLK		0x159e
 			MX93_PAD_SD2_CMD__USDHC2_CMD		0x4000139e
 			MX93_PAD_SD2_DATA0__USDHC2_DATA0	0x4000138e
 			MX93_PAD_SD2_DATA1__USDHC2_DATA1	0x4000138e
@@ -289,7 +295,7 @@
 	/* need to config the SION for data and cmd pad, refer to ERR052021 */
 	pinctrl_usdhc2_100mhz: usdhc2-100mhzgrp {
 		fsl,pins = <
-			MX93_PAD_SD2_CLK__USDHC2_CLK            0x179e
+			MX93_PAD_SD2_CLK__USDHC2_CLK            0x159e
 			MX93_PAD_SD2_CMD__USDHC2_CMD            0x4000139e
 			MX93_PAD_SD2_DATA0__USDHC2_DATA0        0x4000138e
 			MX93_PAD_SD2_DATA1__USDHC2_DATA1        0x4000138e
@@ -302,7 +308,7 @@
 	/* need to config the SION for data and cmd pad, refer to ERR052021 */
 	pinctrl_usdhc2_200mhz: usdhc2-200mhzgrp {
 		fsl,pins = <
-			MX93_PAD_SD2_CLK__USDHC2_CLK            0x178e
+			MX93_PAD_SD2_CLK__USDHC2_CLK            0x158e
 			MX93_PAD_SD2_CMD__USDHC2_CMD            0x4000139e
 			MX93_PAD_SD2_DATA0__USDHC2_DATA0        0x4000139e
 			MX93_PAD_SD2_DATA1__USDHC2_DATA1        0x4000139e
@@ -321,7 +327,7 @@
 	pinctrl_flexcan1: flexcan1grp {
 		fsl,pins = <
 			MX93_PAD_PDM_BIT_STREAM0__CAN1_RX	0x139e
-			MX93_PAD_PDM_CLK__CAN1_TX		0x1382
+			MX93_PAD_PDM_CLK__CAN1_TX		0x139e
 		>;
 	};
 
