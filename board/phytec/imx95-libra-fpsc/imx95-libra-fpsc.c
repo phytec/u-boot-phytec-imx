@@ -8,6 +8,7 @@
 #include <asm/arch-imx9/ccm_regs.h>
 #include <asm/arch/clock.h>
 #include <fdt_support.h>
+#include <usb.h>
 #include <dwc3-uboot.h>
 #include <asm/io.h>
 #include <linux/bitfield.h>
@@ -32,6 +33,42 @@ int board_early_init_f(void)
 	init_uart_clk(6);
 
 	return 0;
+}
+
+static struct dwc3_device dwc3_device_data = {
+#ifdef CONFIG_SPL_BUILD
+	.maximum_speed = USB_SPEED_HIGH,
+#else
+	.maximum_speed = USB_SPEED_SUPER,
+#endif
+	.base = USB1_BASE_ADDR,
+	.dr_mode = USB_DR_MODE_PERIPHERAL,
+	.index = 0,
+	.power_down_scale = 2,
+};
+
+int dm_usb_gadget_handle_interrupts(struct udevice *dev)
+{
+	dwc3_uboot_handle_interrupt(dev);
+	return 0;
+}
+
+int board_usb_init(int index, enum usb_init_type init)
+{
+	if (index == 0 && init == USB_INIT_DEVICE)
+		return dwc3_uboot_init(&dwc3_device_data);
+
+	return 0;
+}
+
+int board_usb_cleanup(int index, enum usb_init_type init)
+{
+	int ret = 0;
+
+	if (index == 0 && init == USB_INIT_DEVICE)
+		dwc3_uboot_exit(index);
+
+	return ret;
 }
 
 #define TUSB_PORT_POL_CRTL_REG	0xB
