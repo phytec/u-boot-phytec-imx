@@ -141,10 +141,6 @@
 	bootph-pre-ram;
 };
 
-&wdog3 {
-	status = "disabled";
-};
-
 &pinctrl_lpuart7 {
 	bootph-all;
 };
