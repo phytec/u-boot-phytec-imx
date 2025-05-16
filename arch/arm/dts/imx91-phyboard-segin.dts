@@ -44,12 +44,100 @@
 		regulator-min-microvolt = <3300000>;
 		regulator-name = "VCC_SD";
 	};
+
+	reg_vcc_1v8_audio: regulator-vcc1v8-audio {
+		compatible = "regulator-fixed";
+		regulator-max-microvolt = <1800000>;
+		regulator-min-microvolt = <1800000>;
+		regulator-name = "VCC1V8_AUDIO";
+	};
+
+	reg_vcc_3v3: regulator-vcc-3v3 {
+		compatible = "regulator-fixed";
+		regulator-max-microvolt = <3300000>;
+		regulator-min-microvolt = <3300000>;
+		regulator-name = "VCC3V3";
+	};
+
+	sound: sound {
+		compatible = "simple-audio-card";
+		simple-audio-card,name = "phyBOARD-Segin-TLV320AIC3007";
+		simple-audio-card,format = "i2s";
+		simple-audio-card,bitclock-master = <&dailink_master>;
+		simple-audio-card,frame-master = <&dailink_master>;
+		simple-audio-card,widgets =
+			"Line", "Line In",
+			"Line", "Line Out",
+			"Speaker", "Speaker";
+		simple-audio-card,routing =
+			"Line Out", "LLOUT",
+			"Line Out", "RLOUT",
+			"Speaker", "SPOP",
+			"Speaker", "SPOM",
+			"LINE1L", "Line In",
+			"LINE1R", "Line In";
+
+		simple-audio-card,cpu {
+			sound-dai = <&sai1>;
+		};
+
+		dailink_master: simple-audio-card,codec {
+			sound-dai = <&tlv320>;
+			clocks = <&clk IMX91_CLK_SAI1>;
+		};
+	};
+};
+
+/* Audio */
+&sai1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_sai1>;
+	clocks = <&clk IMX91_CLK_SAI1_IPG>, <&clk IMX91_CLK_DUMMY>,
+		<&clk IMX91_CLK_SAI1_GATE>,
+		<&clk IMX91_CLK_DUMMY>, <&clk IMX91_CLK_DUMMY>,
+		<&clk IMX91_CLK_AUDIO_PLL>;
+	clock-names = "bus", "mclk0", "mclk1", "mclk2", "mclk3", "pll8k";
+	assigned-clocks = <&clk IMX91_CLK_SAI1>;
+	assigned-clock-parents = <&clk IMX91_CLK_AUDIO_PLL>;
+	assigned-clock-rates = <19200000>;
+	fsl,sai-mclk-direction-output;
+	#sound-dai-cells = <0>;
+	status = "okay";
 };
 
 /* Power-key */
 &bbnsm_pwrkey {
 	linux,keycode = <KEY_POWER>;
 	wakeup-source;
+};
+
+&ethphy1 {
+	ti,leds-polarity = <0>;
+};
+
+/* Ethernet */
+&eqos {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_eqos>;
+	phy-mode = "rmii";
+	phy-handle = <&ethphy2>;
+	assigned-clocks = <&clk IMX91_CLK_ENET_TIMER>,
+			  <&clk IMX91_CLK_ENET1_QOS_TSN>;
+	assigned-clock-parents = <&clk IMX91_CLK_SYS_PLL_PFD1_DIV2>,
+				 <&clk IMX91_CLK_SYS_PLL_PFD1_DIV2>;
+	assigned-clock-rates = <100000000>, <50000000>;
+	status = "okay";
+};
+
+/* ENET2 MDIO */
+&mdio {
+	ethphy2: ethernet-phy@2 {
+		reg = <2>;
+		micrel,led-mode = <1>;
+		compatible = "ethernet-phy-id0022.1561";
+		clocks = <&clk IMX91_CLK_ENET2_REGULAR>;
+		clock-names = "rmii-ref";
+	};
 };
 
 /* CAN */
@@ -67,6 +155,16 @@
 	#address-cells = <1>;
 	#size-cells = <0>;
 	status = "okay";
+
+	tlv320: audio-codec@18 {
+		compatible = "ti,tlv320aic3007";
+		reg = <0x18>;
+		AVDD-supply = <&reg_vcc_3v3>;
+		IOVDD-supply = <&reg_vcc_3v3>;
+		DRVDD-supply = <&reg_vcc_3v3>;
+		DVDD-supply = <&reg_vcc_1v8_audio>;
+		#sound-dai-cells = <0>;
+	};
 
 	i2c_rtc: rtc@68 {
 		compatible = "microcrystal,rv4162";
@@ -124,6 +222,31 @@
 };
 
 &iomuxc {
+	pinctrl_sai1: sai1grp {
+		fsl,pins = <
+			MX91_PAD_UART2_RXD__SAI1_MCLK				0x1202
+			MX91_PAD_SAI1_TXFS__SAI1_TX_SYNC			0x1202
+			MX91_PAD_SAI1_TXC__SAI1_TX_BCLK				0x1202
+			MX91_PAD_SAI1_TXD0__SAI1_TX_DATA0			0x1402
+			MX91_PAD_SAI1_RXD0__SAI1_RX_DATA0			0x1402
+		>;
+	};
+
+	pinctrl_eqos: eqosgrp {
+		fsl,pins = <
+			MX91_PAD_ENET1_TD2__ENET_QOS_CLOCK_GENERATE_CLK	   0x4000050e
+			MX91_PAD_ENET1_RD0__ENET_QOS_RGMII_RD0                  0x57e
+			MX91_PAD_ENET1_RD1__ENET_QOS_RGMII_RD1                  0x57e
+			MX91_PAD_ENET1_TD0__ENET_QOS_RGMII_TD0                  0x50e
+			/* name 'ENET1_RGMII' is missleading, but ref manual sais for
+			 * that mux mode (ALT==0x00) it is 'ENET_QOS_RGMII_TD1'.
+			 */
+			MX91_PAD_ENET1_TD1__ENET1_RGMII_TD1			0x50e
+			MX91_PAD_ENET1_RX_CTL__ENET_QOS_RGMII_RX_CTL            0x57e
+			MX91_PAD_ENET1_TX_CTL__ENET_QOS_RGMII_TX_CTL            0x50e
+			MX91_PAD_ENET1_RXC__ENET_QOS_RX_ER                      0x57e
+		>;
+	};
 
 	pinctrl_lpi2c2: lpi2c2grp {
 		fsl,pins = <
@@ -153,11 +276,11 @@
 
 	pinctrl_usdhc2_default: usdhc2grp {
 		fsl,pins = <
-			MX91_PAD_SD2_CLK__USDHC2_CLK		0x179e
-			MX91_PAD_SD2_CMD__USDHC2_CMD		0x139e
-			MX91_PAD_SD2_DATA0__USDHC2_DATA0	0x138e
+			MX91_PAD_SD2_CLK__USDHC2_CLK		0x158e
+			MX91_PAD_SD2_CMD__USDHC2_CMD		0x1382
+			MX91_PAD_SD2_DATA0__USDHC2_DATA0	0x1386
 			MX91_PAD_SD2_DATA1__USDHC2_DATA1	0x138e
-			MX91_PAD_SD2_DATA2__USDHC2_DATA2	0x138e
+			MX91_PAD_SD2_DATA2__USDHC2_DATA2	0x139e
 			MX91_PAD_SD2_DATA3__USDHC2_DATA3	0x139e
 			MX91_PAD_SD2_VSELECT__USDHC2_VSELECT	0x51e
 		>;
@@ -165,7 +288,7 @@
 
 	pinctrl_usdhc2_100mhz: usdhc2-100mhzgrp {
 		fsl,pins = <
-			MX91_PAD_SD2_CLK__USDHC2_CLK            0x179e
+			MX91_PAD_SD2_CLK__USDHC2_CLK            0x159e
 			MX91_PAD_SD2_CMD__USDHC2_CMD            0x139e
 			MX91_PAD_SD2_DATA0__USDHC2_DATA0        0x138e
 			MX91_PAD_SD2_DATA1__USDHC2_DATA1        0x138e
@@ -177,8 +300,8 @@
 
 	pinctrl_usdhc2_200mhz: usdhc2-200mhzgrp {
 		fsl,pins = <
-			MX91_PAD_SD2_CLK__USDHC2_CLK            0x178e
-			MX91_PAD_SD2_CMD__USDHC2_CMD            0x139e
+			MX91_PAD_SD2_CLK__USDHC2_CLK            0x158e
+			MX91_PAD_SD2_CMD__USDHC2_CMD            0x138e
 			MX91_PAD_SD2_DATA0__USDHC2_DATA0        0x139e
 			MX91_PAD_SD2_DATA1__USDHC2_DATA1        0x139e
 			MX91_PAD_SD2_DATA2__USDHC2_DATA2        0x139e
@@ -196,7 +319,7 @@
 	pinctrl_flexcan1: flexcan1grp {
 		fsl,pins = <
 			MX91_PAD_PDM_BIT_STREAM0__CAN1_RX	0x139e
-			MX91_PAD_PDM_CLK__CAN1_TX		0x1382
+			MX91_PAD_PDM_CLK__CAN1_TX		0x139e
 		>;
 	};
 
