@@ -18,6 +18,7 @@
 #include <miiphy.h>
 #include <asm/gpio.h>
 #include <asm/arch/sys_proto.h>
+#include <asm/mach-imx/boot_mode.h>
 #include <dm/uclass.h>
 #include <dm/uclass-internal.h>
 #include <scmi_agent.h>
@@ -136,6 +137,24 @@ int board_init(void)
 
 int board_late_init(void)
 {
+	pr_err("board_late_init get_boot_device\n");
+	switch (get_boot_device()) {
+	case SD2_BOOT:
+		env_set_ulong("mmcdev", 1);
+		env_set("boot_targets", "mmc1 mmc0 ethernet");
+		break;
+	case MMC1_BOOT:
+		env_set_ulong("mmcdev", 0);
+                env_set("boot_targets", "mmc0 mmc1 ethernet");
+		break;
+	case USB_BOOT:
+		printf("Detect USB boot. Will enter fastboot mode!\n");
+		env_set_ulong("dofastboot", 1);
+		break;
+	default:
+		break;
+	}
+
 	return 0;
 }
 
