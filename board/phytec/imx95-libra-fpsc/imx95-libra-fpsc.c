@@ -108,19 +108,19 @@ void tusb8042a_swap_lines(void)
 
 static int imx9_scmi_power_domain_enable(u32 domain, bool enable)
 {
-        return scmi_pwd_state_set(gd->arch.scmi_dev, 0, domain, enable ? 0 : BIT(30));
+	return scmi_pwd_state_set(gd->arch.scmi_dev, 0, domain, enable ? 0 : BIT(30));
 }
 
 void netc_init(void)
 {
-        int ret;
+	int ret;
 
-        /* Power up the NETC MIX. */
-        ret = imx9_scmi_power_domain_enable(IMX95_PD_NETC, true);
-        if (ret) {
-                printf("SCMI_POWWER_STATE_SET Failed for NETC MIX\n");
-                return;
-        }
+	/* Power up the NETC MIX. */
+	ret = imx9_scmi_power_domain_enable(IMX95_PD_NETC, true);
+	if (ret) {
+		printf("SCMI_POWWER_STATE_SET Failed for NETC MIX\n");
+		return;
+	}
 
 	set_clk_netc(ENET_125MHZ);
 	pci_init();
