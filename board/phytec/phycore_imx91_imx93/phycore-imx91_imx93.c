@@ -84,6 +84,46 @@ err:
 	printf("Could not detect eMMC VDD-IO. Fall back to default.\n");
 }
 
+static void phy_reset_fixup(void *blob, struct phytec_eeprom_data *data)
+{
+	u8 pcb_rev = phytec_get_rev(data);
+
+	if (pcb_rev == PHYTEC_EEPROM_INVAL) {
+		pr_err("ERROR: Could not detect SOM revision. Cannot disable phy-reset-gpio.\n");
+		return;
+	}
+
+	if (pcb_rev < 4) {
+		/* disable phy-reset-gpio handling, as in pcb-revisions before 4 gpio is not
+		 * connected to phy reset
+		 */
+		char fec_path[64];
+		int res;
+		int node;
+		int offset;
+
+		node = fdt_node_offset_by_compatible(blob, -1, "fsl,imx93-fec");
+		if (node < 0)
+			goto err_fec;
+
+		res = fdt_get_path(blob, node, fec_path, sizeof(fec_path));
+		if (res < 0)
+			goto err_fec;
+
+		offset = fdt_node_offset_by_pathf(blob, "%s/mdio/ethernet-phy@1", fec_path);
+		if (offset) {
+			fdt_delprop(blob, offset, "reset-gpios");
+			fdt_delprop(blob, offset, "reset-assert-us");
+		} else {
+			goto err_fec;
+		}
+	}
+
+	return;
+err_fec:
+	pr_err("Could not find fec/ethernet-phy@1 node. Cannot disable phy-reset-gpio\n");
+}
+
 static void usdhc_clk_fixup(void *blob, u32 reg, unsigned long freq)
 {
 	/* imx93-usdhc driver is also used by imx91 */
@@ -103,6 +143,7 @@ int board_fix_fdt(void *blob)
 	phytec_eeprom_data_setup(&data, 2, EEPROM_ADDR);
 
 	emmc_fixup(blob, &data);
+	phy_reset_fixup(blob, &data);
 
 	if (is_voltage_mode(VOLT_LOW_DRIVE)) {
 		usdhc_clk_fixup(blob, 0x42850000, 266666667);
@@ -116,6 +157,7 @@ int board_fix_fdt(void *blob)
 int ft_board_setup(void *blob, struct bd_info *bd)
 {
 	emmc_fixup(blob, NULL);
+	phy_reset_fixup(blob, NULL);
 
 	/**
 	 * NOTE: VOLT_LOW_DRIVE fixup is already done by the ft_system_setup()
