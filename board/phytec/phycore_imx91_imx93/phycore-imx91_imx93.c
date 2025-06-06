@@ -102,9 +102,13 @@ static void phy_reset_fixup(void *blob, struct phytec_eeprom_data *data)
 		int node;
 		int offset;
 
+		/* fec-node can have compatible 'imx91' or 'imx93' */
 		node = fdt_node_offset_by_compatible(blob, -1, "fsl,imx93-fec");
-		if (node < 0)
-			goto err_fec;
+		if (node < 0) {
+			node = fdt_node_offset_by_compatible(blob, -1, "fsl,imx91-fec");
+			if (node < 0)
+				goto err_fec;
+		}
 
 		res = fdt_get_path(blob, node, fec_path, sizeof(fec_path));
 		if (res < 0)
