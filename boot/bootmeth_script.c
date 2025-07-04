@@ -129,7 +129,10 @@ static int script_read_bootflow_net(struct bootflow *bflow)
 	if (!fname)
 		return log_msg_ret("dhc", -EINVAL);
 
-	ret = dhcp_run(addr, fname, true);
+	if (env_get_yesno("ip_dyn") == 0)
+		ret = tftpb_run(addr, fname);
+	else
+		ret = dhcp_run(addr, fname, true);
 	if (ret)
 		return log_msg_ret("dhc", ret);
 
