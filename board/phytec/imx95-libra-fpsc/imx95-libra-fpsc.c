@@ -141,11 +141,11 @@ int board_late_init(void)
 	switch (get_boot_device()) {
 	case SD2_BOOT:
 		env_set_ulong("mmcdev", 1);
-		env_set("boot_targets", "mmc1 mmc0 ethernet");
+		if (!strcmp(env_get("boot_targets"), env_get_default("boot_targets")))
+			env_set("boot_targets", "mmc1 mmc0 ethernet");
 		break;
 	case MMC1_BOOT:
 		env_set_ulong("mmcdev", 0);
-                env_set("boot_targets", "mmc0 mmc1 ethernet");
 		break;
 	case USB_BOOT:
 		printf("Detect USB boot. Will enter fastboot mode!\n");
