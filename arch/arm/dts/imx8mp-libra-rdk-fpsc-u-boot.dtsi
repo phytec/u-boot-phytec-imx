@@ -65,6 +65,10 @@
 	bootph-pre-ram;
 };
 
+&usb_dwc3_1 {
+	compatible = "fsl,imx8mq-dwc3", "snps,dwc3";
+};
+
 &usdhc2 {
 	bootph-pre-ram;
 };
