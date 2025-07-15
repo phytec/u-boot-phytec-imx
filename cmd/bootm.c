@@ -138,13 +138,14 @@ int do_bootm(struct cmd_tbl *cmdtp, int flag, int argc, char *const argv[])
 	struct bootm_info bmi;
 	int ret;
 	__maybe_unused void *buf;
+	__maybe_unused unsigned long addr = image_load_addr;
 
 	/* determine if we have a sub command */
 	argc--; argv++;
 	if (argc > 0) {
 		char *endp;
 
-		hextoul(argv[0], &endp);
+		addr = simple_strtoul(argv[0], &endp, 16);
 		/* endp pointing to NULL means that argv[0] was just a
 		 * valid number, pass it along to the normal bootm processing
 		 *
@@ -184,22 +185,22 @@ int do_bootm(struct cmd_tbl *cmdtp, int flag, int argc, char *const argv[])
 		return 1;
 	};
 
-	ret = bootz_setup(image_load_addr, &zi_start, &zi_end);
+	ret = bootz_setup(addr, &zi_start, &zi_end);
 	if (ret != 0)
 		return 1;
 
-	if (authenticate_image(image_load_addr, zi_end - zi_start) != 0) {
+	if (authenticate_image(addr, zi_end - zi_start) != 0) {
 		printf("Authenticate zImage Fail, Please check\n");
 		return 1;
 	}
 
 #else
 
-	switch (genimg_get_format((const void *)image_load_addr)) {
+	switch (genimg_get_format((const void *)addr)) {
 #if defined(CONFIG_LEGACY_IMAGE_FORMAT)
 	case IMAGE_FORMAT_LEGACY:
-		if (authenticate_image(image_load_addr,
-			image_get_image_size((struct legacy_img_hdr *)image_load_addr)) != 0) {
+		if (authenticate_image(addr,
+			image_get_image_size((struct legacy_img_hdr *)addr)) != 0) {
 			printf("Authenticate uImage Fail, Please check\n");
 			return 1;
 		}
@@ -212,10 +213,10 @@ int do_bootm(struct cmd_tbl *cmdtp, int flag, int argc, char *const argv[])
 #endif
 #ifdef CONFIG_FIT
 	case IMAGE_FORMAT_FIT:
-		buf = (void *)map_sysmem(image_load_addr, 0);
+		buf = (void *)map_sysmem(addr, 0);
 		size_t size = fit_get_size(buf);
 		unmap_sysmem(buf);
-		if (authenticate_image(image_load_addr, size) != 0) {
+		if (authenticate_image(addr, size) != 0) {
 			printf("Authenticate FIT image Fail, Please check\n");
 			return 1;
 		}
