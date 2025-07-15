@@ -137,6 +137,7 @@ int do_bootm(struct cmd_tbl *cmdtp, int flag, int argc, char *const argv[])
 {
 	struct bootm_info bmi;
 	int ret;
+	__maybe_unused void *buf;
 
 	/* determine if we have a sub command */
 	argc--; argv++;
@@ -207,6 +208,17 @@ int do_bootm(struct cmd_tbl *cmdtp, int flag, int argc, char *const argv[])
 #ifdef CONFIG_ANDROID_BOOT_IMAGE
 	case IMAGE_FORMAT_ANDROID:
 		/* Do this authentication in boota command */
+		break;
+#endif
+#ifdef CONFIG_FIT
+	case IMAGE_FORMAT_FIT:
+		buf = (void *)map_sysmem(image_load_addr, 0);
+		size_t size = fit_get_size(buf);
+		unmap_sysmem(buf);
+		if (authenticate_image(image_load_addr, size) != 0) {
+			printf("Authenticate FIT image Fail, Please check\n");
+			return 1;
+		}
 		break;
 #endif
 	default:
