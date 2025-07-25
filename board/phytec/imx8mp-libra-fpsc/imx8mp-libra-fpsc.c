@@ -17,7 +17,9 @@
 #include <mtd_node.h>
 #include <usb.h>
 
+#if IS_ENABLED(CONFIG_PHYTEC_SOM_DETECTION)
 #include "../common/imx8m_som_detection.h"
+#endif
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -96,10 +98,12 @@ static int setup_fec(void)
 
 int board_init(void)
 {
+#if IS_ENABLED(CONFIG_PHYTEC_SOM_DETECTION)
 	int ret = phytec_eeprom_data_setup(NULL, 0, EEPROM_ADDR);
 
 	if (ret)
 		printf("%s: EEPROM data init failed\n", __func__);
+#endif
 
 	tusb8042a_swap_lines();
 
