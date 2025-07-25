@@ -11,6 +11,7 @@
 #include <dwc3-uboot.h>
 #include <env.h>
 #include <init.h>
+#include <i2c.h>
 #include <fdt_support.h>
 #include <jffs2/load_kernel.h>
 #include <miiphy.h>
