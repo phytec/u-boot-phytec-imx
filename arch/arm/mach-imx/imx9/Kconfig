@@ -49,11 +49,13 @@ config IMX93
 config IMX91
 	bool
 	select IMX9
+	select ARCH_MISC_INIT
 	select ARMV8_SPL_EXCEPTION_VECTORS
 	select SYS_FSL_ERRATUM_052357
 
 config IMX95
 	bool
+	select ARCH_MISC_INIT
 	select ARMV8_SPL_EXCEPTION_VECTORS
 	select IMX9
 	select DM_MAILBOX
