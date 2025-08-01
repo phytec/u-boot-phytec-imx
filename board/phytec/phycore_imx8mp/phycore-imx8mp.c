@@ -8,16 +8,49 @@
 #include <asm/global_data.h>
 #include <asm/io.h>
 #include <asm/mach-imx/boot_mode.h>
+#include <asm/arch/clock.h>
 #include <env.h>
 #include <init.h>
 #include <fdt_support.h>
 #include <jffs2/load_kernel.h>
 #include <miiphy.h>
 #include <mtd_node.h>
+#include <usb.h>
+#include <dwc3-uboot.h>
 
 #include "../common/imx8m_som_detection.h"
 
 DECLARE_GLOBAL_DATA_PTR;
+
+static struct dwc3_device dwc3_device_data = {
+#ifdef CONFIG_SPL_BUILD
+	.maximum_speed = USB_SPEED_HIGH,
+#else
+	.maximum_speed = USB_SPEED_SUPER,
+#endif
+	.base = USB1_BASE_ADDR,
+	.dr_mode = USB_DR_MODE_PERIPHERAL,
+	.index = 0,
+	.power_down_scale = 2,
+};
+
+int board_usb_init(int index, enum usb_init_type init)
+{
+	if (index == 0 && init == USB_INIT_DEVICE) {
+		imx8m_usb_power(index, true);
+		return dwc3_uboot_init(&dwc3_device_data);
+	}
+	return 0;
+}
+
+int board_usb_cleanup(int index, enum usb_init_type init)
+{
+	if (index == 0 && init == USB_INIT_DEVICE) {
+		dwc3_uboot_exit(index);
+		imx8m_usb_power(index, false);
+	}
+	return 0;
+}
 
 #define EEPROM_ADDR		0x51
 #define EEPROM_ADDR_FALLBACK	0x59
@@ -57,6 +90,8 @@ int board_init(void)
 		printf("%s: EEPROM data init failed\n", __func__);
 
 	setup_fec();
+
+	init_usb_clk();
 
 	return 0;
 }
