@@ -37,6 +37,7 @@ config IMX_CRRM_SELFTEST
 
 config IMX9
 	bool
+	select BINMAN
 	select HAS_CAAM
 	select ROM_UNIFIED_SECTIONS
 
