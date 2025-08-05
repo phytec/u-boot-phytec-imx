@@ -21,7 +21,9 @@
 #include <spl.h>
 #include <common.h>
 
+#if IS_ENABLED(CONFIG_PHYTEC_SOM_DETECTION)
 #include "../common/imx8m_som_detection.h"
+#endif
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -34,16 +36,16 @@ int spl_board_boot_device(enum boot_device boot_dev_spl)
 
 void spl_dram_init(void)
 {
+#if IS_ENABLED(CONFIG_PHYTEC_SOM_DETECTION)
 	int ret;
 
 	ret = phytec_eeprom_data_setup(NULL, 0, EEPROM_ADDR);
-	if (ret)
-		goto out;
-
-	ret = phytec_imx8m_detect(NULL);
-	if (!ret)
-		phytec_print_som_info(NULL);
-out:
+	if (!ret) {
+		ret = phytec_imx8m_detect(NULL);
+		if (!ret)
+			phytec_print_som_info(NULL);
+	}
+#endif
 	ddr_init(&dram_timing);
 }
 
