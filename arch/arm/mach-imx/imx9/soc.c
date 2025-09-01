@@ -734,31 +734,66 @@ static int low_drive_fdt_fix_clock(void *fdt, int node_off, u32 clk_index,
 #	define MEDIA_AXI_PARENT IMX93_CLK_SYS_PLL_PFD1
 #	define MEDIA_APB_PARENT IMX93_CLK_SYS_PLL_PFD1_DIV2
 
-static int low_drive_freq_update(void *blob)
+struct low_drive_table {
+	struct low_drive_freq_entry *entries;
+	int size;
+};
+
+/* U-Boot dtb clocks for low drive mode */
+static struct low_drive_freq_entry table_uboot[] = {
+	{"/soc@0/lcd-controller@4ae30000", 0, 200000000, MEDIA_AXI_PARENT},
+	{"/soc@0/lcd-controller@4ae30000", 1, 133333334, MEDIA_APB_PARENT},
+	{"/soc@0/bus@42800000/mmc@42850000", 0, 266666667},
+	{"/soc@0/bus@42800000/mmc@42860000", 0, 266666667},
+	{"/soc@0/bus@42800000/mmc@428b0000", 0, 266666667},
+};
+
+/* Kernel dtb clocks for low drive mode */
+static struct low_drive_freq_entry table_kernel[] = {
+	{"/soc@0/lcd-controller@4ae30000", 2, 200000000, MEDIA_AXI_PARENT},
+	{"/soc@0/lcd-controller@4ae30000", 3, 133333334, MEDIA_APB_PARENT},
+	{"/soc@0/bus@42800000/camera/isi@4ae40000", 0, 200000000, MEDIA_AXI_PARENT},
+	{"/soc@0/bus@42800000/camera/isi@4ae40000", 1, 133333334, MEDIA_APB_PARENT},
+	{"/soc@0/bus@42800000/isi@4ae40000", 0, 200000000, MEDIA_AXI_PARENT},
+	{"/soc@0/bus@42800000/isi@4ae40000", 1, 133333334, MEDIA_APB_PARENT},
+	{"/soc@0/bus@42800000/mmc@42850000", 0, 266666667},
+	{"/soc@0/bus@42800000/mmc@42860000", 0, 266666667},
+	{"/soc@0/bus@42800000/mmc@428b0000", 0, 266666667},
+};
+
+static const struct low_drive_table low_drive_tables[] = {
+	[LOW_DRIVE_TABLE_UBOOT] = {
+		.entries = table_uboot,
+		.size = ARRAY_SIZE(table_uboot),
+	},
+	[LOW_DRIVE_TABLE_KERNEL] = {
+		.entries = table_kernel,
+		.size = ARRAY_SIZE(table_kernel),
+	},
+};
+
+int low_drive_freq_update(void *blob, enum low_drive_table_type type)
 {
-	int nodeoff, ret;
-	int i;
+	int nodeoff, ret, i;
 
-	/* Update kernel dtb clocks for low drive mode */
-	struct low_drive_freq_entry table[] = {
-		{"/soc@0/lcd-controller@4ae30000", 2, 200000000, MEDIA_AXI_PARENT},
-		{"/soc@0/lcd-controller@4ae30000", 3, 133333334, MEDIA_APB_PARENT},
-		{"/soc@0/bus@42800000/camera/isi@4ae40000", 0, 200000000, MEDIA_AXI_PARENT},
-		{"/soc@0/bus@42800000/camera/isi@4ae40000", 1, 133333334, MEDIA_APB_PARENT},
-		{"/soc@0/bus@42800000/isi@4ae40000", 0, 200000000, MEDIA_AXI_PARENT},
-		{"/soc@0/bus@42800000/isi@4ae40000", 1, 133333334, MEDIA_APB_PARENT},
-		{"/soc@0/bus@42800000/mmc@42850000", 0, 266666667},
-		{"/soc@0/bus@42800000/mmc@42860000", 0, 266666667},
-		{"/soc@0/bus@42800000/mmc@428b0000", 0, 266666667},
-	};
+	if (type < 0 || type >= ARRAY_SIZE(low_drive_tables)) {
+		printf("%s: invalid table type = %d\n", __func__, type);
+		return -1;
+	}
 
-	for (i = 0; i < ARRAY_SIZE(table); i++) {
-		nodeoff = fdt_path_offset(blob, table[i].node_path);
+	const struct low_drive_table *table = &low_drive_tables[type];
+
+	for (i = 0; i < table->size; i++) {
+		nodeoff = fdt_path_offset(blob, table->entries[i].node_path);
 		if (nodeoff >= 0) {
-			ret = low_drive_fdt_fix_clock(blob, nodeoff, table[i].clk,
-						      table[i].new_rate, table[i].new_parent);
-			if (!ret)
-				printf("%s freq updated\n", table[i].node_path);
+			ret = low_drive_fdt_fix_clock(blob,
+						      nodeoff,
+						      table->entries[i].clk,
+						      table->entries[i].new_rate,
+						      table->entries[i].new_parent);
+			if (ret)
+				debug("freq update failed for %s\n",
+				      table->entries[i].node_path);
 		}
 	}
 
@@ -799,25 +834,8 @@ static int disable_lpm(void *blob)
 int board_fix_fdt(void *fdt)
 {
 	/* Update u-boot dtb clocks for low drive mode */
-	if (is_voltage_mode(VOLT_LOW_DRIVE)){
-		int nodeoff;
-		int i;
-
-		struct low_drive_freq_entry table[] = {
-			{"/soc@0/lcd-controller@4ae30000", 0, 200000000, MEDIA_AXI_PARENT},
-			{"/soc@0/lcd-controller@4ae30000", 1, 133333334, MEDIA_APB_PARENT},
-			{"/soc@0/bus@42800000/mmc@42850000", 0, 266666667},
-			{"/soc@0/bus@42800000/mmc@42860000", 0, 266666667},
-			{"/soc@0/bus@42800000/mmc@428b0000", 0, 266666667},
-		};
-
-		for (i = 0; i < ARRAY_SIZE(table); i++) {
-			nodeoff = fdt_path_offset(fdt, table[i].node_path);
-			if (nodeoff >= 0)
-				low_drive_fdt_fix_clock(fdt, nodeoff, table[i].clk,
-							table[i].new_rate, table[i].new_parent);
-		}
-	}
+	if (is_voltage_mode(VOLT_LOW_DRIVE))
+		low_drive_freq_update(fdt, LOW_DRIVE_TABLE_UBOOT);
 
 	return 0;
 }
@@ -842,7 +860,7 @@ int ft_system_setup(void *blob, struct bd_info *bd)
 		disable_npu_nodes(blob);
 
 	if (is_voltage_mode(VOLT_LOW_DRIVE)) {
-		low_drive_freq_update(blob);
+		low_drive_freq_update(blob, LOW_DRIVE_TABLE_KERNEL);
 		disable_lpm(blob);
 	}
 
