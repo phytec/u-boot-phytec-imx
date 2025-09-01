@@ -15,10 +15,17 @@ enum imx9_soc_voltage_mode {
 	VOLT_SUPER_OVER_DRIVE,
 };
 
+enum low_drive_table_type {
+	LOW_DRIVE_TABLE_UBOOT,
+	LOW_DRIVE_TABLE_KERNEL,
+};
+
 void soc_power_init(void);
 bool m33_is_rom_kicked(void);
 int m33_prepare(void);
 bool is_usb_boot(void);
+int low_drive_freq_update(void *blob, enum low_drive_table_type type);
+
 
 enum imx9_soc_voltage_mode soc_target_voltage_mode(void);
 int get_reset_reason(bool sys, bool lm);
