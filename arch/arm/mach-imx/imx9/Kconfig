@@ -34,6 +34,7 @@ config IMX9
 	select CPU_IMX
 	select HAS_CAAM
 	select ROM_UNIFIED_SECTIONS
+	imply IMX_TMU
 
 config IMX93
 	bool
