@@ -547,7 +547,7 @@ static void imx_tmu_set_trips(struct imx_tmu_plat *pdata)
 
 	/* default alert/crit temps based on temp grade */
 	get_cpu_temp_grade(&minc, &maxc);
-	pdata->critical = maxc * 1000;
+	pdata->critical = (maxc - 5) * 1000;
 	pdata->alert = (maxc - 10) * 1000;
 }
 
