@@ -81,6 +81,27 @@ static void emmc_fixup(void *blob, struct phytec_eeprom_data *data)
 	}
 }
 
+static void ethphy_fixup(void *blob, struct phytec_eeprom_data *data)
+{
+	const char *path = "/soc@0/bus@42800000/ethernet@42890000/mdio/ethernet-phy@1";
+	u8 option = phytec_imx93_get_opt(data, PHYTEC_IMX93_OPT_ETH);
+	int ret, offset;
+
+	offset = fdt_path_offset(blob, path);
+	if (offset < 0) {
+		printf("%s: failed to find eth phy offset %s\n", __func__, path);
+		return;
+	}
+
+	if (!option) {
+		ret = fdt_status_disabled(blob, offset);
+		if (ret < 0)
+			printf("%s: failed to disable eth phy %s\n", __func__, path);
+		else
+			return;
+	}
+}
+
 int board_fix_fdt(void *blob)
 {
 	struct phytec_eeprom_data data;
@@ -88,6 +109,8 @@ int board_fix_fdt(void *blob)
 	phytec_eeprom_data_setup(&data, 2, EEPROM_ADDR);
 
 	emmc_fixup(blob, &data);
+
+	ethphy_fixup(blob, &data);
 
 	/* Update dtb clocks for low drive mode */
 	if (is_voltage_mode(VOLT_LOW_DRIVE))
@@ -99,6 +122,8 @@ int board_fix_fdt(void *blob)
 int ft_board_setup(void *blob, struct bd_info *bd)
 {
 	emmc_fixup(blob, NULL);
+
+	ethphy_fixup(blob, NULL);
 
 	/**
 	 * NOTE: VOLT_LOW_DRIVE fixup is done by the ft_system_setup()
