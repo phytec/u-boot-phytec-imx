@@ -85,6 +85,7 @@ static void ethphy_fixup(void *blob, struct phytec_eeprom_data *data)
 {
 	const char *path = "/soc@0/bus@42800000/ethernet@42890000/mdio/ethernet-phy@1";
 	u8 option = phytec_imx93_get_opt(data, PHYTEC_IMX93_OPT_ETH);
+	u8 pcb_rev = phytec_get_rev(data);
 	int ret, offset;
 
 	offset = fdt_path_offset(blob, path);
@@ -99,6 +100,17 @@ static void ethphy_fixup(void *blob, struct phytec_eeprom_data *data)
 			printf("%s: failed to disable eth phy %s\n", __func__, path);
 		else
 			return;
+	}
+
+	if (pcb_rev == PHYTEC_EEPROM_INVAL) {
+		printf("%s: invalid PCB revision, skipping\n", __func__);
+		return;
+	}
+
+	if (pcb_rev < 4) {
+		ret = fdt_delprop(blob, offset, "reset-gpios");
+		if (ret < 0)
+			printf("%s: failed to delete \"reset-gpios\" property\n", __func__);
 	}
 }
 
