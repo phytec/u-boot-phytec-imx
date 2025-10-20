@@ -52,23 +52,33 @@ int board_late_init(void)
 static void emmc_fixup(void *blob, struct phytec_eeprom_data *data)
 {
 	enum phytec_imx93_voltage voltage = phytec_imx93_get_voltage(data);
-	int offset;
+	u8 option = phytec_imx93_get_opt(data, PHYTEC_IMX93_OPT_EMMC);
+	int ret, offset;
 
-	if (voltage == PHYTEC_IMX93_VOLTAGE_INVALID)
-		goto err;
-
-	if (voltage == PHYTEC_IMX93_VOLTAGE_1V8) {
-		offset = fdt_node_offset_by_compat_reg(blob, "fsl,imx93-usdhc",
-						       0x42850000);
-		if (offset)
-			fdt_delprop(blob, offset, "no-1-8-v");
-		else
-			goto err;
+	offset = fdt_node_offset_by_compat_reg(blob, "fsl,imx93-usdhc", 0x42850000);
+	if (offset < 0) {
+		printf("%s: failed to find eMMC node offset\n", __func__);
+		return;
 	}
 
-	return;
-err:
-	printf("Could not detect eMMC VDD-IO. Fall back to default.\n");
+	if (!option) {
+		ret = fdt_status_disabled(blob, offset);
+		if (ret < 0)
+			printf("%s: failed to disable eMMC node\n", __func__);
+		else
+			return;
+	}
+
+	if (voltage == PHYTEC_IMX93_VOLTAGE_INVALID) {
+		printf("%s: invalid voltage, skipping\n", __func__);
+		return;
+	}
+
+	if (voltage == PHYTEC_IMX93_VOLTAGE_1V8) {
+		ret = fdt_delprop(blob, offset, "no-1-8-v");
+		if (ret < 0)
+			printf("%s: failed to delete \"no-1-8-v\" property\n", __func__);
+	}
 }
 
 int board_fix_fdt(void *blob)
