@@ -1,4 +1,5 @@
 #
+# Copyright (C) 2025 PHYTEC Messtechnik GmbH
 # Copyright 2022 NXP
 # Copyright (C) 2023 PHYTEC Messtechnik GmbH
 # Christoph Stoidner <c.stoidner@phytec.de>
@@ -7,8 +8,13 @@
 # SPDX-License-Identifier:      GPL-2.0+
 #
 
-obj-y += phycore-imx93.o
+obj-y += phycore-imx91-93.o
 
 ifdef CONFIG_XPL_BUILD
-obj-y += spl.o lpddr4_timing.o
+obj-y += spl.o
+ifdef CONFIG_IMX91
+obj-$(CONFIG_IMX9_LPDDR4X) += lpddr4_timing_imx91.o
+else
+obj-$(CONFIG_IMX9_LPDDR4X) += lpddr4_timing_imx93.o
+endif
 endif

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
+ * Copyright (C) 2025 PHYTEC Messtechnik GmbH
  * Copyright (C) 2023 PHYTEC Messtechnik GmbH
  * Author: Christoph Stoidner <c.stoidner@phytec.de>
  * Copyright (C) 2024 Mathieu Othacehe <m.othacehe@gmail.com>
@@ -13,7 +14,7 @@
 #include <fdt_support.h>
 #include <phy.h>
 
-#include "../common/imx93_som_detection.h"
+#include "../common/imx91_93_som_detection.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -88,7 +89,7 @@ static void dp8382x_phy_fixup(struct phy_device *phydev)
 
 int board_phy_config(struct phy_device *phydev)
 {
-	u8 option = phytec_imx93_get_opt(NULL, PHYTEC_IMX93_OPT_ETH);
+	u8 option = phytec_imx91_93_get_opt(NULL, PHYTEC_IMX91_93_OPT_ETH);
 
 	if (!option)
 		return 0;
@@ -103,8 +104,8 @@ int board_phy_config(struct phy_device *phydev)
 
 static void emmc_fixup(void *blob, struct phytec_eeprom_data *data)
 {
-	enum phytec_imx93_voltage voltage = phytec_imx93_get_voltage(data);
-	u8 option = phytec_imx93_get_opt(data, PHYTEC_IMX93_OPT_EMMC);
+	enum phytec_imx91_93_voltage voltage = phytec_imx91_93_get_voltage(data);
+	u8 option = phytec_imx91_93_get_opt(data, PHYTEC_IMX91_93_OPT_EMMC);
 	int ret, offset;
 
 	offset = fdt_node_offset_by_compat_reg(blob, "fsl,imx93-usdhc", 0x42850000);
@@ -121,12 +122,12 @@ static void emmc_fixup(void *blob, struct phytec_eeprom_data *data)
 			return;
 	}
 
-	if (voltage == PHYTEC_IMX93_VOLTAGE_INVALID) {
+	if (voltage == PHYTEC_IMX91_93_VOLTAGE_INVALID) {
 		printf("%s: invalid voltage, skipping\n", __func__);
 		return;
 	}
 
-	if (voltage == PHYTEC_IMX93_VOLTAGE_1V8) {
+	if (voltage == PHYTEC_IMX91_93_VOLTAGE_1V8) {
 		ret = fdt_delprop(blob, offset, "no-1-8-v");
 		if (ret < 0)
 			printf("%s: failed to delete \"no-1-8-v\" property\n", __func__);
@@ -136,7 +137,7 @@ static void emmc_fixup(void *blob, struct phytec_eeprom_data *data)
 static void ethphy_fixup(void *blob, struct phytec_eeprom_data *data)
 {
 	const char *path = "/soc@0/bus@42800000/ethernet@42890000/mdio/ethernet-phy@1";
-	u8 option = phytec_imx93_get_opt(data, PHYTEC_IMX93_OPT_ETH);
+	u8 option = phytec_imx91_93_get_opt(data, PHYTEC_IMX91_93_OPT_ETH);
 	u8 pcb_rev = phytec_get_rev(data);
 	int ret, offset;
 
