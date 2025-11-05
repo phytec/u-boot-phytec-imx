@@ -147,7 +147,7 @@ static void imx91_tmu_set_trips(struct imx91_tmu *tmu)
 
 	/* default alert/passive temps based on temp grade */
 	get_cpu_temp_grade(&minc, &maxc);
-	tmu->critical = maxc * 1000;
+	tmu->critical = (maxc - 5) * 1000;
 	tmu->passive = (maxc - 10) * 1000;
 }
 
