@@ -281,6 +281,7 @@ static const struct udevice_id imx91_tmu_ids[] = {
 static int imx91_tmu_of_to_plat(struct udevice *dev)
 {
 	struct imx91_tmu *tmu = dev_get_priv(dev);
+	ofnode cpu_thermal_np;
 	void *iobase;
 	int ret;
 
@@ -292,6 +293,10 @@ static int imx91_tmu_of_to_plat(struct udevice *dev)
 		return -EINVAL;
 	}
 	tmu->iobase = iobase;
+
+	cpu_thermal_np = ofnode_path("/thermal-zones/cpu-thermal");
+	tmu->polling_delay = ofnode_read_u32_default(cpu_thermal_np, "polling-delay",
+						     IMX_TMU_POLLING_DELAY_MS);
 
 	imx91_tmu_set_trips(tmu);
 
