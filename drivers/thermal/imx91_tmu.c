@@ -79,9 +79,8 @@ struct imx91_tmu {
 	int passive;
 };
 
-int imx91_tmu_get_temp(struct udevice *dev, int *temp)
+static int read_temperature(struct imx91_tmu *tmu, int *temp)
 {
-	struct imx91_tmu *tmu = dev_get_priv(dev);
 	u32 val;
 	s16 data;
 	int ret;
@@ -95,6 +94,30 @@ int imx91_tmu_get_temp(struct udevice *dev, int *temp)
 	*temp = data * 1000 / 64 / 1000;
 	if (*temp < TMU_TEMP_LOW_LIMIT || *temp > TMU_TEMP_HIGH_LIMIT)
 		return -EAGAIN;
+
+	return 0;
+}
+
+int imx91_tmu_get_temp(struct udevice *dev, int *temp)
+{
+	struct imx91_tmu *tmu = dev_get_priv(dev);
+	int cpu_tmp = 0;
+	int ret;
+
+	ret = read_temperature(tmu, &cpu_tmp);
+	if (ret)
+		return ret;
+
+	while (cpu_tmp >= tmu->passive) {
+		dev_crit(dev, "CPU Temperature (%dC) is beyond alert (%dC), close to critical (%dC) waiting...\n",
+			 cpu_tmp, tmu->passive, tmu->critical);
+		mdelay(tmu->polling_delay);
+		ret = read_temperature(tmu, &cpu_tmp);
+		if (ret)
+			return ret;
+	}
+
+	*temp = cpu_tmp;
 
 	return 0;
 }
