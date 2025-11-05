@@ -22,6 +22,7 @@
 #include <nvmem.h>
 #include <linux/bitfield.h>
 #include <linux/iopoll.h>
+#include <linux/psci.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -115,6 +116,15 @@ int imx91_tmu_get_temp(struct udevice *dev, int *temp)
 		ret = read_temperature(tmu, &cpu_tmp);
 		if (ret)
 			return ret;
+
+		if (is_imx91()) {
+			if (cpu_tmp >= tmu->critical) {
+				dev_crit(dev, "CPU Temperature (%dC) reaches critical temperature.\n",
+					 cpu_tmp);
+				dev_crit(dev, "Shutting down ...\n");
+				do_smc_shutdown();
+			}
+		}
 	}
 
 	*temp = cpu_tmp;
