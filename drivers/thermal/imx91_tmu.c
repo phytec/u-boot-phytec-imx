@@ -141,6 +141,16 @@ static int imx_init_from_fuse(struct imx91_tmu *tmu)
 	return 0;
 }
 
+static void imx91_tmu_set_trips(struct imx91_tmu *tmu)
+{
+	int minc, maxc;
+
+	/* default alert/passive temps based on temp grade */
+	get_cpu_temp_grade(&minc, &maxc);
+	tmu->critical = maxc * 1000;
+	tmu->passive = (maxc - 10) * 1000;
+}
+
 static int imx91_tmu_default_setup(struct imx91_tmu *tmu)
 {
 	int ret;
@@ -238,7 +248,6 @@ static const struct udevice_id imx91_tmu_ids[] = {
 static int imx91_tmu_of_to_plat(struct udevice *dev)
 {
 	struct imx91_tmu *tmu = dev_get_priv(dev);
-	ofnode trips_np;
 	void *iobase;
 	int ret;
 
@@ -251,20 +260,7 @@ static int imx91_tmu_of_to_plat(struct udevice *dev)
 	}
 	tmu->iobase = iobase;
 
-	trips_np = ofnode_path("/thermal-zones/cpu-thermal/trips");
-	ofnode_for_each_subnode(trips_np, trips_np) {
-		const char *type;
-
-		type = ofnode_get_property(trips_np, "type", NULL);
-		if (!type)
-			continue;
-		if (!strcmp(type, "critical"))
-			tmu->critical = ofnode_read_u32_default(trips_np, "temperature", 85);
-		else if (strcmp(type, "passive") == 0)
-			tmu->passive = ofnode_read_u32_default(trips_np, "temperature", 80);
-		else
-			continue;
-	}
+	imx91_tmu_set_trips(tmu);
 
 #if (IS_ENABLED(CONFIG_CLK))
 	ret = clk_get_by_index(dev, 0, &tmu->clk);
