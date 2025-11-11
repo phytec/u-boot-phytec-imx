@@ -43,5 +43,22 @@ config PHYCORE_IMX91_93_RAM_TYPE_LPDDR4X_2GB
 
 endchoice
 
+choice
+	prompt "Set the polarity of Ethernet PHY LEDs"
+	default PHYCORE_IMX91_93_ETHPHYLED_ACTIVEHIGH
+
+config PHYCORE_IMX91_93_ETHPHYLED_ACTIVEHIGH
+	bool "Active High"
+	help
+	  Set Ethernet PHY LEDs polarity to active-high on the
+	  PHYTEC phyCORE-i.MX 91/93 SoMs
+
+config PHYCORE_IMX91_93_ETHPHYLED_ACTIVELOW
+	bool "Active Low"
+	help
+	  Set Ethernet PHY LEDs polarity to active-low on the
+	  PHYTEC phyCORE-i.MX 91/93 SoMs
+endchoice
+
 source "board/phytec/common/Kconfig"
 endif

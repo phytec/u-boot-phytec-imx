@@ -66,16 +66,22 @@ static void dp8382x_phy_fixup(struct phy_device *phydev)
 		phy_set_bits_mmd(phydev, DP83822_DEVADDR, 0x0, BIT(12));
 		/* CRS_DV: enable */
 		phy_clear_bits_mmd(phydev, DP83822_DEVADDR, 0x302, BIT(8));
-		/* LED_2_Polarity: active low */
-		phy_clear_bits_mmd(phydev, DP83822_DEVADDR, 0x469, BIT(6));
+		/* LED_2_Polarity: active low/high */
+		if (IS_ENABLED(CONFIG_PHYCORE_IMX91_93_ETHPHYLED_ACTIVELOW))
+			phy_clear_bits_mmd(phydev, DP83822_DEVADDR, 0x469, BIT(6));
+		else if (IS_ENABLED(CONFIG_PHYCORE_IMX91_93_ETHPHYLED_ACTIVEHIGH))
+			phy_set_bits_mmd(phydev, DP83822_DEVADDR, 0x469, BIT(6));
 		/* LED_2_Control: RX/TX act */
 		phy_clear_bits_mmd(phydev, DP83822_DEVADDR, 0x460, GENMASK(7, 4));
 		phy_set_bits_mmd(phydev, DP83822_DEVADDR, 0x460, BIT(4));
 		/* LED_0_Configuration: Link OK, cfg_mled_en: LED_0 */
 		phy_clear_bits_mmd(phydev, DP83822_DEVADDR, 0x25, GENMASK(6, 3));
 		phy_set_bits_mmd(phydev, DP83822_DEVADDR, 0x25, BIT(0));
-		/* LED_Link_Polarity : active low */
-		phy_clear_bits_mmd(phydev, DP83822_DEVADDR, 0x18, BIT(7));
+		/* LED_Link_Polarity : active low/high */
+		if (IS_ENABLED(CONFIG_PHYCORE_IMX91_93_ETHPHYLED_ACTIVELOW))
+			phy_clear_bits_mmd(phydev, DP83822_DEVADDR, 0x18, BIT(7));
+		else if (IS_ENABLED(CONFIG_PHYCORE_IMX91_93_ETHPHYLED_ACTIVEHIGH))
+			phy_set_bits_mmd(phydev, DP83822_DEVADDR, 0x18, BIT(7));
 	}
 
 	/* DP83826I fixup */
