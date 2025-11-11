@@ -58,6 +58,10 @@
 	bootph-some-ram;
 };
 
+&eqos {
+	status = "disabled";
+};
+
 &iomuxc {
 	bootph-pre-ram;
 	bootph-some-ram;
