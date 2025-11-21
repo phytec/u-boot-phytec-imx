@@ -40,9 +40,11 @@ int board_late_init(void)
 	switch (get_boot_device()) {
 	case SD2_BOOT:
 		env_set_ulong("mmcdev", 1);
+		env_set("boot_targets", "mmc1 mmc0 usb ethernet");
 		break;
 	case MMC1_BOOT:
 		env_set_ulong("mmcdev", 0);
+		env_set("boot_targets", "mmc0 mmc1 usb ethernet");
 		break;
 	default:
 		break;
