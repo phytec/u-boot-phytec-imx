@@ -1,0 +1,12 @@
+if TARGET_IMX95_PHYFLEX_LIBRA_RDK
+
+config SYS_BOARD
+	default "imx95-phyflex-libra-rdk"
+
+config SYS_VENDOR
+	default "phytec"
+
+config SYS_CONFIG_NAME
+	default "imx95-phyflex-libra-rdk"
+
+endif
