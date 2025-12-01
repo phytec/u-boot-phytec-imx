@@ -15,13 +15,6 @@
 	 */
 	model = "PHYTEC phyCORE-i.MX91";
 
-	wdt-reboot {
-		compatible = "wdt-reboot";
-		wdt = <&wdog3>;
-		bootph-pre-ram;
-		bootph-some-ram;
-	};
-
 	aliases {
 		ethernet0 = &fec;
 		ethernet1 = &eqos;
