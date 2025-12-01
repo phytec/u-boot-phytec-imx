@@ -26,4 +26,9 @@
 /* Using ULP WDOG for reset */
 #define WDOG_BASE_ADDR          WDG3_BASE_ADDR
 
+#ifdef CONFIG_ENV_WRITEABLE_LIST
+/* Set environment flag validation to a list of env vars that must be writable */
+#define CFG_ENV_FLAGS_LIST_STATIC "BOOT_ORDER:sw,BOOT_system0_LEFT:dw,BOOT_system1_LEFT:dw"
+#endif
+
 #endif /* __PHYCORE_IMX91_93_H */
