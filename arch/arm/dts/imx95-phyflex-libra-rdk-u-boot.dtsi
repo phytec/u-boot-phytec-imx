@@ -3,8 +3,6 @@
  * Copyright 2025 PHYTEC Messtechnik GmbH
  */
 
-#include "imx95-u-boot.dtsi"
-
 / {
 	bootstd {
 		bootph-verify;
