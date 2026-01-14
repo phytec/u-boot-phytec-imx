@@ -41,5 +41,30 @@ config PHYCORE_IMX8MM_RAM_SIZE_4GB
 	  Set RAM size fix to 4GB for phyCORE-i.MX8MM.
 endchoice
 
+config PHYCORE_IMX8MM_RAM_STATIC_SOM_REV
+	bool "Set static phyCORE-i.MX8MM SoM revision for RAM timing setup"
+	default false
+	help
+	  phyCORE-i.MX8MM SoM revision 7 uses a updated set of optimized
+	  RAM timings compared to revision 6 and older. Set the SoM
+	  revision during compile time instead of being detected.
+
+choice
+	prompt "phyCORE-i.MX8MM RAM timing SoM revision static config"
+	depends on PHYCORE_IMX8MM_RAM_STATIC_SOM_REV
+	default PHYCORE_IMX8MM_USE_SOM_REV_7
+
+config PHYCORE_IMX8MM_USE_SOM_REV_6
+	bool "RAM Timings for SoM Revisions 6 and older"
+	help
+	  Use optimized RAM Timings for phyCORE-i.MX8MM SoM Revisions 6
+	  and older.
+
+config PHYCORE_IMX8MM_USE_SOM_REV_7
+	bool "RAM Timings for SoM Revision 7"
+	help
+	  Use optimized RAM Timings for phyCORE-i.MX8MM SoM Revision 7.
+endchoice
+
 source "board/phytec/common/Kconfig"
 endif
