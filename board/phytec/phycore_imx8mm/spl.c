@@ -48,6 +48,7 @@ static void spl_dram_init(void)
 {
 	int ret;
 	enum phytec_imx8mm_ddr_eeprom_code size = PHYTEC_EEPROM_INVAL;
+	u8 rev = PHYTEC_EEPROM_INVAL;
 
 	ret = phytec_eeprom_data_setup_fallback(NULL, 0, EEPROM_ADDR,
 			EEPROM_ADDR_FALLBACK);
@@ -67,6 +68,22 @@ static void spl_dram_init(void)
 			size = PHYTEC_IMX8MM_DDR_4GB;
 	} else {
 		size = phytec_get_imx8m_ddr_size(NULL);
+	}
+
+	if (IS_ENABLED(CONFIG_PHYCORE_IMX8MM_RAM_STATIC_SOM_REV)) {
+		if (IS_ENABLED(CONFIG_PHYCORE_IMX8MM_USE_SOM_REV_6))
+			rev = 6;
+		else if (IS_ENABLED(CONFIG_PHYCORE_IMX8MM_USE_SOM_REV_7))
+			rev = 7;
+	} else {
+		rev = phytec_get_rev(NULL);
+	}
+
+	if (rev >= 7 || rev == PHYTEC_EEPROM_INVAL) {
+		debug("%s: Using rev7 RAM timings.\n", __func__);
+		set_dram_timings_rev7();
+	} else {
+		debug("%s: Using rev6 RAM timings.\n", __func__);
 	}
 
 	switch (size) {
