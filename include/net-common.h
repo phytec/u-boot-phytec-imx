@@ -490,6 +490,15 @@ int net_loop(enum proto_t protocol);
 int dhcp_run(ulong addr, const char *fname, bool autoload);
 
 /**
+ * tftpb_run() - Run TFTP on the current ethernet device
+ *
+ * @addr: Address to load the file into
+ * @fname: Filename of file to load (NULL to use the default filename)
+ * @return 0 if OK, -ENOENT if ant file was not found
+ */
+int tftpb_run(ulong addr, const char *fname);
+
+/**
  * do_tftpb - Run the tftpboot command
  *
  * @cmdtp: Command information for tftpboot
