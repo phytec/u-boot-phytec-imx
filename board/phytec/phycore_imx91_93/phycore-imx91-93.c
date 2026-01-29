@@ -96,7 +96,7 @@ static void dp8382x_phy_fixup(struct phy_device *phydev)
 
 int board_phy_config(struct phy_device *phydev)
 {
-	u8 option = phytec_imx91_93_get_opt(NULL, PHYTEC_IMX91_93_OPT_ETH);
+	u8 option = phytec_imx91_93_phycore_get_opt(NULL, PHYTEC_IMX91_93_PHYCORE_OPT_ETH);
 
 	if (!option)
 		return 0;
@@ -112,7 +112,7 @@ int board_phy_config(struct phy_device *phydev)
 static void emmc_fixup(void *blob, struct phytec_eeprom_data *data)
 {
 	enum phytec_imx91_93_voltage voltage = phytec_imx91_93_get_voltage(data);
-	u8 option = phytec_imx91_93_get_opt(data, PHYTEC_IMX91_93_OPT_EMMC);
+	u8 option = phytec_imx91_93_phycore_get_opt(data, PHYTEC_IMX91_93_PHYCORE_OPT_EMMC);
 	int ret, offset;
 
 	offset = fdt_node_offset_by_compat_reg(blob, "fsl,imx93-usdhc", 0x42850000);
@@ -144,7 +144,7 @@ static void emmc_fixup(void *blob, struct phytec_eeprom_data *data)
 static void ethphy_fixup(void *blob, struct phytec_eeprom_data *data)
 {
 	const char *path = "/soc@0/bus@42800000/ethernet@42890000/mdio/ethernet-phy@1";
-	u8 option = phytec_imx91_93_get_opt(data, PHYTEC_IMX91_93_OPT_ETH);
+	u8 option = phytec_imx91_93_phycore_get_opt(data, PHYTEC_IMX91_93_PHYCORE_OPT_ETH);
 	u8 pcb_rev = phytec_get_rev(data);
 	int ret, offset;
 

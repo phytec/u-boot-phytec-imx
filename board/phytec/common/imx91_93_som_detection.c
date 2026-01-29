@@ -20,10 +20,11 @@ extern struct phytec_eeprom_data eeprom_data;
 /* Check if the SoM is actually one of the following products:
  * - i.MX91
  * - i.MX93
+ * and has som_no PHYCORE_IMX91_93_SOM or PHYFLEX_IMX91_93_SOM.
  *
  * Returns 0 in case it's a known SoM. Otherwise, returns 1.
  */
-u8 __maybe_unused phytec_imx91_93_detect(struct phytec_eeprom_data *data)
+u8 __maybe_unused phytec_imx91_93_detect(struct phytec_eeprom_data *data, u8 som_no)
 {
 	u8 som;
 
@@ -37,7 +38,8 @@ u8 __maybe_unused phytec_imx91_93_detect(struct phytec_eeprom_data *data)
 	som = data->payload.data.data_api2.som_no;
 	debug("%s: som id: %u\n", __func__, som);
 
-	if (som == PHYTEC_IMX91_93_SOM && (is_imx91() || is_imx93()))
+	/* PHYTEC_IMX93_SOMs can have an imx91 SoC or imx93 SoC */
+	if (som == som_no && (is_imx91() || is_imx93()))
 		return 0;
 
 	pr_err("%s: SoM ID does not match. Wrong EEPROM data?\n", __func__);
@@ -53,7 +55,7 @@ u8 __maybe_unused phytec_imx91_93_detect(struct phytec_eeprom_data *data)
  *
  */
 u8 __maybe_unused phytec_imx91_93_get_opt(struct phytec_eeprom_data *data,
-					  enum phytec_imx91_93_option_index idx)
+					  int idx)
 {
 	char *opt;
 	u8 opt_id;
@@ -85,7 +87,7 @@ u8 __maybe_unused phytec_imx91_93_get_opt(struct phytec_eeprom_data *data,
 enum phytec_imx91_93_voltage
 __maybe_unused phytec_imx91_93_get_voltage(struct phytec_eeprom_data *data)
 {
-	u8 option = phytec_imx91_93_get_opt(data, PHYTEC_IMX91_93_OPT_FEAT);
+	u8 option = phytec_imx91_93_phycore_get_opt(data, PHYTEC_IMX91_93_PHYCORE_OPT_FEAT);
 
 	if (option == PHYTEC_EEPROM_INVAL)
 		return PHYTEC_IMX91_93_VOLTAGE_INVALID;
@@ -94,13 +96,13 @@ __maybe_unused phytec_imx91_93_get_voltage(struct phytec_eeprom_data *data)
 
 #else
 
-inline u8 __maybe_unused phytec_imx91_93_detect(struct phytec_eeprom_data *data)
+inline u8 __maybe_unused phytec_imx91_93_detect(struct phytec_eeprom_data *data, u8 som_no)
 {
 	return 1;
 }
 
 inline u8 __maybe_unused phytec_imx91_93_get_opt(struct phytec_eeprom_data *data,
-						 enum phytec_imx91_93_option_index idx)
+						 int idx)
 {
 	return PHYTEC_EEPROM_INVAL;
 }

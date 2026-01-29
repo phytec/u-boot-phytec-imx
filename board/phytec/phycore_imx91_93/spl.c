@@ -57,7 +57,7 @@ void spl_dram_init(void)
 	if (ret && !IS_ENABLED(CONFIG_PHYCORE_IMX91_93_RAM_TYPE_FIX))
 		goto out;
 
-	ret = phytec_imx91_93_detect(NULL);
+	ret = phytec_imx91_93_detect(NULL, PHYCORE_IMX91_93_SOM);
 	if (!ret)
 		phytec_print_som_info(NULL);
 
@@ -69,7 +69,7 @@ void spl_dram_init(void)
 		else if (IS_ENABLED(CONFIG_PHYCORE_IMX91_93_RAM_TYPE_LPDDR4X_2GB))
 			ddr_opt = PHYTEC_IMX91_93_LPDDR4X_2GB;
 	} else {
-		ddr_opt = phytec_imx91_93_get_opt(NULL, PHYTEC_IMX91_93_OPT_DDR);
+		ddr_opt = phytec_imx91_93_phycore_get_opt(NULL, PHYTEC_IMX91_93_PHYCORE_OPT_DDR);
 	}
 
 	switch (ddr_opt) {
