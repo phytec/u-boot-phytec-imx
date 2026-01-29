@@ -1,0 +1,14 @@
+phyFLEX-i.MX91/93
+M:      Christoph Stoidner <c.stoidner@phytec.de>
+R:      Christoph Stoidner <c.stoidner@phytec.de>
+W:      https://www.phytec.eu/en/produkte/system-on-modules/phyflex-imx-91-93/
+S:      Maintained
+F:      arch/arm/dts/imx93-phyflex-libra-rdk.dts
+F:      arch/arm/dts/imx93-phyflex-libra-rdk-u-boot.dtsi
+F:      arch/arm/dts/imx93-phyflex-fpsc-g-som.dtsi
+F:      board/phytec/phyflex_imx91_93/
+F:      board/phytec/common/imx91_93_som_detection.c
+F:      board/phytec/common/imx91_93_som_detection.h
+F:      configs/imx93-phyflex_defconfig
+F:      doc/board/phytec/imx91-93-phyflex.rst
+F:      include/configs/phyflex_imx91_93.h

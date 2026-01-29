@@ -830,7 +830,7 @@ static int disable_lpm(void *blob)
 }
 
 #if defined(CONFIG_OF_BOARD_FIXUP) && !defined(CONFIG_TARGET_PHYCORE_IMX93) && \
-!defined(CONFIG_TARGET_PHYCORE_IMX91)
+!defined(CONFIG_TARGET_PHYCORE_IMX91) && !defined(CONFIG_TARGET_PHYFLEX_IMX93)
 #ifndef CONFIG_XPL_BUILD
 int board_fix_fdt(void *fdt)
 {
