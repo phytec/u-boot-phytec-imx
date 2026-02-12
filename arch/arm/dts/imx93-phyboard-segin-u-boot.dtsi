@@ -21,6 +21,7 @@
 	aliases {
 		ethernet0 = &fec;
 		ethernet1 = &eqos;
+		usb_gadget0 = &usbg1;
 	};
 
 	bootstd {
@@ -44,6 +45,13 @@
 			compatible = "linaro,optee-tz";
 			method = "smc";
 		};
+	};
+
+	usbg1: usbg1 {
+		compatible = "fsl,imx27-usb-gadget";
+		dr_mode = "peripheral";
+		chipidea,usb = <&usbotg1>;
+		status = "okay";
 	};
 };
 
