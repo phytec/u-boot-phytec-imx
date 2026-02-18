@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
- * Copyright (C) 2026 PHYTEC Messtechnik GmbH
+ * Copyright (C) 2025 PHYTEC Messtechnik GmbH
  * Author: Christoph Stoidner <c.stoidner@phytec.de>
  *
  * Product homepage:
@@ -20,21 +20,324 @@
 	aliases {
 		mmc0 = &usdhc1;
 		mmc1 = &usdhc2;
+		rtc0 = &i2c_rtc;
+		rtc1 = &bbnsm_rtc;
 	};
 
 	chosen {
 		stdout-path = &lpuart1;
 	};
+
+	backlight: backlight {
+		compatible = "pwm-backlight";
+		power-supply = <&reg_vdd_12v0>;
+		brightness-levels = <0 8 16 32 64 128 255>;
+		default-brightness-level = <8>;
+		num-interpolated-steps = <2>;
+		pwms = <&tpm3 3 66667 0>;
+		status = "disabled";
+	};
+
+	can_transceiver1: can-phy1 {
+		compatible = "ti,tcan1043";
+		#phy-cells = <0>;
+		max-bitrate = <8000000>;
+		standby-gpios = <&gpio_expander2 0 GPIO_ACTIVE_HIGH>;
+	};
+
+	can_transceiver2: can-phy2 {
+		compatible = "ti,tcan1043";
+		#phy-cells = <0>;
+		max-bitrate = <8000000>;
+		standby-gpios = <&gpio_expander2 1 GPIO_ACTIVE_HIGH>;
+	};
+
+	connector {
+		compatible = "usb-c-connector";
+		label = "USB-C";
+		data-role = "dual";
+		pd-disable;
+		self-powered;
+		vbus-supply = <&reg_vdd_vbus>;
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+
+				hs_ep: endpoint {
+					remote-endpoint = <&usb3_hs_ep>;
+				};
+			};
+
+			port@1 {
+				reg = <1>;
+
+				ss_ep: endpoint {
+					remote-endpoint = <&hd3ss3220_in_ep>;
+				};
+			};
+		};
+	};
+
+	curr_sens_som_in: current-sense-som-in {
+		compatible = "current-sense-amplifier";
+		#io-channel-cells = <0>;
+		io-channels = <&adc1 0>;
+		sense-gain-div = <3>;
+		sense-gain-mult = <100>;
+		sense-resistor-micro-ohms = <4000>;
+	};
+
+	curr_sens_som_in_ext: current-sense-som-in-ext {
+		compatible = "current-sense-amplifier";
+		#io-channel-cells = <0>;
+		io-channels = <&adc2 0>;
+		sense-gain-div = <15>;
+		sense-gain-mult = <1400>;
+		sense-resistor-micro-ohms = <4000>;
+	};
+
+	curr_sens_vdd_1v8_ext: current-sense-vdd-1v8-ext {
+		compatible = "current-sense-amplifier";
+		#io-channel-cells = <0>;
+		io-channels = <&adc2 6>;
+		sense-gain-mult = <100>;
+		sense-resistor-micro-ohms = <4000>;
+	};
+
+	curr_sens_vdd_3v3_ext: current-sense-vdd-3v3-ext {
+		compatible = "current-sense-amplifier";
+		#io-channel-cells = <0>;
+		io-channels = <&adc2 4>;
+		sense-gain-mult = <100>;
+		sense-resistor-micro-ohms = <4000>;
+	};
+
+	curr_sens_vdd_5v0: current-sense-vdd-5v0 {
+		compatible = "current-sense-amplifier";
+		#io-channel-cells = <0>;
+		io-channels = <&adc1 2>;
+		sense-gain-div = <3>;
+		sense-gain-mult = <100>;
+		sense-resistor-micro-ohms = <4000>;
+	};
+
+	curr_sens_vdd_5v0_ext: current-sense-vdd-5v0-ext {
+		compatible = "current-sense-amplifier";
+		#io-channel-cells = <0>;
+		io-channels = <&adc2 2>;
+		sense-gain-div = <15>;
+		sense-gain-mult = <1400>;
+		sense-resistor-micro-ohms = <4000>;
+	};
+
+	iio-hwmon {
+		compatible = "iio-hwmon";
+		io-channels = <&curr_sens_vdd_1v8_ext>, <&adc2 7>,
+				<&curr_sens_vdd_3v3_ext>, <&adc2 5>,
+				<&curr_sens_vdd_5v0>, <&volt_sens_vdd_5v0>,
+				<&curr_sens_vdd_5v0_ext>, <&volt_sens_vdd_5v0_ext>,
+				<&curr_sens_som_in>, <&volt_sens_som_in>,
+				<&curr_sens_som_in_ext>, <&volt_sens_som_in_ext>;
+	};
+
+	panel_lvds1: panel-lvds0 {
+		backlight = <&backlight>;
+		enable-gpios = <&gpio_expander2 9 GPIO_ACTIVE_HIGH>;
+		power-supply = <&reg_vdd_3v3>;
+		status = "disabled";
+	};
+
+	reg_vdd_12v0: regulator-vdd-12v0 {
+		compatible = "regulator-fixed";
+		regulator-always-on;
+		regulator-boot-on;
+		regulator-max-microvolt = <12000000>;
+		regulator-min-microvolt = <12000000>;
+	};
+
+	reg_vdd_1v8: regulator-vdd-1v8 {
+		compatible = "regulator-fixed";
+		regulator-always-on;
+		regulator-boot-on;
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+	};
+
+	reg_vdd_3v3: regulator-vdd-3v3 {
+		compatible = "regulator-fixed";
+		regulator-always-on;
+		regulator-boot-on;
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+	};
+
+	reg_vdd_5v0: regulator-vdd-5v0 {
+		compatible = "regulator-fixed";
+		regulator-always-on;
+		regulator-boot-on;
+		regulator-max-microvolt = <5000000>;
+		regulator-min-microvolt = <5000000>;
+	};
+
+	reg_vdd_5v0_ref: regulator-vdd-5v0-ref {
+		compatible = "regulator-fixed";
+		regulator-always-on;
+		regulator-boot-on;
+		regulator-max-microvolt = <5000000>;
+		regulator-min-microvolt = <5000000>;
+	};
+
+	reg_vdd_vbus: regulator-vdd-vbus {
+		compatible = "regulator-fixed";
+		enable-active-high;
+		gpio = <&gpio2 24 GPIO_ACTIVE_HIGH>;
+		regulator-name = "VDD_VBUS_C";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+	};
+
+	reg_vdd_vbus_dummy: regulator-vdd-vbus-dummy {
+		compatible = "regulator-fixed";
+		regulator-name = "VDD_VBUS_C_DUMMY";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		regulator-always-on;
+	};
+
+	volt_sens_som_in: voltage-sense-som-in {
+		compatible = "voltage-divider";
+		#io-channel-cells = <0>;
+		io-channels = <&adc1 1>;
+		output-ohms = <100>;
+		full-ohms = <346>;
+	};
+
+	volt_sens_som_in_ext: voltage-sense-som-in-ext {
+		compatible = "voltage-divider";
+		#io-channel-cells = <0>;
+		io-channels = <&adc2 1>;
+		output-ohms = <280>;
+		full-ohms = <346>;
+	};
+
+	volt_sens_vdd_5v0: voltage-sense-vdd-5v0 {
+		compatible = "voltage-divider";
+		#io-channel-cells = <0>;
+		io-channels = <&adc1 3>;
+		output-ohms = <100>;
+		full-ohms = <346>;
+	};
+
+	volt_sens_vdd_5v0_ext: voltage-sense-vdd-5v0-ext {
+		compatible = "voltage-divider";
+		#io-channel-cells = <0>;
+		io-channels = <&adc2 3>;
+		output-ohms = <280>;
+		full-ohms = <346>;
+	};
+};
+
+/* ADC */
+&adc1 {
+	status = "okay";
 };
 
 /* FPSC I2C2 */
 &lpi2c1 {
 	status = "okay";
+
+	gpio_expander1: gpio@21 {
+		compatible = "ti,tcal6416";
+		reg = <0x21>;
+		interrupt-controller;
+		interrupt-parent = <&gpio2>;
+		interrupts = <22 IRQ_TYPE_LEVEL_LOW>;
+		#interrupt-cells = <2>;
+		#gpio-cells = <2>;
+		gpio-controller;
+		gpio-line-names = "VCONN_nFAULT", "CSI1_CTRL1", "CSI1_CTRL3",
+				  "CSI1_CTRL4", "USB-C_nINT/AUDIO_AC",
+				  "CSI2_CTRL1", "CSI2_CTRL3", "CSI2_CTRL4",
+				  "CLK_EN_AV", "W_nDISABLE1", "W_nDISABLE2",
+				  "PCIE1_nWAKE", "PCIE2_nWAKE", "UART1_nWAKE",
+				  "UART1_BT_RS_SEL", "UART1_RS232_485_SEL";
+	};
 };
 
 /* FPSC I2C3 */
 &lpi2c2 {
 	status = "okay";
+
+	gpio_expander2: gpio@21 {
+		compatible = "ti,tcal6416";
+		reg = <0x21>;
+		interrupt-controller;
+		interrupt-parent = <&gpio2>;
+		interrupts = <23 IRQ_TYPE_LEVEL_LOW>;
+		#interrupt-cells = <2>;
+		#gpio-cells = <2>;
+		gpio-controller;
+		gpio-line-names = "CAN1_STBY", "CAN2_STBY", "CAN3_STBY",
+				  "KEY-E_nALERT", "KEY-M_nALERT",
+				  "SDIO_nWAKE", "SDIO_nRESET", "HDMI_EN",
+				  "RTC_nINT", "LVDS1_BL_EN", "SFP_TX_FAULT",
+				  "SFP_TX_DISABLE", "SFP_MOD_ABS", "SFP_RS0",
+				  "SFP_RX_LOSS", "SFP_RS1";
+	};
+
+	led-controller@62 {
+		compatible = "nxp,pca9633";
+		reg = <0x62>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		led@0 {
+			reg = <0>;
+			color = <LED_COLOR_ID_RED>;
+			function = LED_FUNCTION_STATUS;
+		};
+
+		led@1 {
+			reg = <1>;
+			color = <LED_COLOR_ID_GREEN>;
+			function = LED_FUNCTION_STATUS;
+		};
+
+		led@2 {
+			reg = <2>;
+			color = <LED_COLOR_ID_BLUE>;
+			function = LED_FUNCTION_STATUS;
+		};
+	};
+
+	usb-typec@47 {
+		compatible = "ti,hd3ss3220";
+		reg = <0x47>;
+		interrupt-parent = <&gpio_expander1>;
+		interrupts = <4 IRQ_TYPE_LEVEL_LOW>;
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+				hd3ss3220_in_ep: endpoint {
+					remote-endpoint = <&ss_ep>;
+				};
+			};
+
+			port@1 {
+				reg = <1>;
+				hd3ss3220_out_ep: endpoint {
+					remote-endpoint = <&usb3_role_switch>;
+				};
+			};
+		};
+	};
 };
 
 /* FPSC ENET2 */
@@ -50,13 +353,121 @@
 		interrupts = <1 IRQ_TYPE_LEVEL_LOW>;
 		ti,clk-output-sel = <DP83867_CLK_O_SEL_OFF>;
 		ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
-		ti,rx-internal-delay = <DP83867_RGMIIDCTL_1_50_NS>;
+		ti,rx-internal-delay = <DP83867_RGMIIDCTL_1_75_NS>;
 		ti,tx-internal-delay = <DP83867_RGMIIDCTL_1_75_NS>;
 	};
 };
 
+/* RTC */
+&i2c_rtc {
+	interrupt-parent = <&gpio_expander2>;
+	interrupts = <8 IRQ_TYPE_LEVEL_LOW>;
+	aux-voltage-chargeable = <1>;
+	wakeup-source;
+};
+
+/* FPSC SPI2 */
+&lpspi3 {
+	status = "okay";
+
+	/* TPM */
+	tpm@0 {
+		compatible = "infineon,slb9670", "tcg,tpm_tis-spi";
+		reg = <0>;
+		spi-max-frequency = <10000000>;
+	};
+};
+
+/* FPSC SPI1 */
+&lpspi6 {
+	status = "okay";
+
+	/* ADC */
+	adc2: adc2@0 {
+		compatible = "microchip,mcp3208";
+		reg = <0>;
+		spi-max-frequency = <1000000>;
+		vref-supply = <&reg_vdd_5v0_ref>;
+		#io-channel-cells = <1>;
+	};
+};
+
+/* FPSC QSPI */
+&flexspi1 {
+	status = "okay";
+
+	spi_nor: flash@0 {
+		compatible = "jedec,spi-nor";
+		reg = <0>;
+		spi-max-frequency = <166000000>;
+		spi-rx-bus-width = <4>;
+		spi-tx-bus-width = <4>;
+	};
+};
+
+/* FPSC CAN1 */
+&flexcan1 {
+	phys = <&can_transceiver1>;
+	status = "okay";
+};
+
+/* FPSC CAN2 */
+&flexcan2 {
+	phys = <&can_transceiver2>;
+	status = "okay";
+};
+
 /* Console */
 &lpuart1 {
+	status = "okay";
+};
+
+/* FPSC UART1 */
+&lpuart6 {
+	status = "okay";
+};
+
+/* USB */
+&usbphynop1 {
+	vbus-supply = <&reg_vdd_vbus_dummy>;
+};
+
+&usbphynop2 {
+	vbus-supply = <&reg_vdd_5v0>;
+};
+
+&usbotg1 {
+	adp-disable;
+	disable-over-current;
+	dr_mode = "otg";
+	hnp-disable;
+	srp-disable;
+	usb-role-switch;
+	status = "okay";
+
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@0 {
+			reg = <0>;
+			usb3_hs_ep: endpoint {
+				remote-endpoint = <&hs_ep>;
+			};
+		};
+
+		port@1 {
+			reg = <1>;
+			usb3_role_switch: endpoint {
+				remote-endpoint = <&hd3ss3220_out_ep>;
+			};
+		};
+	};
+};
+
+&usbotg2 {
+	disable-over-current;
+	dr_mode = "host";
 	status = "okay";
 };
 
