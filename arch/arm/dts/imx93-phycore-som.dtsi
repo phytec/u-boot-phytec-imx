@@ -69,14 +69,18 @@
 };
 
 /* Secure enclave */
-&ele_fw2 {
-	memory-region = <&ele_reserved>;
-};
+/* Disable for u-boot: ele_fw2 does not exist in context of u-boot
+ *	&ele_fw2 {
+ *		memory-region = <&ele_reserved>;
+ *	};
+ */
 
 /* PXP */
-&epxp {
-	status = "okay";
-};
+/* Disable for u-boot: epxp does not exist in context of u-boot
+ *	&epxp {
+ *		status = "okay";
+ *	};
+ */
 
 /* Ethernet */
 &fec {
@@ -204,11 +208,13 @@
 };
 
 /* Frequency scaling */
-&lpm {
-	soc-supply = <&buck1>;
-	ld-mode-enabled;
-	status = "okay";
-};
+/* Disable for u-boot: lpm does not exist in context of u-boot
+ *	&lpm {
+ *		soc-supply = <&buck1>;
+ *		ld-mode-enabled;
+ *		status = "okay";
+ *	};
+ */
 
 /* eMMC */
 &usdhc1 {

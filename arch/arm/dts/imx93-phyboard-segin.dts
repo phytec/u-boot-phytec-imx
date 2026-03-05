@@ -95,9 +95,11 @@
 			"LINE1L", "Line In",
 			"LINE1R", "Line In";
 
-		simple-audio-card,cpu {
-			sound-dai = <&sai1>;
-		};
+/* Disable for u-boot: simple-audio-card needs sai1 that does not exist in u-boot
+ *		simple-audio-card,cpu {
+ *			sound-dai = <&sai1>;
+ *		};
+ */
 
 		dailink_master: simple-audio-card,codec {
 			sound-dai = <&audio_codec>;
@@ -180,15 +182,17 @@
 };
 
 /* Audio */
-&sai1 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_sai1>;
-	assigned-clocks = <&clk IMX93_CLK_SAI1>;
-	assigned-clock-parents = <&clk IMX93_CLK_AUDIO_PLL>;
-	assigned-clock-rates = <19200000>;
-	fsl,sai-mclk-direction-output;
-	status = "okay";
-};
+/* Disable for u-boot: sai1 does not exist in context of u-boot
+ *	&sai1 {
+ *		pinctrl-names = "default";
+ *		pinctrl-0 = <&pinctrl_sai1>;
+ *		assigned-clocks = <&clk IMX93_CLK_SAI1>;
+ *		assigned-clock-parents = <&clk IMX93_CLK_AUDIO_PLL>;
+ *		assigned-clock-rates = <19200000>;
+ *		fsl,sai-mclk-direction-output;
+ *		status = "okay";
+ *	};
+ */
 
 /* USB  */
 &usbphynop1 {
