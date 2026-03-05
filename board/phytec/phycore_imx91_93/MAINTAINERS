@@ -10,5 +10,6 @@ F:      board/phytec/common/imx91_93_som_detection.c
 F:      board/phytec/common/imx91_93_som_detection.h
 F:      configs/imx91-phycore_defconfig
 F:      configs/imx93-phycore_defconfig
+F:      include/dt-bindings/regulator/nxp,pca9450-regulator.h
 F:      include/configs/phycore_imx91_93.h
 F:      doc/board/phytec/imx91-93-phycore.rst
