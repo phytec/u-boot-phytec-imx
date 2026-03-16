@@ -13,6 +13,10 @@
 #define CFG_SYS_UBOOT_BASE \
 		(QSPI0_AMBA_BASE + CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR * 512)
 
+#ifdef CONFIG_ENV_WRITEABLE_LIST
+/* Set environment flag validation to a list of env vars that must be writable */
+#define CFG_ENV_FLAGS_LIST_STATIC "BOOT_ORDER:sw,BOOT_system0_LEFT:dw,BOOT_system1_LEFT:dw"
+#endif
 /* Link Definitions */
 
 #define CFG_SYS_INIT_RAM_ADDR	0x40000000
