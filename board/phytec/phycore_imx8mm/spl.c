@@ -102,6 +102,7 @@ static void spl_dram_init(void)
 	return;
 out:
 	puts("Could not detect correct RAM size. Fall back to default.\n");
+	set_dram_timings_rev7();
 	ddr_init(&dram_timing);
 }
 
