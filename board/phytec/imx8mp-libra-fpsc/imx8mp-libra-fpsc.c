@@ -43,9 +43,22 @@ void tusb8042a_swap_lines(void)
 		printf("TUSB8042A: Failed to fixup USB HUB.\n");
 }
 
+static int setup_fec(void)
+{
+	struct iomuxc_gpr_base_regs *gpr =
+		(struct iomuxc_gpr_base_regs *)IOMUXC_GPR_BASE_ADDR;
+
+	/* Use 125M anatop REF_CLK1 for ENET1, not from external */
+	clrsetbits_le32(&gpr->gpr[1], 0x2000, 0);
+
+	return 0;
+}
+
 int board_init(void)
 {
 	tusb8042a_swap_lines();
+
+	setup_fec();
 
 	return 0;
 }
