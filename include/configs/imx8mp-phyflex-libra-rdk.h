@@ -3,8 +3,8 @@
  * Copyright (C) 2025 PHYTEC Messtechnik GmbH
  */
 
-#ifndef __IMX8MP_LIBRA_FPSC_H
-#define __IMX8MP_LIBRA_FPSC_H
+#ifndef __IMX8MP_PHYFLEX_LIBRA_RDK_H
+#define __IMX8MP_PHYFLEX_LIBRA_RDK_H
 
 #include <linux/sizes.h>
 #include <asm/arch/imx-regs.h>
@@ -24,4 +24,4 @@
 #define PHYS_SDRAM_2                    0x100000000
 #define PHYS_SDRAM_2_SIZE               (SZ_4G + SZ_1G) /* 5GB */
 
-#endif /* __IMX8MP_LIBRA_FPSC_H */
+#endif /* __IMX8MP_PHYFLEX_LIBRA_RDK_H */

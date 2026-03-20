@@ -2,7 +2,7 @@
 #
 # Copyright (C) 2025 PHYTEC Messtechnik GmbH
 
-obj-y += imx8mp-libra-fpsc.o
+obj-y += imx8mp-phyflex-libra-rdk.o
 
 ifdef CONFIG_XPL_BUILD
 obj-y += spl.o
