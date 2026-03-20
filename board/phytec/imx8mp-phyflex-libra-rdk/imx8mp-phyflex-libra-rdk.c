@@ -16,7 +16,6 @@
 #include <miiphy.h>
 #include <mtd_node.h>
 #include <usb.h>
-#include <i2c.h>
 
 #if IS_ENABLED(CONFIG_PHYTEC_SOM_DETECTION)
 #include "../common/imx8m_som_detection.h"
@@ -55,29 +54,6 @@ int board_usb_cleanup(int index, enum usb_init_type init)
 	return 0;
 }
 
-#define TUSB_PORT_POL_CRTL_REG	0xB
-#define TUSB_CUSTOM_POL		BIT(7)
-#define TUSB_P0_POL		BIT(0)
-
-/*
- * WORKAROUND for PCM-937-L 1618.0, 1618.1.
- * USB HUB TUSB8042A has swapped upstream pin polarity.
- * Set i2c registers to inform the hub that the lines
- * are swapped.
- */
-void tusb8042a_swap_lines(void)
-{
-	const u8 pol_swap_val = (TUSB_CUSTOM_POL | TUSB_P0_POL);
-	const int addr = 0x44;
-	struct udevice *dev = 0;
-	int ret = i2c_get_chip_for_busnum(2, addr, 1, &dev);
-
-	if (!ret)
-		dm_i2c_write(dev, TUSB_PORT_POL_CRTL_REG, &pol_swap_val, 1);
-	else
-		printf("TUSB8042A: Failed to fixup USB HUB.\n");
-}
-
 static int setup_fec(void)
 {
 	struct iomuxc_gpr_base_regs *gpr =
@@ -97,8 +73,6 @@ int board_init(void)
 	if (ret)
 		printf("%s: EEPROM data init failed\n", __func__);
 #endif
-
-	tusb8042a_swap_lines();
 
 	setup_fec();
 
