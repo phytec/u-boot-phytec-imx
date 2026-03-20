@@ -24,6 +24,37 @@
 
 #define EEPROM_ADDR		0x51
 
+static struct dwc3_device dwc3_device_data = {
+#ifdef CONFIG_SPL_BUILD
+	.maximum_speed = USB_SPEED_HIGH,
+#else
+	.maximum_speed = USB_SPEED_SUPER,
+#endif
+	.base = USB1_BASE_ADDR,
+	.dr_mode = USB_DR_MODE_PERIPHERAL,
+	.index = 0,
+	.power_down_scale = 2,
+};
+
+int board_usb_init(int index, enum usb_init_type init)
+{
+	if (index == 0 && init == USB_INIT_DEVICE) {
+		imx8m_usb_power(index, true);
+		return dwc3_uboot_init(&dwc3_device_data);
+	}
+	return 0;
+}
+
+int board_usb_cleanup(int index, enum usb_init_type init)
+{
+	if (index == 0 && init == USB_INIT_DEVICE) {
+		dwc3_uboot_exit(index);
+		imx8m_usb_power(index, false);
+	}
+
+	return 0;
+}
+
 #define TUSB_PORT_POL_CRTL_REG	0xB
 #define TUSB_CUSTOM_POL		BIT(7)
 #define TUSB_P0_POL		BIT(0)
@@ -71,12 +102,19 @@ int board_init(void)
 
 	setup_fec();
 
+	init_usb_clk();
+
 	return 0;
 }
 
 int board_mmc_get_env_dev(int devno)
 {
 	return devno;
+}
+
+int mmc_map_to_kernel_blk(int dev_no)
+{
+	return dev_no;
 }
 
 int board_late_init(void)
