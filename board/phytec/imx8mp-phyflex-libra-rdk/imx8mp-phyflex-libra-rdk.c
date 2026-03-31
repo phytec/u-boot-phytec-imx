@@ -4,6 +4,7 @@
  */
 
 #include <asm/arch/clock.h>
+#include <asm/arch/imx-regs.h>
 #include <asm/arch/sys_proto.h>
 #include <asm/global_data.h>
 #include <linux/io.h>
@@ -111,6 +112,33 @@ int board_usb_cleanup(int index, enum usb_init_type init)
 		dwc3_uboot_exit(index);
 		imx8m_usb_power(index, false);
 	}
+
+	return 0;
+}
+
+/*
+ * WORKAROUND: Set mac addresses as expected in the board code
+ * as imx_get_mac_from_fuse() can not handle FPSC naming scheme.
+ */
+int board_fix_fdt(void *fdt)
+{
+	unsigned char mac[6];
+	int ret;
+
+	ret = fdt_increase_size(fdt, 100);
+	if (ret < 0) {
+		printf("Could not increase fdt. Can not fixup MAC addr: %s\n",
+		       fdt_strerror(ret));
+		return 0;
+	}
+
+	/* set first MAC address */
+	imx_get_mac_from_fuse(0, mac);
+	do_fixup_by_compat(fdt, "fsl,imx8mp-fec", "local-mac-address", &mac, 6, 1);
+
+	/* set second MAC address */
+	imx_get_mac_from_fuse(1, mac);
+	do_fixup_by_compat(fdt, "nxp,imx8mp-dwmac-eqos", "local-mac-address", &mac, 6, 1);
 
 	return 0;
 }
