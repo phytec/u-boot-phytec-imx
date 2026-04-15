@@ -79,13 +79,17 @@ int __maybe_unused phytec_imx8m_detect(struct phytec_eeprom_data *data)
 }
 
 /*
- * All PHYTEC i.MX8M boards have RAM size definition at the
- * same location.
+ * Returns RAM size option for i.MX8M boards (not the size itself).
+ * - phyCORE i.MX8M boards have RAM size definition at opt[2]
+ * - phyFLEX i.MX8MP has RAM size definition at opt[3]
+ * returns: RAM size code. See imx8m_som_detection.h for macros
+ * mapping the actual size.
  */
 u8 __maybe_unused phytec_get_imx8m_ddr_size(struct phytec_eeprom_data *data)
 {
+	u8 ddr_id = PHYTEC_EEPROM_INVAL;
 	char *opt;
-	u8 ddr_id;
+	u8 type;
 
 	if (!data)
 		data = &eeprom_data;
@@ -94,10 +98,14 @@ u8 __maybe_unused phytec_get_imx8m_ddr_size(struct phytec_eeprom_data *data)
 		return PHYTEC_EEPROM_INVAL;
 
 	opt = phytec_get_opt(data);
-	if (opt)
+	if (!opt)
+		return PHYTEC_EEPROM_INVAL;
+
+	type = data->payload.data.data_api2.som_type;
+	if (phytec_type_is_phycore(type))
 		ddr_id = PHYTEC_GET_OPTION(opt[2]);
-	else
-		ddr_id = PHYTEC_EEPROM_INVAL;
+	else if (phytec_type_is_phyflex(type))
+		ddr_id = PHYTEC_GET_OPTION(opt[3]);
 
 	debug("%s: ddr id: %u\n", __func__, ddr_id);
 	return ddr_id;
