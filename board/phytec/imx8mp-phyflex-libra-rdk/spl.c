@@ -42,7 +42,15 @@ void spl_dram_init(void)
 	if (!ret)
 		phytec_print_som_info(NULL);
 
-	size = phytec_get_imx8m_ddr_size(NULL);
+	if (IS_ENABLED(CONFIG_PHYFLEX_IMX8MP_RAM_STATIC_SIZE)) {
+		if (IS_ENABLED(CONFIG_PHYFLEX_IMX8MP_RAM_SIZE_2GB))
+			size = PHYTEC_PHYFLEX_IMX8MP_DDR_2GB;
+		else if (IS_ENABLED(CONFIG_PHYFLEX_IMX8MP_RAM_SIZE_4GB))
+			size = PHYTEC_PHYFLEX_IMX8MP_DDR_4GB;
+	} else {
+		size = phytec_get_imx8m_ddr_size(NULL);
+	}
+
 	switch (size) {
 	case PHYTEC_PHYFLEX_IMX8MP_DDR_2GB:
 		break;

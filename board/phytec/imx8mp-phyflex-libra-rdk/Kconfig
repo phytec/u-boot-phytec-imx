@@ -12,5 +12,29 @@ config IMX_CONFIG
 config SYS_CONFIG_NAME
 	default "imx8mp-phyflex-libra-rdk"
 
+config PHYFLEX_IMX8MP_RAM_STATIC_SIZE
+	bool "Set phyFLEX-i.MX8MP RAM size static instead of detecting"
+	default false
+	help
+	  RAM size is automatic being detected with the help of
+	  the EEPROM introspection data. Set RAM size to a static value
+	  during compile time instead.
+
+choice
+	prompt "phyFLEX-i.MX8MP RAM size"
+	depends on PHYFLEX_IMX8MP_RAM_STATIC_SIZE
+	default PHYFLEX_IMX8MP_RAM_SIZE_2GB
+
+config PHYFLEX_IMX8MP_RAM_SIZE_2GB
+	bool "2GB RAM"
+	help
+	  Set RAM size static to 2GB for phyFLEX-i.MX8MP.
+
+config PHYFLEX_IMX8MP_RAM_SIZE_4GB
+	bool "4GB RAM"
+	help
+	  Set RAM size static to 4GB for phyFLEX-i.MX8MP.
+endchoice
+
 source "board/phytec/common/Kconfig"
 endif
