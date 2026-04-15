@@ -37,7 +37,7 @@ void spl_dram_init(void)
 {
 	int ret;
 	bool use_2ghz_timings = false;
-	enum phytec_imx8mp_ddr_eeprom_code size = PHYTEC_EEPROM_INVAL;
+	enum phytec_phycore_imx8mp_ddr_code size = PHYTEC_EEPROM_INVAL;
 
 	ret = phytec_eeprom_data_setup_fallback(NULL, 0, EEPROM_ADDR,
 						EEPROM_ADDR_FALLBACK);
@@ -50,26 +50,26 @@ void spl_dram_init(void)
 
 	if (IS_ENABLED(CONFIG_PHYCORE_IMX8MP_RAM_SIZE_FIX)) {
 		if (IS_ENABLED(CONFIG_PHYCORE_IMX8MP_RAM_SIZE_1GB))
-			size = PHYTEC_IMX8MP_DDR_1GB;
+			size = PHYTEC_PHYCORE_IMX8MP_DDR_1GB;
 		else if (IS_ENABLED(CONFIG_PHYCORE_IMX8MP_RAM_SIZE_2GB))
-			size = PHYTEC_IMX8MP_DDR_2GB;
+			size = PHYTEC_PHYCORE_IMX8MP_DDR_2GB;
 		else if (IS_ENABLED(CONFIG_PHYCORE_IMX8MP_RAM_SIZE_4GB))
-			size = PHYTEC_IMX8MP_DDR_4GB;
+			size = PHYTEC_PHYCORE_IMX8MP_DDR_4GB;
 		else if (IS_ENABLED(CONFIG_PHYCORE_IMX8MP_RAM_SIZE_8GB))
-			size = PHYTEC_IMX8MP_DDR_8GB;
+			size = PHYTEC_PHYCORE_IMX8MP_DDR_8GB;
 	} else {
 		size = phytec_get_imx8m_ddr_size(NULL);
 	}
 
 	if (IS_ENABLED(CONFIG_PHYCORE_IMX8MP_RAM_FREQ_FIX)) {
 		if (IS_ENABLED(CONFIG_PHYCORE_IMX8MP_USE_2GHZ_RAM_TIMINGS)) {
-			if (size == PHYTEC_IMX8MP_DDR_4GB)
-				size = PHYTEC_IMX8MP_DDR_4GB_2GHZ;
+			if (size == PHYTEC_PHYCORE_IMX8MP_DDR_4GB)
+				size = PHYTEC_PHYCORE_IMX8MP_DDR_4GB_2GHZ;
 			else
 				use_2ghz_timings = true;
 		} else if (IS_ENABLED(CONFIG_PHYCORE_IMX8MP_USE_1_5GHZ_RAM_TIMINGS)) {
-			if (size == PHYTEC_IMX8MP_DDR_4GB_2GHZ)
-				size = PHYTEC_IMX8MP_DDR_4GB;
+			if (size == PHYTEC_PHYCORE_IMX8MP_DDR_4GB_2GHZ)
+				size = PHYTEC_PHYCORE_IMX8MP_DDR_4GB;
 			else
 				use_2ghz_timings = false;
 		}
@@ -83,23 +83,23 @@ void spl_dram_init(void)
 	}
 
 	switch (size) {
-	case PHYTEC_IMX8MP_DDR_1GB:
+	case PHYTEC_PHYCORE_IMX8MP_DDR_1GB:
 		if (use_2ghz_timings)
 			set_dram_timings_2ghz_1gb();
 		else
 			set_dram_timings_1_5ghz_1gb();
 		break;
-	case PHYTEC_IMX8MP_DDR_2GB:
+	case PHYTEC_PHYCORE_IMX8MP_DDR_2GB:
 		if (use_2ghz_timings)
 			set_dram_timings_2ghz_2gb();
 		break;
-	case PHYTEC_IMX8MP_DDR_4GB:
+	case PHYTEC_PHYCORE_IMX8MP_DDR_4GB:
 		set_dram_timings_1_5ghz_4gb();
 		break;
-	case PHYTEC_IMX8MP_DDR_4GB_2GHZ:
+	case PHYTEC_PHYCORE_IMX8MP_DDR_4GB_2GHZ:
 		set_dram_timings_2ghz_4gb();
 		break;
-	case PHYTEC_IMX8MP_DDR_8GB:
+	case PHYTEC_PHYCORE_IMX8MP_DDR_8GB:
 		set_dram_timings_2ghz_8gb();
 		break;
 	default:

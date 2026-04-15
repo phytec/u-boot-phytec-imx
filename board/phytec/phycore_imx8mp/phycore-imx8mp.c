@@ -57,7 +57,7 @@ int board_usb_cleanup(int index, enum usb_init_type init)
 
 int ft_board_setup(void *blob, struct bd_info *bd)
 {
-	enum phytec_imx8mp_ddr_eeprom_code size;
+	enum phytec_phycore_imx8mp_ddr_code size;
 
 	u8 spi = phytec_get_imx8m_spi(NULL);
 	/* Add partitions when SPI flash is available */
@@ -70,7 +70,7 @@ int ft_board_setup(void *blob, struct bd_info *bd)
 	};
 
 	size = phytec_get_imx8m_ddr_size(NULL);
-	if (size == PHYTEC_IMX8MP_DDR_1GB) {
+	if (size == PHYTEC_PHYCORE_IMX8MP_DDR_1GB) {
 		u32 *prop;
 		u32 phandle;
 		int prop_offset;
