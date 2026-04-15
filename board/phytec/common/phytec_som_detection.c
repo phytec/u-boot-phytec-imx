@@ -349,24 +349,26 @@ static int phytec_get_part_number(struct phytec_eeprom_data *data,
 	if (res)
 		return res;
 
-	if (som_type == SOM_TYPE_PCM || som_type == SOM_TYPE_PCL) {
+	switch (som_type) {
+	case SOM_TYPE_PCM:
+	case SOM_TYPE_PCL:
 		len = snprintf(part, PHYTEC_PART_NUMBER_MAX_LEN + 1,
 			       "%s-%s.%s", product_name, api2->opt,
 			       api2->bom_rev);
 		if (len < PHYTEC_PART_NUMBER_PCX_LEN)
 			return -EINVAL;
-		return 0;
-	}
-
-	if (phytec_type_is_ksm_ksp(som_type)) {
+		break;
+	case SOM_TYPE_KSP:
+	case SOM_TYPE_KSM:
 		len = snprintf(part, PHYTEC_PART_NUMBER_MAX_LEN + 1, "%s.%s",
 			       product_name, api2->bom_rev);
 		if (len != PHYTEC_PART_NUMBER_KSP_LEN)
 			return -EINVAL;
-		return 0;
-	}
-
-	if (phytec_type_is_phyflex(som_type)) {
+		break;
+	case SOM_TYPE_PFL_G_PT:
+	case SOM_TYPE_PFL_G_SP:
+	case SOM_TYPE_PFL_G_KP:
+	case SOM_TYPE_PFL_G_KM:
 		switch (som_type) {
 		case SOM_TYPE_PFL_G_PT:
 			variant = "PT";
@@ -384,15 +386,20 @@ static int phytec_get_part_number(struct phytec_eeprom_data *data,
 			       api2->ksp_no, api2->bom_rev);
 		if (len != PHYTEC_PART_NUMBER_PFL_LEN)
 			return -EINVAL;
-		return 0;
-	}
-
-	/* phyCORE PCM-KSP/PCM-KSM/PCL-KSP/PCL-KSM */
-	len = snprintf(part, PHYTEC_PART_NUMBER_MAX_LEN + 1, "%s-%s%02u.%s",
-		       product_name, phytec_som_type_str(som_type),
-		       api2->ksp_no, api2->bom_rev);
-	if (len < PHYTEC_PART_NUMBER_STD_KSP_LEN)
+		break;
+	case SOM_TYPE_PCM_KSP:
+	case SOM_TYPE_PCM_KSM:
+	case SOM_TYPE_PCL_KSP:
+	case SOM_TYPE_PCL_KSM:
+		len = snprintf(part, PHYTEC_PART_NUMBER_MAX_LEN + 1, "%s-%s%02u.%s",
+			       product_name, phytec_som_type_str(som_type),
+			       api2->ksp_no, api2->bom_rev);
+		if (len < PHYTEC_PART_NUMBER_STD_KSP_LEN)
+			return -EINVAL;
+	default:
 		return -EINVAL;
+		break;
+	}
 
 	return 0;
 }
