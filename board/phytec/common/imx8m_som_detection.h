@@ -9,9 +9,9 @@
 
 #include "phytec_som_detection.h"
 
-#define PHYTEC_IMX8MQ_SOM       66
-#define PHYTEC_IMX8MM_SOM       69
-#define PHYTEC_IMX8MP_SOM       70
+#define PHYTEC_PHYCORE_IMX8MQ	66
+#define PHYTEC_PHYCORE_IMX8MM	69
+#define PHYTEC_PHYCORE_IMX8MP	70
 
 enum phytec_imx8mp_ddr_eeprom_code {
 	PHYTEC_IMX8MP_DDR_1GB = 2,

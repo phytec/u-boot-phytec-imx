@@ -43,10 +43,10 @@ int __maybe_unused phytec_imx8m_detect(struct phytec_eeprom_data *data)
 	if (!opt)
 		return -1;
 
-	if (som == PHYTEC_IMX8MP_SOM && is_imx8mp())
+	if (som == PHYTEC_PHYCORE_IMX8MP && is_imx8mp())
 		return 0;
 
-	if (som == PHYTEC_IMX8MM_SOM) {
+	if (som == PHYTEC_PHYCORE_IMX8MM) {
 		if ((PHYTEC_GET_OPTION(opt[0]) != 0) &&
 		    (PHYTEC_GET_OPTION(opt[1]) == 0) && is_imx8mm())
 			return 0;
@@ -55,7 +55,7 @@ int __maybe_unused phytec_imx8m_detect(struct phytec_eeprom_data *data)
 			return 0;
 	}
 
-	if (som == PHYTEC_IMX8MQ_SOM && is_imx8mq())
+	if (som == PHYTEC_PHYCORE_IMX8MQ && is_imx8mq())
 		return 0;
 
 	pr_err("%s: SoM ID does not match. Wrong EEPROM data?\n", __func__);
