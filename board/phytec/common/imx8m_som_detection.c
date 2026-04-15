@@ -172,14 +172,15 @@ u8 __maybe_unused phytec_get_imx8m_eth(struct phytec_eeprom_data *data)
 }
 
 /*
- * Filter RTC information for phyCORE-i.MX8MP.
+ * Filter RTC information for phyCORE-i.MX8MP and phyFLEX-i.MX8MP
  * returns: 0 if no RTC is populated. 1 if it is populated.
  * PHYTEC_EEPROM_INVAL when the data is invalid.
  */
 u8 __maybe_unused phytec_get_imx8mp_rtc(struct phytec_eeprom_data *data)
 {
+	u8 rtc = PHYTEC_EEPROM_INVAL;
 	char *opt;
-	u8 rtc;
+	u8 type;
 
 	if (!data)
 		data = &eeprom_data;
@@ -188,13 +189,20 @@ u8 __maybe_unused phytec_get_imx8mp_rtc(struct phytec_eeprom_data *data)
 		return PHYTEC_EEPROM_INVAL;
 
 	opt = phytec_get_opt(data);
-	if (opt) {
+	if (!opt)
+		return PHYTEC_EEPROM_INVAL;
+
+	type = data->payload.data.data_api2.som_type;
+	if (phytec_type_is_phycore(type)) {
 		rtc = PHYTEC_GET_OPTION(opt[5]);
 		rtc &= 0x4;
 		rtc = !(rtc >> 2);
-	} else {
-		rtc = PHYTEC_EEPROM_INVAL;
+	} else if (phytec_type_is_phyflex(type)) {
+		rtc = PHYTEC_GET_OPTION(opt[6]);
+		rtc &= 0x1;
+		rtc = !rtc;
 	}
+
 	debug("%s: rtc: %u\n", __func__, rtc);
 	return rtc;
 }
