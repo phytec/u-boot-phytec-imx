@@ -128,6 +128,10 @@ u8 __maybe_unused phytec_get_imx8m_spi(struct phytec_eeprom_data *data)
 	if (!data->valid || data->payload.api_rev < PHYTEC_API_REV2)
 		return PHYTEC_EEPROM_INVAL;
 
+	/* phyFLEX does not have a SPI flash on SoM */
+	if (phytec_type_is_phyflex(data->payload.data.data_api2.som_type))
+		return 0;
+
 	opt = phytec_get_opt(data);
 	if (opt)
 		spi = PHYTEC_GET_OPTION(opt[4]);
