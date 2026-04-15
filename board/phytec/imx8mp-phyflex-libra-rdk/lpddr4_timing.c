@@ -1812,3 +1812,12 @@ struct dram_timing_info dram_timing = {
 	.fsp_table = { 4000, },
 };
 
+void set_dram_timings_4gb(void)
+{
+	dram_timing.ddrc_cfg[2].val = 0xa3080020;
+	dram_timing.ddrc_cfg[39].val = 0x17;
+	dram_timing.fsp_msg[0].fsp_cfg[9].val = 0x310;
+	dram_timing.fsp_msg[0].fsp_cfg[21].val = 0x3;
+	dram_timing.fsp_msg[1].fsp_cfg[10].val = 0x310;
+	dram_timing.fsp_msg[1].fsp_cfg[22].val = 0x3;
+}
