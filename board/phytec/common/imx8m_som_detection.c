@@ -28,6 +28,7 @@ int __maybe_unused phytec_imx8m_detect(struct phytec_eeprom_data *data)
 {
 	char *opt;
 	u8 som;
+	u8 type;
 
 	if (!data)
 		data = &eeprom_data;
@@ -39,24 +40,39 @@ int __maybe_unused phytec_imx8m_detect(struct phytec_eeprom_data *data)
 	som = data->payload.data.data_api2.som_no;
 	debug("%s: som id: %u\n", __func__, som);
 
+	type = data->payload.data.data_api2.som_type;
+	debug("%s: som type: %u\n", __func__, type);
+
 	opt = phytec_get_opt(data);
 	if (!opt)
 		return -1;
 
-	if (som == PHYTEC_PHYCORE_IMX8MP && is_imx8mp())
-		return 0;
-
-	if (som == PHYTEC_PHYCORE_IMX8MM) {
-		if ((PHYTEC_GET_OPTION(opt[0]) != 0) &&
-		    (PHYTEC_GET_OPTION(opt[1]) == 0) && is_imx8mm())
+	switch (som) {
+	case PHYTEC_PHYCORE_IMX8MP:
+		if (phytec_type_is_phycore(type) && is_imx8mp())
 			return 0;
-		else if ((PHYTEC_GET_OPTION(opt[0]) == 0) &&
-			 (PHYTEC_GET_OPTION(opt[1]) != 0) && is_imx8mn())
+		break;
+	case PHYTEC_PHYFLEX_IMX8MP:
+		if (phytec_type_is_phyflex(type) && is_imx8mp())
 			return 0;
+		break;
+	case PHYTEC_PHYCORE_IMX8MM:
+		if (phytec_type_is_phycore(type)) {
+			if ((PHYTEC_GET_OPTION(opt[0]) != 0) &&
+			    (PHYTEC_GET_OPTION(opt[1]) == 0) && is_imx8mm())
+				return 0;
+			else if ((PHYTEC_GET_OPTION(opt[0]) == 0) &&
+				 (PHYTEC_GET_OPTION(opt[1]) != 0) && is_imx8mn())
+				return 0;
+		}
+		break;
+	case PHYTEC_PHYCORE_IMX8MQ:
+		if (phytec_type_is_phycore(type) && is_imx8mq())
+			return 0;
+		break;
+	default:
+		break;
 	}
-
-	if (som == PHYTEC_PHYCORE_IMX8MQ && is_imx8mq())
-		return 0;
 
 	pr_err("%s: SoM ID does not match. Wrong EEPROM data?\n", __func__);
 	return -1;

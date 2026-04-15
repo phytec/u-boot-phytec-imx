@@ -12,6 +12,7 @@
 #define PHYTEC_PHYCORE_IMX8MQ	66
 #define PHYTEC_PHYCORE_IMX8MM	69
 #define PHYTEC_PHYCORE_IMX8MP	70
+#define PHYTEC_PHYFLEX_IMX8MP	 1
 
 enum phytec_imx8mp_ddr_eeprom_code {
 	PHYTEC_IMX8MP_DDR_1GB = 2,
