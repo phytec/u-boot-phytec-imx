@@ -17,9 +17,7 @@
 #include <power/pca9450.h>
 #include <spl.h>
 
-#if IS_ENABLED(CONFIG_PHYTEC_SOM_DETECTION)
 #include "../common/imx8m_som_detection.h"
-#endif
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -32,17 +30,29 @@ int spl_board_boot_device(enum boot_device boot_dev_spl)
 
 void spl_dram_init(void)
 {
-#if IS_ENABLED(CONFIG_PHYTEC_SOM_DETECTION)
+	enum phytec_phyflex_imx8mp_ddr_code size = PHYTEC_EEPROM_INVAL;
 	int ret;
 
-	ret = phytec_eeprom_data_setup(NULL, 0, EEPROM_ADDR);
-	if (!ret) {
-		ret = phytec_imx8m_detect(NULL);
-		if (!ret)
-			phytec_print_som_info(NULL);
-	}
-#endif
+	ret = phytec_eeprom_data_setup(NULL, CONFIG_PHYTEC_EEPROM_BUS, EEPROM_ADDR);
+	if (ret)
+		goto out;
 
+	ret = phytec_imx8m_detect(NULL);
+	if (!ret)
+		phytec_print_som_info(NULL);
+
+	size = phytec_get_imx8m_ddr_size(NULL);
+	switch (size) {
+	case PHYTEC_PHYFLEX_IMX8MP_DDR_2GB:
+		ddr_init(&dram_timing);
+		break;
+	default:
+		goto out;
+	}
+
+	return;
+out:
+	printf("Could not detect correct RAM size. Fallback to default.\n");
 	ddr_init(&dram_timing);
 }
 
