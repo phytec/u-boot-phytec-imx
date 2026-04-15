@@ -35,21 +35,35 @@ enum {
 	PHYTEC_API_REV3,
 };
 
-enum phytec_som_type_str {
+enum phytec_som_type {
 	SOM_TYPE_PCM = 0,
 	SOM_TYPE_PCL,
-	SOM_TYPE_KSM,
 	SOM_TYPE_KSP,
-	SOM_TYPE_PFL_G,
+	SOM_TYPE_KSM,
+	SOM_TYPE_PCM_KSP,
+	SOM_TYPE_PCM_KSM,
+	SOM_TYPE_PCL_KSP,
+	SOM_TYPE_PCL_KSM,
+	SOM_TYPE_PFL_G_PT,
+	SOM_TYPE_PFL_G_SP,
+	SOM_TYPE_PFL_G_KP,
+	SOM_TYPE_PFL_G_KM,
 };
 
-static const char * const phytec_som_type_str[] = {
-	"PCM",
-	"PCL",
-	"KSM",
-	"KSP",
-	"PFL-G",
-};
+static inline int phytec_type_is_ksm_ksp(enum phytec_som_type type)
+{
+	return (type == SOM_TYPE_KSP || type == SOM_TYPE_KSM);
+}
+
+static inline int phytec_type_is_phycore(enum phytec_som_type type)
+{
+	return (type < SOM_TYPE_PFL_G_PT && !phytec_type_is_ksm_ksp(type));
+}
+
+static inline int phytec_type_is_phyflex(enum phytec_som_type type)
+{
+	return (type >= SOM_TYPE_PFL_G_PT && type <= SOM_TYPE_PFL_G_KM);
+}
 
 struct phytec_api0_data {
 	u8 pcb_rev;		/* PCB revision of SoM */

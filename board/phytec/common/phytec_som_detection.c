@@ -271,6 +271,31 @@ err:
 	return ret;
 }
 
+static const char *phytec_som_type_str(enum phytec_som_type type)
+{
+	switch (type) {
+	case SOM_TYPE_PCM:
+		return "PCM";
+	case SOM_TYPE_PCL:
+		return "PCL";
+	case SOM_TYPE_KSP:
+	case SOM_TYPE_PCM_KSP:
+	case SOM_TYPE_PCL_KSP:
+		return "KSP";
+	case SOM_TYPE_KSM:
+	case SOM_TYPE_PCM_KSM:
+	case SOM_TYPE_PCL_KSM:
+		return "KSM";
+	case SOM_TYPE_PFL_G_PT:
+	case SOM_TYPE_PFL_G_SP:
+	case SOM_TYPE_PFL_G_KP:
+	case SOM_TYPE_PFL_G_KM:
+		return "PFL-G";
+	default:
+		return "unknown";
+	}
+}
+
 static int phytec_get_product_name(struct phytec_eeprom_data *data,
 				   char *product)
 {
@@ -282,50 +307,25 @@ static int phytec_get_product_name(struct phytec_eeprom_data *data,
 		return -EINVAL;
 
 	api2 = &data->payload.data.data_api2;
+	som_type = api2->som_type;
 
-	if (api2->som_type > 1 && api2->som_type <= 3) {
+	if (phytec_type_is_ksm_ksp(som_type)) {
 		ksp_no = (api2->ksp_no << 8) | api2->som_no;
 		len = snprintf(product, PHYTEC_PRODUCT_NAME_MAX_LEN + 1,
-			       "%s-%04u", phytec_som_type_str[api2->som_type],
+			       "%s-%04u", phytec_som_type_str(som_type),
 			       ksp_no);
 		if (len != PHYTEC_PRODUCT_NAME_KSP_LEN)
 			return -EINVAL;
 		return 0;
 	}
 
-	switch (api2->som_type) {
-	case 0:
-	case 1:
-	case 2:
-	case 3:
-		som_type = api2->som_type;
-		break;
-	case 4:
-	case 5:
-		som_type = 0;
-		break;
-	case 6:
-	case 7:
-		som_type = 1;
-		break;
-	case 8:
-	case 9:
-	case 10:
-	case 11:
-		som_type = SOM_TYPE_PFL_G;
-		break;
-	default:
-		pr_err("%s: Invalid SOM type: %i", __func__, api2->som_type);
-		return -EINVAL;
-	};
-
-	const char *fmt = (som_type == SOM_TYPE_PFL_G) ? "%s-%02u" : "%s-%03u";
+	const char *fmt = (phytec_type_is_phyflex(som_type)) ? "%s-%02u" : "%s-%03u";
 
 	len = snprintf(product, PHYTEC_PRODUCT_NAME_MAX_LEN + 1, fmt,
-		       phytec_som_type_str[som_type], api2->som_no);
-	if (som_type != SOM_TYPE_PFL_G && len != PHYTEC_PRODUCT_NAME_PCX_LEN)
+		       phytec_som_type_str(som_type), api2->som_no);
+	if (!phytec_type_is_phyflex(som_type) && len != PHYTEC_PRODUCT_NAME_PCX_LEN)
 		return -EINVAL;
-	if (som_type == SOM_TYPE_PFL_G && len != PHYTEC_PRODUCT_NAME_PFL_LEN)
+	if (phytec_type_is_phyflex(som_type) && len != PHYTEC_PRODUCT_NAME_PFL_LEN)
 		return -EINVAL;
 	return 0;
 }
@@ -334,8 +334,8 @@ static int phytec_get_part_number(struct phytec_eeprom_data *data,
 				  char *part)
 {
 	char product_name[PHYTEC_PRODUCT_NAME_MAX_LEN + 1] = {'\0'};
+	unsigned int som_type;
 	struct phytec_api2_data *api2;
-	unsigned int ksp_type;
 	int res, len;
 	char *variant = "SP";
 
@@ -343,12 +343,13 @@ static int phytec_get_part_number(struct phytec_eeprom_data *data,
 		return -EINVAL;
 
 	api2 = &data->payload.data.data_api2;
+	som_type = api2->som_type;
 
 	res = phytec_get_product_name(data, product_name);
 	if (res)
 		return res;
 
-	if (api2->som_type <= 1) {
+	if (som_type == SOM_TYPE_PCM || som_type == SOM_TYPE_PCL) {
 		len = snprintf(part, PHYTEC_PART_NUMBER_MAX_LEN + 1,
 			       "%s-%s.%s", product_name, api2->opt,
 			       api2->bom_rev);
@@ -356,7 +357,8 @@ static int phytec_get_part_number(struct phytec_eeprom_data *data,
 			return -EINVAL;
 		return 0;
 	}
-	if (api2->som_type <= 3) {
+
+	if (phytec_type_is_ksm_ksp(som_type)) {
 		len = snprintf(part, PHYTEC_PART_NUMBER_MAX_LEN + 1, "%s.%s",
 			       product_name, api2->bom_rev);
 		if (len != PHYTEC_PART_NUMBER_KSP_LEN)
@@ -364,15 +366,15 @@ static int phytec_get_part_number(struct phytec_eeprom_data *data,
 		return 0;
 	}
 
-	if (api2->som_type >= 8 && api2->som_type <= 11) {
-		switch (api2->som_type) {
-		case 8:
+	if (phytec_type_is_phyflex(som_type)) {
+		switch (som_type) {
+		case SOM_TYPE_PFL_G_PT:
 			variant = "PT";
 			break;
-		case 10:
+		case SOM_TYPE_PFL_G_KP:
 			variant = "KP";
 			break;
-		case 11:
+		case SOM_TYPE_PFL_G_KM:
 			variant = "KM";
 			break;
 		}
@@ -385,26 +387,9 @@ static int phytec_get_part_number(struct phytec_eeprom_data *data,
 		return 0;
 	}
 
-	switch (api2->som_type) {
-	case 4:
-		ksp_type = 3;
-		break;
-	case 5:
-		ksp_type = 2;
-		break;
-	case 6:
-		ksp_type = 3;
-		break;
-	case 7:
-		ksp_type = 2;
-		break;
-	default:
-		pr_err("%s: Invalid SOM type: %i", __func__, api2->som_type);
-		return -EINVAL;
-	};
-
+	/* phyCORE PCM-KSP/PCM-KSM/PCL-KSP/PCL-KSM */
 	len = snprintf(part, PHYTEC_PART_NUMBER_MAX_LEN + 1, "%s-%s%02u.%s",
-		       product_name, phytec_som_type_str[ksp_type],
+		       product_name, phytec_som_type_str(som_type),
 		       api2->ksp_no, api2->bom_rev);
 	if (len < PHYTEC_PART_NUMBER_STD_KSP_LEN)
 		return -EINVAL;
@@ -437,7 +422,7 @@ void __maybe_unused phytec_print_som_info(struct phytec_eeprom_data *data)
 
 	printf("SOM: %s\n", part_number);
 	printf("PCB Rev.: %u%c\n", api2->pcb_rev, pcb_sub_rev);
-	if (api2->som_type > 1)
+	if (api2->som_type != SOM_TYPE_PCM && api2->som_type != SOM_TYPE_PCL)
 		printf("Options: %s\n", api2->opt);
 }
 
