@@ -5,7 +5,7 @@
 
 /dts-v1/;
 
-#include <dt-bindings/leds/leds-pca9532.h>
+#include <dt-bindings/leds/common.h>
 #include <dt-bindings/phy/phy-imx8-pcie.h>
 #include <dt-bindings/pwm/pwm.h>
 #include "imx8mp-phyflex-fpsc-g-som.dtsi"
@@ -23,6 +23,20 @@
 		status = "disabled";
 	};
 
+	can_transceiver1: can-phy1 {
+		compatible = "ti,tcan1043";
+		#phy-cells = <0>;
+		max-bitrate = <8000000>;
+		standby-gpios = <&gpio_expander2 0 GPIO_ACTIVE_HIGH>;
+	};
+
+	can_transceiver2: can-phy2 {
+		compatible = "ti,tcan1043";
+		#phy-cells = <0>;
+		max-bitrate = <8000000>;
+		standby-gpios = <&gpio_expander2 1 GPIO_ACTIVE_HIGH>;
+	};
+
 	chosen {
 		stdout-path = &uart4;
 	};
@@ -38,22 +52,6 @@
 				remote-endpoint = <&ldb_lvds_ch0>;
 			};
 		};
-	};
-
-	reg_can1_stby: regulator-can1-stby {
-		compatible = "regulator-fixed";
-		regulator-max-microvolt = <1800000>;
-		regulator-min-microvolt = <1800000>;
-		regulator-name = "can1-stby";
-		gpio = <&gpio_expander 10 GPIO_ACTIVE_LOW>;
-	};
-
-	reg_can2_stby: regulator-can2-stby {
-		compatible = "regulator-fixed";
-		regulator-max-microvolt = <1800000>;
-		regulator-min-microvolt = <1800000>;
-		regulator-name = "can2-stby";
-		gpio = <&gpio_expander 9 GPIO_ACTIVE_LOW>;
 	};
 
 	reg_vdd_12v0: regulator-vdd-12v0 {
@@ -116,13 +114,23 @@
 
 /* CAN FD */
 &flexcan1 {
-	xceiver-supply = <&reg_can1_stby>;
+	phys = <&can_transceiver1>;
 	status = "okay";
 };
 
 &flexcan2 {
-	xceiver-supply = <&reg_can2_stby>;
+	phys = <&can_transceiver2>;
 	status = "okay";
+};
+
+&ecspi2 {
+	status = "okay";
+
+	tpm@0 {
+		compatible = "infineon,slb9670", "tcg,tpm_tis-spi";
+		reg = <0>;
+		spi-max-frequency = <18500000>;
+	};
 };
 
 &flexspi {
@@ -166,63 +174,70 @@
 		pagesize = <16>;
 		vcc-supply = <&reg_vdd_1v8>;
 	};
+
+	gpio_expander1: gpio@21 {
+		compatible = "ti,tcal6416";
+		reg = <0x21>;
+		interrupt-controller;
+		interrupt-parent = <&gpio5>;
+		interrupts = <26 IRQ_TYPE_LEVEL_LOW>;
+		#interrupt-cells = <2>;
+		#gpio-cells = <2>;
+		gpio-controller;
+		gpio-line-names = "VCONN_nFAULT", "CSI1_CTRL1", "CSI1_CTRL3",
+				  "CSI1_CTRL4", "USB-C_nINT/AUDIO_AC",
+				  "CSI2_CTRL1", "CSI2_CTRL3", "CSI2_CTRL4",
+				  "CLK_EN_AV", "W_nDISABLE1", "W_nDISABLE2",
+				  "PCIE1_nWAKE", "NC", "UART1_nWAKE",
+				  "UART1_BT_RS_SEL", "UART1_RS232_485_SEL";
+
+		vcc-supply = <&reg_vdd_1v8>;
+	};
 };
 
 &i2c3 {
 	clock-frequency = <400000>;
 	status = "okay";
 
-	leds@62 {
-		compatible = "nxp,pca9533";
-		reg = <0x62>;
-
-		led-1 {
-			type = <PCA9532_TYPE_LED>;
-		};
-
-		led-2 {
-			type = <PCA9532_TYPE_LED>;
-		};
-
-		led-3 {
-			type = <PCA9532_TYPE_LED>;
-		};
-	};
-};
-
-&i2c5 {
-	#address-cells = <1>;
-	#size-cells = <0>;
-	clock-frequency = <400000>;
-	status = "okay";
-
-	gpio_expander: gpio@20 {
-		compatible = "ti,tca6416";
-		reg = <0x20>;
+	gpio_expander2: gpio@21 {
+		compatible = "ti,tcal6416";
+		reg = <0x21>;
+		interrupt-controller;
 		interrupt-parent = <&gpio4>;
 		interrupts = <3 IRQ_TYPE_LEVEL_LOW>;
-		#gpio-cells = <2>;
+		#interrupt-cells = <2>;
 		gpio-controller;
-		gpio-line-names = "CSI1_CTRL1", "CSI1_CTRL2", "CSI1_CTRL3",
-				  "CSI1_CTRL4", "CSI2_CTRL1", "CSI2_CTRL2",
-				  "CSI2_CTRL3", "CSI2_CTRL4", "CLK_EN_AV",
-				  "nCAN2_EN", "nCAN1_EN", "PCIE1_nWAKE",
-				  "PCIE2_nWAKE", "PCIE2_nALERT_3V3",
-				  "UART1_BT_RS_SEL", "UART1_RS232_485_SEL";
+		#gpio-cells = <2>;
+		gpio-line-names = "CAN1_STBY", "CAN2_STBY", "NC",
+				  "KEY-E_nALERT", "NC", "SDIO_nWAKE",
+				  "SDIO_nRESET", "HDMI_EN", "RTC_nINT",
+				  "LVDS1_BL_EN", "NC", "NC", "NC", "NC",
+				  "NC", "NC";
 		vcc-supply = <&reg_vdd_1v8>;
+	};
 
-		uart1_bt_rs_sel: bt-rs-hog {
-			gpios = <14 GPIO_ACTIVE_HIGH>;
-			gpio-hog;
-			line-name = "UART1_BT_RS_SEL";
-			output-low;	/* default RS232/RS485 */
+	led-controller@62 {
+		compatible = "nxp,pca9633";
+		reg = <0x62>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		led@0 {
+			reg = <0>;
+			color = <LED_COLOR_ID_RED>;
+			function = LED_FUNCTION_STATUS;
 		};
 
-		uart1_rs232_485_sel: rs232-485-hog {
-			gpios = <15 GPIO_ACTIVE_HIGH>;
-			gpio-hog;
-			line-name = "UART1_RS232_485_SEL";
-			output-high;	/* default RS232 */
+		led@1 {
+			reg = <1>;
+			color = <LED_COLOR_ID_GREEN>;
+			function = LED_FUNCTION_STATUS;
+		};
+
+		led@2 {
+			reg = <2>;
+			color = <LED_COLOR_ID_BLUE>;
+			function = LED_FUNCTION_STATUS;
 		};
 	};
 };
@@ -231,11 +246,6 @@
 	pinctrl_lvds0: lvds0grp {
 		fsl,pins = <
 			MX8MP_IOMUXC_UART1_TXD__GPIO5_IO23	0x12
-		>;
-	};
-	pinctrl_rtc: rtcgrp {
-		fsl,pins = <
-			MX8MP_IOMUXC_UART2_TXD__GPIO5_IO25	0x1c0
 		>;
 	};
 };
@@ -271,16 +281,20 @@
 };
 
 &rv3028 {
-	interrupt-parent = <&gpio5>;
-	interrupts = <25 IRQ_TYPE_LEVEL_LOW>;
+	interrupt-parent = <&gpio_expander2>;
+	interrupts = <8 IRQ_TYPE_LEVEL_LOW>;
 	aux-voltage-chargeable = <1>;
-	pinctrl-0 = <&pinctrl_rtc>;
-	pinctrl-names = "default";
 	trickle-resistor-ohms = <3000>;
 	wakeup-source;
 };
 
 &snvs_pwrkey {
+	status = "okay";
+};
+
+/* RS232/RS485/BT */
+&uart3 {
+	uart-has-rtscts;
 	status = "okay";
 };
 
