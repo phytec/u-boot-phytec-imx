@@ -34,7 +34,11 @@ void spl_dram_init(void)
 	enum phytec_phyflex_imx8mp_ddr_code size = PHYTEC_EEPROM_INVAL;
 	int ret;
 
-	ret = phytec_eeprom_data_setup(NULL, CONFIG_PHYTEC_EEPROM_BUS, EEPROM_ADDR);
+	/*
+	 * Pass 0 as bus number. SPL does not make use of the aliases in device
+	 * tree. Will be i2c1 (FPSC standard) in later boot stages.
+	 */
+	ret = phytec_eeprom_data_setup(NULL, 0, EEPROM_ADDR);
 	if (ret)
 		goto out;
 

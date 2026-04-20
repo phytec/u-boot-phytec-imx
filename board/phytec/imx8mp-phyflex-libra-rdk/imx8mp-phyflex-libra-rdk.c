@@ -157,7 +157,7 @@ static int setup_fec(void)
 int board_init(void)
 {
 #if IS_ENABLED(CONFIG_PHYTEC_SOM_DETECTION)
-	int ret = phytec_eeprom_data_setup(NULL, 0, EEPROM_ADDR);
+	int ret = phytec_eeprom_data_setup(NULL, CONFIG_PHYTEC_EEPROM_BUS, EEPROM_ADDR);
 
 	if (ret)
 		printf("%s: EEPROM data init failed\n", __func__);
