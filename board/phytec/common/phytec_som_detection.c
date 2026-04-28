@@ -160,6 +160,10 @@ int phytec_eeprom_data_init_v3(struct phytec_eeprom_data *data,
 		goto err;
 	}
 
+	/* If data length is 0x0 we have no v3 data. Return gracefully. */
+	if (header.data_length == 0x0)
+		return 0;
+
 	debug("%s: data length: %i\n", __func__, header.data_length);
 	payload = malloc(header.data_length);
 	if (!payload) {
