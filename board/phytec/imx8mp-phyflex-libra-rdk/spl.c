@@ -42,20 +42,20 @@ void spl_dram_init(void)
 	 * tree. Will be i2c1 (FPSC standard) in later boot stages.
 	 */
 	ret = phytec_eeprom_data_setup(NULL, 0, EEPROM_ADDR);
-	if (ret)
-		goto out;
+	if (!ret) {
+		ret = phytec_imx8m_detect(NULL);
+		if (!ret)
+			phytec_print_som_info(NULL);
 
-	ret = phytec_imx8m_detect(NULL);
-	if (!ret)
-		phytec_print_som_info(NULL);
+		size = phytec_get_imx8m_ddr_size(NULL);
+	}
 
+	/* Overwrite size with static configuration */
 	if (IS_ENABLED(CONFIG_PHYFLEX_IMX8MP_RAM_STATIC_SIZE)) {
 		if (IS_ENABLED(CONFIG_PHYFLEX_IMX8MP_RAM_SIZE_2GB))
 			size = PHYTEC_PHYFLEX_IMX8MP_DDR_2GB;
 		else if (IS_ENABLED(CONFIG_PHYFLEX_IMX8MP_RAM_SIZE_4GB))
 			size = PHYTEC_PHYFLEX_IMX8MP_DDR_4GB;
-	} else {
-		size = phytec_get_imx8m_ddr_size(NULL);
 	}
 
 	switch (size) {
