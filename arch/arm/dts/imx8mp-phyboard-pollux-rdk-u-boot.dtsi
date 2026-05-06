@@ -28,10 +28,6 @@
 		script {
 			compatible = "u-boot,script";
 		};
-
-		efi {
-			compatible = "u-boot,distro-efi";
-		};
 	};
 };
 
