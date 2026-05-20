@@ -1850,4 +1850,8 @@ void set_dram_timings_4gb(void)
 	dram_timing.fsp_msg[0].fsp_cfg[21].val = 0x3;
 	dram_timing.fsp_msg[1].fsp_cfg[10].val = 0x310;
 	dram_timing.fsp_msg[1].fsp_cfg[22].val = 0x3;
+	dram_timing.fsp_msg[2].fsp_cfg[10].val = 0x310;
+	dram_timing.fsp_msg[2].fsp_cfg[22].val = 0x3;
+	dram_timing.fsp_msg[3].fsp_cfg[10].val = 0x310;
+	dram_timing.fsp_msg[3].fsp_cfg[22].val = 0x3;
 }
