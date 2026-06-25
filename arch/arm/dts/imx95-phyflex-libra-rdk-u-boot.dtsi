@@ -1,0 +1,125 @@
+// SPDX-License-Identifier: GPL-2.0+
+/*
+ * Copyright 2025 PHYTEC Messtechnik GmbH
+ */
+
+/ {
+	bootstd {
+		bootph-verify;
+		compatible = "u-boot,boot-std";
+
+		filename-prefixes = "/", "/boot/";
+		bootdev-order = "mmc0", "mmc1", "ethernet";
+
+		rauc {
+			compatible = "u-boot,distro-rauc";
+		};
+
+		script {
+			compatible = "u-boot,script";
+		};
+	};
+};
+
+&A55_0 {
+	clocks = <&scmi_clk IMX95_CLK_ARMPLL_PFD0>;
+	/delete-property/ power-domains;
+};
+
+&A55_1 {
+	clocks = <&scmi_clk IMX95_CLK_ARMPLL_PFD0>;
+	/delete-property/ power-domains;
+};
+
+&A55_2 {
+	clocks = <&scmi_clk IMX95_CLK_ARMPLL_PFD0>;
+	/delete-property/ power-domains;
+};
+
+&A55_3 {
+	clocks = <&scmi_clk IMX95_CLK_ARMPLL_PFD0>;
+	/delete-property/ power-domains;
+};
+
+&A55_4 {
+	clocks = <&scmi_clk IMX95_CLK_ARMPLL_PFD0>;
+	/delete-property/ power-domains;
+};
+
+&A55_5 {
+	clocks = <&scmi_clk IMX95_CLK_ARMPLL_PFD0>;
+	/delete-property/ power-domains;
+};
+
+&dispmix_csr {
+	/delete-property/ assigned-clocks;
+	/delete-property/ assigned-clock-rates;
+	/delete-property/ assigned-clock-parents;
+};
+
+&gpio1 {
+	reg = <0 0x47400000 0 0x1000>, <0 0x47400040 0 0x40>;
+};
+
+&lpuart7 {
+	clocks = <&scmi_clk IMX95_CLK_LPUART7>, <&scmi_clk IMX95_CLK_LPUART7>;
+	clock-names = "ipg", "per";
+	bootph-all;
+};
+
+&pinctrl_lpuart7 {
+	bootph-all;
+};
+
+&pinctrl_usdhc1 {
+	bootph-pre-ram;
+};
+
+&pinctrl_usdhc1_100mhz {
+	bootph-pre-ram;
+};
+
+&pinctrl_usdhc1_200mhz {
+	bootph-pre-ram;
+};
+
+&pinctrl_usdhc2 {
+	bootph-all;
+};
+
+&pinctrl_usdhc2_100mhz {
+	bootph-all;
+};
+
+&pinctrl_usdhc2_200mhz {
+	bootph-all;
+};
+
+&pinctrl_reg_usdhc2_vmmc {
+	bootph-all;
+};
+
+&reg_usdhc2_vmmc {
+	bootph-pre-ram;
+};
+
+&usb2 {
+	compatible = "fsl,imx8mm-usb", "fsl,imx7d-usb";
+	/delete-property/ power-domains;
+};
+
+&usb3 {
+	/delete-property/ power-domains;
+};
+
+&usb3_dwc3 {
+	compatible = "fsl,imx95a-dwc3", "fsl,imx8mq-dwc3", "snps,dwc3";
+};
+
+&usdhc1 {
+	bootph-pre-ram;
+};
+
+&usdhc2 {
+	bootph-pre-ram;
+};
