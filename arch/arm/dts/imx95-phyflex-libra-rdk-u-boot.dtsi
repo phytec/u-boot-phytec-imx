@@ -51,6 +51,10 @@
 	/delete-property/ power-domains;
 };
 
+&enetc_port2 {
+	status = "disabled";
+};
+
 &dispmix_csr {
 	/delete-property/ assigned-clocks;
 	/delete-property/ assigned-clock-rates;
