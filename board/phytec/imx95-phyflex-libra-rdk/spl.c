@@ -6,6 +6,7 @@
 #include <asm/arch/clock.h>
 #include <asm/arch/mu.h>
 #include <asm/mach-imx/boot_mode.h>
+#include <asm/mach-imx/ele_api.h>
 #include <asm/sections.h>
 #include <hang.h>
 #include <init.h>
@@ -31,7 +32,13 @@ int spl_board_boot_device(enum boot_device boot_dev_spl)
 
 void spl_board_init(void)
 {
+	int ret;
+
 	puts("Normal Boot\n");
+
+	ret = ele_start_rng();
+	if (ret)
+		printf("Fail to start RNG: %d\n", ret);
 }
 
 void board_init_f(ulong dummy)
