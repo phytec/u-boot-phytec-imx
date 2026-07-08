@@ -1,0 +1,126 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * Copyright (C) 2026 PHYTEC Messtechnik GmbH
+ */
+
+#include "imx8mp-u-boot.dtsi"
+
+/ {
+	wdt-reboot {
+		compatible = "wdt-reboot";
+		wdt = <&wdog1>;
+		bootph-pre-ram;
+	};
+
+	bootstd {
+		bootph-verify;
+		compatible = "u-boot,boot-std";
+
+		filename-prefixes = "/", "/boot/";
+		bootdev-order = "mmc2", "mmc1", "ethernet";
+
+		/* order of bootmeth nodes matters */
+		rauc {
+			compatible = "u-boot,distro-rauc";
+		};
+
+		script {
+			compatible = "u-boot,script";
+		};
+	};
+};
+
+&reg_usdhc2_vmmc {
+	bootph-pre-ram;
+};
+
+&pinctrl_uart4 {
+	bootph-pre-ram;
+};
+
+&pinctrl_usdhc2 {
+	bootph-pre-ram;
+};
+
+&pinctrl_usdhc3 {
+	bootph-pre-ram;
+};
+
+&pinctrl_wdog {
+	bootph-pre-ram;
+};
+
+&gpio1 {
+	bootph-pre-ram;
+};
+
+&gpio2 {
+	bootph-pre-ram;
+};
+
+&gpio3 {
+	bootph-pre-ram;
+};
+
+&gpio4 {
+	bootph-pre-ram;
+};
+
+&gpio5 {
+	bootph-pre-ram;
+};
+
+&uart4 {
+	bootph-pre-ram;
+};
+
+&i2c1 {
+	bootph-pre-ram;
+};
+
+&pmic {
+	bootph-pre-ram;
+};
+
+&usb3_phy0 {
+	status = "okay";
+};
+
+&usb3_0 {
+	fsl,over-current-active-low;
+	status = "okay";
+};
+
+&usb_dwc3_0 {
+	compatible = "fsl,imx8mq-dwc3", "snps,dwc3";
+	dr_mode = "host";
+	status = "okay";
+};
+
+&usb3_phy1 {
+	vbus-supply = <&reg_vcc_5v>;
+	status = "okay";
+};
+
+&usb3_1 {
+	fsl,over-current-active-low;
+	status = "okay";
+};
+
+&usb_dwc3_1 {
+	compatible = "fsl,imx8mq-dwc3", "snps,dwc3";
+	dr_mode = "host";
+	status = "okay";
+};
+
+&usdhc2 {
+	bootph-pre-ram;
+};
+
+&usdhc3 {
+	bootph-pre-ram;
+};
+
+&wdog1 {
+	bootph-pre-ram;
+};
