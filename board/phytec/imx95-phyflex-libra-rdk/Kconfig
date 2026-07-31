@@ -9,4 +9,5 @@ config SYS_VENDOR
 config SYS_CONFIG_NAME
 	default "imx95-phyflex-libra-rdk"
 
+source "board/phytec/common/Kconfig"
 endif

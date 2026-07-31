@@ -12,7 +12,11 @@
 #include <init.h>
 #include <spl.h>
 
+#include "../common/imx95_som_detection.h"
+
 DECLARE_GLOBAL_DATA_PTR;
+
+#define EEPROM_ADDR	     0x51
 
 int spl_board_boot_device(enum boot_device boot_dev_spl)
 {
@@ -39,6 +43,17 @@ void spl_board_init(void)
 	ret = ele_start_rng();
 	if (ret)
 		printf("Fail to start RNG: %d\n", ret);
+
+	/*
+	 * Pass 0 as bus number. SPL does not make use of the aliases in device
+	 * tree. Will be i2c5 (FPSC standard) in later boot stages.
+	 */
+	ret = phytec_eeprom_data_setup(NULL, 0, EEPROM_ADDR);
+	if (!ret) {
+		ret = phytec_imx95_detect(NULL);
+		if (!ret)
+			phytec_print_som_info(NULL);
+	}
 }
 
 void board_init_f(ulong dummy)
