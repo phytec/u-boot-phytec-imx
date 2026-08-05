@@ -20,6 +20,7 @@
 #include <asm/mach-imx/boot_mode.h>
 #include <dm/uclass.h>
 #include <dm/uclass-internal.h>
+#include <power/regulator.h>
 #include <scmi_agent.h>
 #include <dt-bindings/clock/nxp,imx95-clock.h>
 #include <../dts/upstream/src/arm64/freescale/imx95-power.h>
@@ -46,18 +47,51 @@ static struct dwc3_device dwc3_device_data = {
 
 int board_usb_init(int index, enum usb_init_type init)
 {
+	int ret = 0;
+	struct udevice *reg;
+
 	if (index == 0 && init == USB_INIT_DEVICE)
 		return dwc3_uboot_init(&dwc3_device_data);
 
-	return 0;
+	if (index == 2 && init == USB_INIT_HOST) {
+		ret = regulator_get_by_platname("VDD_VBUS_C", &reg);
+		if (ret) {
+			pr_err("Failed to get regulator: VDD_VBUS_C\n");
+			return ret;
+		}
+
+		ret = regulator_set_enable(reg, true);
+		if (ret) {
+			pr_err("Failed to enable regulator VDD_VBUS_C: %d", ret);
+			return ret;
+		}
+	}
+
+	return ret;
 }
 
 int board_usb_cleanup(int index, enum usb_init_type init)
 {
 	int ret = 0;
+	struct udevice *reg;
 
 	if (index == 0 && init == USB_INIT_DEVICE)
 		dwc3_uboot_exit(index);
+
+	if (index == 2 && init == USB_INIT_HOST) {
+		ret = regulator_get_by_platname("VDD_VBUS_C", &reg);
+		if (ret) {
+			pr_err("Failed to get regulator: VDD_VBUS_C\n");
+			return ret;
+		}
+
+		ret = regulator_set_enable(reg, false);
+		if (ret) {
+			pr_err("Failed to disable regulator VDD_VBUS_C: %d", ret);
+			return ret;
+		}
+
+	}
 
 	return ret;
 }
