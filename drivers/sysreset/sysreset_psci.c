@@ -18,6 +18,7 @@ static int psci_sysreset_request(struct udevice *dev, enum sysreset_t type)
 	switch (type) {
 	case SYSRESET_WARM:
 	case SYSRESET_COLD:
+	case SYSRESET_POWER:
 		psci_sys_reset(type);
 		break;
 	case SYSRESET_POWER_OFF:

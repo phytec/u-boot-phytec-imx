@@ -49,6 +49,12 @@ config SYSRESET_CMD_RESET
 	help
 	  Enable sysreset implementation of the reset command.
 
+config SYSRESET_DEFAULT_TYPE_POWER
+	bool "Use SYSRESET_POWER as default reset type instead of SYSRESET_COLD"
+	depends on SYSRESET_CMD_RESET
+	help
+	  Use SYSRESET_POWER as default reset type instead of SYSRESET_COLD
+
 if CMD_POWEROFF
 
 config SYSRESET_CMD_POWEROFF

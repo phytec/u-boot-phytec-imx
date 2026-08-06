@@ -122,12 +122,21 @@ int do_reset(struct cmd_tbl *cmdtp, int flag, int argc, char *const argv[])
 {
 	enum sysreset_t reset_type = SYSRESET_COLD;
 
+#if IS_ENABLED(CONFIG_SYSRESET_DEFAULT_TYPE_POWER)
+	reset_type = SYSRESET_POWER;
+#endif
+
 	if (argc > 2)
 		return CMD_RET_USAGE;
 
-	if (argc == 2 && argv[1][0] == '-' && argv[1][1] == 'w') {
+	if (argc == 2 && argv[1][0] == '-' && argv[1][1] == 'c')
+		reset_type = SYSRESET_COLD;
+
+	if (argc == 2 && argv[1][0] == '-' && argv[1][1] == 'w')
 		reset_type = SYSRESET_WARM;
-	}
+
+	if (argc == 2 && argv[1][0] == '-' && argv[1][1] == 'p')
+		reset_type = SYSRESET_POWER;
 
 	printf("resetting ...\n");
 	mdelay(100);
