@@ -291,6 +291,10 @@ void psci_sys_reset(u32 type)
 		 * cookie = 0 (ignored by the implementation)
 		 */
 		invoke_psci_fn(PSCI_FN_NATIVE(1_1, SYSTEM_RESET2), 0, 0, 0);
+#if IS_ENABLED(CONFIG_MACH_IMX)
+	} else if (type == SYSRESET_POWER && reset2_supported)  {
+		invoke_psci_fn(PSCI_FN_NATIVE(1_1, SYSTEM_RESET2), 0x80000002, 0, 0);
+#endif
 	} else {
 		invoke_psci_fn(PSCI_0_2_FN_SYSTEM_RESET, 0, 0, 0);
 	}
