@@ -184,12 +184,11 @@
 		i2c-bus = <&lpi2c4>;
 		los-gpios = <&gpio_expander2 14 GPIO_ACTIVE_HIGH>;
 		maximum-power-milliwatt = <2500>;
-		mod-def0-gpios = <&gpio_expander2 12 GPIO_ACTIVE_HIGH>;
+		mod-def0-gpios = <&gpio_expander2 12 GPIO_ACTIVE_LOW>;
 		rate-select0-gpios = <&gpio_expander2 13 GPIO_ACTIVE_HIGH>;
 		rate-select1-gpios = <&gpio_expander2 15 GPIO_ACTIVE_HIGH>;
 		tx-fault-gpios = <&gpio_expander2 10 GPIO_ACTIVE_HIGH>;
 		tx-disable-gpios = <&gpio_expander2 11 GPIO_ACTIVE_HIGH>;
-		status = "disabled";
 	};
 };
 
@@ -199,9 +198,16 @@
 };
 
 &enetc_port2 {
+	/* name needs to be "ref", as enetc4_pf drivers searches for that
+	 * string.
+	 */
+	clock-names = "ref";
+	clocks = <&enet_refclk>;
+	managed = "in-band-status";
 	max-speed = <10000>;
 	phy-mode = "10gbase-r";
 	sfp = <&sfp_cage>;
+	status = "okay";
 };
 
 /* CAN FD */
@@ -237,6 +243,14 @@
 			  "", "", "", "", "",
 			  "", "RGMII2_nINT", "GPIO4", "RTC_INT", "",
 			  "LVDS1_BL_EN";
+};
+
+&lpi2c1 {
+	temperature-sensor@4f {
+		compatible = "nxp,p3t1755";
+		reg = <0x4f>;
+		vs-supply = <&reg_vdd_1v8>;
+	};
 };
 
 &lpi2c3 {
@@ -311,6 +325,11 @@
 			};
 		};
 	};
+};
+
+&lpi2c4 {
+	clock-frequency = <200000>;
+	status = "okay";
 };
 
 &lpi2c5 {
@@ -439,6 +458,10 @@
 	wakeup-source;
 };
 
+&scmi_bbm {
+	linux,code = <KEY_POWER>;
+};
+
 &scmi_iomuxc {
 	pinctrl_lpuart2: lpuart2grp { /* FPSC proprietary */
 		fsl,pins = <
@@ -530,6 +553,7 @@
 };
 
 &usb3_phy {
+	orientation-switch;
 	status = "okay";
 	vbus-supply = <&reg_usb3_phy>;
 };
