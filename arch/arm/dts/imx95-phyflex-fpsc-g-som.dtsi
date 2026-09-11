@@ -51,6 +51,7 @@
 		enable-gpios = <&gpio3 26 GPIO_ACTIVE_HIGH>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_enet_refclk>;
+		status = "disabled";
 	};
 
 	memory@80000000 {
@@ -84,24 +85,18 @@
 		#address-cells = <2>;
 		#size-cells = <2>;
 
-		ele_reserved: ele-reserved@a4120000 {
-			compatible = "shared-dma-pool";
-			reg = <0 0xa4120000 0 0x100000>;
-			no-map;
-		};
-
 		linux,cma {
 			compatible = "shared-dma-pool";
-			alloc-ranges = <0x00000001 0x00000000 0x00000000 0x80000000>;
+			alloc-ranges = <0x00000000 0x90200000 0x00000000 0x6fe00000>;
 			reusable;
 			size = <0x00000000 0x3c000000>;
 			linux,cma-default;
 		};
+	};
 
-		vpu_boot: vpu_boot@a0000000 {
-			reg = <0 0xa0000000 0 0x100000>;
-			no-map;
-		};
+	reset_ctrl {
+		compatible = "nxp,imx95-resetctrl";
+		status = "okay";
 	};
 };
 
@@ -171,6 +166,8 @@
 	clock-frequency = <400000>;
 	pinctrl-0 = <&pinctrl_lpi2c1>;
 	pinctrl-names = "default";
+	/delete-property/ dmas;
+	/delete-property/ dma-names;
 	status = "okay";
 
 	dram_sense: temperature-sensor@48 {
